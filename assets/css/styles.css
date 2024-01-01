@@ -1,0 +1,69 @@
+.am-list-ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5em;
+}
+
+.manage-activations {
+    padding: 30px;
+    box-shadow: 0px 0px 18px 0px #77777757;
+    background: #fff;
+    z-index: 99;
+    visibility: hidden;
+    transform: translateY(-50%) scale(.8);
+    opacity: 0;
+    transition: all .3s ease;
+    max-width: 500px;
+    position: fixed;
+    width: 100%;
+    top: 50%;
+    right: 0;
+    left: 0;
+    margin: 0 auto;
+    overflow: auto;
+    max-height: 85%;
+    font-size: 1rem;
+}
+.manage-activations-list{
+    display: flex;
+    align-items: center;
+}
+.manage-activations.active{
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+}
+
+.activations-close-modal {
+    text-decoration: none !important;
+    float: right;
+    cursor: pointer;
+    color: #b50000;
+    font-size: 18px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0 10px;
+}
+
+.show_manage_activations_details a {
+    cursor: pointer;
+}
+
+.am-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 98;
+    visibility: hidden;
+    opacity: 0;
+    transition: all .3s ease;
+}
+
+.manage-activations.active ~ .am-overlay {
+    visibility: visible;
+    opacity: 1;
+}

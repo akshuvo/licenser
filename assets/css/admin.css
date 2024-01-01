@@ -1,0 +1,275 @@
+/**
+ * Admin CSS for License Manager
+ */
+
+.lmwppt-wrap, .lmwppt-wrap * {
+    box-sizing: border-box;
+}
+
+.mb-0{
+    margin-bottom: 0 !important;
+}
+
+.lmwppt-inner-card {
+    background: rgb(255, 255, 255);
+    border-radius: 3px;
+    border: 1px solid rgb(226, 228, 231);
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.lmfwppt-form-field {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.lmfwppt-form-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 3px;
+    color: #646970;
+    font-size: 14px;
+    line-height: 21px;
+}
+
+.lmfwppt-form-field input,
+.lmfwppt-form-field select {
+  background-color: #fff;
+  border: 1px solid #a7aaad;
+  border-radius: 3px;
+  height: 56px;
+  padding: 12px;
+  position: relative;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin: 0;
+  width: 100%;
+}
+
+.lmfwppt-form-field select {
+	min-width: 100%;
+}
+
+.lmfwppt-file-field {
+    display: flex;
+    align-items: center;
+}
+
+.lmfwppt-file-field button {
+    height: 56px;
+    width: 150px;
+}
+
+.lmfwppt-file-field input {
+    margin-right: 3px;
+}
+
+.lmfwppt_license_field .hndle {
+    cursor: pointer !IMPORTANT;
+    position: relative;
+}
+
+.postbox.opened .indicator_field {
+    transform: rotateZ(180deg);
+}
+
+.indicator_field {
+    float: right;
+    position: absolute;
+    right: 30px;
+    top: 0;
+    line-height: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    width: 30px;
+    justify-content: center;
+    font-size: 16px;
+    transition: all .3s ease;
+}
+
+.indicator_field:before {
+    content: "\f347";
+}
+
+span.delete_field {
+    float: right;
+    position: absolute;
+    right: 0;
+    top: 0;
+    line-height: 1;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    width: 30px;
+    justify-content: center;
+    border-left: 1px solid #ccd0d4;
+    cursor: pointer;
+}
+
+span.delete_field:hover{
+    border-color: #dc3545;
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.lmfwppt-toggle-wrap {
+    border-top: 1px solid #ccd0d4;
+    display:none;
+}
+
+.lmfwppt-toggle-head {
+    display: block;
+}
+
+.postbox.lmfwppt_license_field {
+    margin-bottom: 5px;
+}
+
+.lmfwppt_license_field .hndle:hover {
+    background-color: #f9f9f9;
+}
+
+.wrap h1.wp-heading-inline {
+    text-transform: capitalize;
+}
+
+.lmwppt-inner-card.card-shameless {
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
+}
+
+.lmwppt-inner-card.card-shameless p.submit {
+    margin-top: 0;
+    text-align: right;
+}
+
+.lmfwppt_license_package{
+    display: none;
+}
+
+.section-content label {
+    font-weight: 600;
+}
+
+.lmfwppt_theme_products{
+    /*display: none;*/
+}
+
+.plugin-opt{
+    display: none;
+}
+.theme-opt{
+    display: none;
+}
+
+.lmfwppt_plugin_products{
+    display: none;
+}
+
+.opt-themes{
+     display: none;
+}
+.opt-plugins{
+    display: none;
+}
+
+.package_details li{
+    color: #777;
+    text-transform: capitalize;
+    margin: 0;
+}
+.w-100 {
+    width: 100%;
+}
+.spinner {
+    float: left;
+    margin-top: 0;
+}
+p.submit {
+    margin: 0;
+    padding: 0;
+}
+.submit_btn_area{
+    display: flex;
+    align-items: center;
+}
+
+.lmwppt-inner{
+    background-color: #fff;
+}
+
+.lmwppt-main-section a {
+    width: 100%;
+    text-decoration: none;
+    margin-right: 30px;
+}
+
+.lmwppt-inner {
+    background-color: #fff;
+    padding: 15px 20px;
+}
+
+.lmwppt-main-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.lmwppt-title h3{
+    color: #777;
+    font-size: 15px;
+    margin: 7px;
+}
+
+.lmwppt-counter h1 {
+    font-size: 25px;
+    margin: 10px;
+}
+
+.lmwppt-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.lmwppt-icon span {
+    font-size: 60px;
+    width: 100%;
+}
+
+.lmwppt-icon span.lmwppt-icon-1 {
+    color: hsl(197deg 93% 74%);
+}
+
+.lmwppt-icon span.lmwppt-icon-2 {
+    color: hsl(241deg 78% 73%);
+}
+
+.lmwppt-icon span.lmwppt-icon-3 {
+    color: hsl(143deg 59% 70%);
+}
+
+.key-spinner{
+    display: none;
+}
+
+button#generate_key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lmfwppt_label_space {
+    margin-left: 200px;
+}
+
+.lmfwppt-form-field:last-child {
+    margin-bottom: 0;
+}
+
+.lmwppt-inner-card h2:first-child {
+    margin-top: 0;
+}
