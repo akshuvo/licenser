@@ -39,7 +39,6 @@ class Installer {
 	          `slug` varchar(255) NOT NULL,
 			  `uuid` varchar(255) NOT NULL UNIQUE,
 	          `product_type` varchar(30) DEFAULT NULL,
-	          `version` varchar(30) DEFAULT NULL,
 	          `tested` varchar(30) DEFAULT NULL,
 	          `requires` varchar(30) DEFAULT NULL,
 	          `requires_php` varchar(30) DEFAULT NULL,
