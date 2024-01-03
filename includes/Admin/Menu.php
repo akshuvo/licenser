@@ -25,8 +25,8 @@ class Menu {
         $capability = 'manage_options';
 
         $hook = add_menu_page(
-            __( 'License manager for WordPress Themes and Plugins', 'lmfwppt' ),
-            __( 'License manager', 'lmfwppt' ),
+            __( 'License manager for WordPress Themes and Plugins', 'licenser' ),
+            __( 'License manager', 'licenser' ),
             $capability,
             $parent_slug,
             [ $this, 'dashboard_page' ],
@@ -35,18 +35,18 @@ class Menu {
 
         $this->admin_menus = $hook;
 
-        add_submenu_page( $parent_slug, __( 'Plugins - License manager for WordPress Themes and Plugins', 'lmfwppt' ), __( 'Dashboard', 'lmfwppt' ), $capability, $parent_slug, [ $this, 'dashboard_page' ] );
+        add_submenu_page( $parent_slug, __( 'Plugins - License manager for WordPress Themes and Plugins', 'licenser' ), __( 'Dashboard', 'licenser' ), $capability, $parent_slug, [ $this, 'dashboard_page' ] );
 
-        add_submenu_page( $parent_slug, __( 'Plugins - License manager for WordPress Themes and Plugins', 'lmfwppt' ), __( 'Plugins', 'lmfwppt' ), $capability, $parent_slug.'-plugins', [ $this, 'plugins_page' ] );
+        add_submenu_page( $parent_slug, __( 'Plugins - License manager for WordPress Themes and Plugins', 'licenser' ), __( 'Plugins', 'licenser' ), $capability, $parent_slug.'-plugins', [ $this, 'plugins_page' ] );
 
-        add_submenu_page( $parent_slug, __( 'Themes - License manager for WordPress Themes and Plugins', 'lmfwppt' ), __( 'Themes', 'lmfwppt' ), $capability, $parent_slug.'-themes', [ $this, 'themes_page' ] );
+        add_submenu_page( $parent_slug, __( 'Themes - License manager for WordPress Themes and Plugins', 'licenser' ), __( 'Themes', 'licenser' ), $capability, $parent_slug.'-themes', [ $this, 'themes_page' ] );
 
-        add_submenu_page( $parent_slug, __( 'License manager for WordPress Themes and Plugins', 'lmfwppt' ), __( 'Licenses', 'lmfwppt' ), $capability, $parent_slug.'-licenses', [ $this, 'licenses_page' ] );
+        add_submenu_page( $parent_slug, __( 'License manager for WordPress Themes and Plugins', 'licenser' ), __( 'Licenses', 'licenser' ), $capability, $parent_slug.'-licenses', [ $this, 'licenses_page' ] );
 
-        add_submenu_page( $parent_slug, __( 'Settings', 'lmfwppt' ), __( 'Settings', 'lmfwppt' ), $capability, 'licenser-settings', [ $this, 'settings_page' ] );
+        add_submenu_page( $parent_slug, __( 'Settings', 'licenser' ), __( 'Settings', 'licenser' ), $capability, 'licenser-settings', [ $this, 'settings_page' ] );
 
 
-        add_submenu_page( $parent_slug, __( 'SDK Generator', 'lmfwppt' ), __( 'SDK Generator', 'lmfwppt' ), $capability, 'licenser-sdk-generator', [ $this, 'sdk_generator_page' ] );
+        add_submenu_page( $parent_slug, __( 'SDK Generator', 'licenser' ), __( 'SDK Generator', 'licenser' ), $capability, 'licenser-sdk-generator', [ $this, 'sdk_generator_page' ] );
 
         add_action( 'admin_head-' . $hook, [ $this, 'enqueue_assets' ] );
     }

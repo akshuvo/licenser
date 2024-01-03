@@ -72,17 +72,17 @@ $sections_arr = unserialize($sections);
 
                     <div class="lmfwppt-form-field">
                         <label for="name"><?php esc_html_e( 'Product Name', 'lmfwppt' ); ?></label>
-                        <input type="text" name="lmfwppt[name]" id="name" class="regular-text product_name_input" placeholder="Your Theme or Plugin Name" value="<?php echo esc_attr( $name ); ?>" required>
+                        <input type="text" name="name" id="name" class="regular-text product_name_input" placeholder="Your Theme or Plugin Name" value="<?php echo esc_attr( $name ); ?>" required>
                     </div>
 
                     <div class="lmfwppt-form-field">
                         <label for="slug"><?php esc_html_e( 'Product Slug', 'lmfwppt' ); ?></label>
-                        <input type="text" name="lmfwppt[slug]" id="slug" class="regular-text product_slug_input" placeholder="your-theme-or-plugin-name" value="<?php echo esc_attr( $slug ); ?>" required>
+                        <input type="text" name="slug" id="slug" class="regular-text product_slug_input" placeholder="your-theme-or-plugin-name" value="<?php echo esc_attr( $slug ); ?>" required>
                     </div>
 
                     <div class="lmfwppt-form-field">
                         <label for="product_type"><?php esc_html_e( 'Product Type', 'lmfwppt' ); ?></label>
-                        <select name="lmfwppt[product_type]" id="product_type">
+                        <select name="product_type" id="product_type">
                             <option value="plugin" <?php selected( $product_type, 'plugin' ); ?> ><?php esc_html_e( 'Plugin', 'lmfwppt' ); ?></option>
                             <option value="theme" <?php selected( $product_type, 'theme' ); ?> ><?php esc_html_e( 'Theme', 'lmfwppt' ); ?></option>
                         </select>
@@ -90,28 +90,28 @@ $sections_arr = unserialize($sections);
 
                     <div class="lmfwppt-form-field">
                         <label for="product_version"><?php esc_html_e( 'Product Version', 'lmfwppt' ); ?></label>
-                        <input type="text" name="lmfwppt[version]" id="product_version" class="regular-text" placeholder="1.0" value="<?php echo esc_attr( $version ); ?>">
+                        <input type="text" name="version" id="product_version" class="regular-text" placeholder="1.0" value="<?php echo esc_attr( $version ); ?>">
                     </div>
 
                     <div class="lmfwppt-form-field">
                         <label for="product_tested"><?php esc_html_e( 'Tested up to', 'lmfwppt' ); ?></label>
-                        <input type="text" name="lmfwppt[tested]" id="product_tested" class="regular-text" placeholder="<?php esc_attr_e( '5.7', 'lmfwppt' ); ?>" value="<?php echo esc_attr( $tested ); ?>">
+                        <input type="text" name="tested" id="product_tested" class="regular-text" placeholder="<?php esc_attr_e( '5.7', 'lmfwppt' ); ?>" value="<?php echo esc_attr( $tested ); ?>">
                     </div>
 
                     <div class="lmfwppt-form-field">
                         <label for="requires"><?php esc_html_e( 'Requires WordPress Version', 'lmfwppt' ); ?></label>
-                        <input type="text" name="lmfwppt[requires]" id="requires" class="regular-text" placeholder="<?php esc_attr_e( '4.7', 'lmfwppt' ); ?>" value="<?php echo esc_attr( $requires ); ?>">
+                        <input type="text" name="requires" id="requires" class="regular-text" placeholder="<?php esc_attr_e( '4.7', 'lmfwppt' ); ?>" value="<?php echo esc_attr( $requires ); ?>">
                     </div>
 
                     <div class="lmfwppt-form-field">
                         <label for="requires_php"><?php esc_html_e( 'Requires PHP Version', 'lmfwppt' ); ?></label>
-                        <input type="text" name="lmfwppt[requires_php]" id="requires_php" class="regular-text" placeholder="<?php esc_attr_e( '7.4', 'lmfwppt' ); ?>" value="<?php echo esc_attr( $requires_php ); ?>">
+                        <input type="text" name="requires_php" id="requires_php" class="regular-text" placeholder="<?php esc_attr_e( '7.4', 'lmfwppt' ); ?>" value="<?php echo esc_attr( $requires_php ); ?>">
                     </div>
 
                     <div class="lmfwppt-form-field">
                         <label for="download_link"><?php esc_html_e( 'File URL', 'lmfwppt' ); ?></label>
                         <div class="lmfwppt-file-field">
-                            <input type="text" name="lmfwppt[download_link]" id="download_link" class="regular-text" placeholder="<?php esc_attr_e( 'URL of the Theme/Plugin file', 'lmfwppt' ); ?>" value="<?php echo esc_attr( $download_link ); ?>">
+                            <input type="text" name="download_link" id="download_link" class="regular-text" placeholder="<?php esc_attr_e( 'URL of the Theme/Plugin file', 'lmfwppt' ); ?>" value="<?php echo esc_attr( $download_link ); ?>">
                             <button title="Select Theme/Plugin ZIP File" class="button trigger_media_frame" data-push_selector="#download_link"  type="button" id="download_link_button"><?php esc_html_e( 'Select File', 'lmfwppt' ); ?></button>
                         </div>
                     </div>
@@ -134,13 +134,13 @@ $sections_arr = unserialize($sections);
 
                     <div class="lmfwppt-form-field">
                         <div class="lmfwppt-file-field">
-                            <input type="text" name="lmfwppt[banners][low]" id="banner_low" class="regular-text" placeholder="<?php esc_attr_e( 'Low', 'lmfwppt' ); ?>" value="<?php echo $low; ?>">
+                            <input type="text" name="banners[low]" id="banner_low" class="regular-text" placeholder="<?php esc_attr_e( 'Low', 'lmfwppt' ); ?>" value="<?php echo $low; ?>">
                             <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#banner_low" type="button" id="banners_low_link_button"><?php esc_html_e( 'Select File', 'lmfwppt' ); ?></button>
                         </div>
                     </div> 
                     <div class="lmfwppt-form-field">
                         <div class="lmfwppt-file-field">
-                            <input type="text" name="lmfwppt[banners][high]" id="banner_high" class="regular-text" placeholder="<?php esc_attr_e( 'High', 'lmfwppt' ); ?>" value="<?php echo $high; ?>">
+                            <input type="text" name="banners[high]" id="banner_high" class="regular-text" placeholder="<?php esc_attr_e( 'High', 'lmfwppt' ); ?>" value="<?php echo $high; ?>">
                             <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#banner_high" type="button" id="banners_high_link_button"><?php esc_html_e( 'Select File', 'lmfwppt' ); ?></button>
                         </div>
                     </div> 
@@ -160,16 +160,16 @@ $sections_arr = unserialize($sections);
             <div class="lmwppt-inner-card">
                 <div class="lmfwppt-form-field">
                     <label for="author"><?php esc_html_e( 'Author', 'lmfwppt' ); ?></label>
-                    <input type="text" name="lmfwppt[author]" id="author" class="regular-text product_name_input" placeholder="Author Name" value="<?php echo esc_attr( $author ); ?>">
+                    <input type="text" name="author" id="author" class="regular-text product_name_input" placeholder="Author Name" value="<?php echo esc_attr( $author ); ?>">
                 </div>
             </div>
 
             <div class="lmfwppt-buttons lmwppt-inner-card card-shameless">
                 <input type="hidden" name="lmaction" value="product_add_form">
-                <input type="hidden" name="lmfwppt[created_by]" value="<?php _e( get_current_user_id() ); ?>">
+                <input type="hidden" name="created_by" value="<?php _e( get_current_user_id() ); ?>">
                 
                 <?php if( isset( $product_id ) ) : ?>
-                    <input class="lmfwppt_edit_id" type="hidden" name="lmfwppt[product_id]" value="<?php _e( $product_id ); ?>">
+                    <input class="lmfwppt_edit_id" type="hidden" name="product_id" value="<?php _e( $product_id ); ?>">
                 <?php endif; ?>
                 
                 <?php wp_nonce_field( 'lmfwppt-add-product-nonce' ); ?>
