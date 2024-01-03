@@ -13,7 +13,6 @@ class Menu {
      */
     function __construct() {
         add_action( 'admin_menu', [ $this, 'admin_menu' ] );
-        add_action( 'admin_bar_menu', [ $this, 'admin_bar_menus' ], 1000 );
     }
 
     /**
@@ -50,128 +49,6 @@ class Menu {
         add_submenu_page( $parent_slug, __( 'SDK Generator', 'lmfwppt' ), __( 'SDK Generator', 'lmfwppt' ), $capability, 'licenser-sdk-generator', [ $this, 'sdk_generator_page' ] );
 
         add_action( 'admin_head-' . $hook, [ $this, 'enqueue_assets' ] );
-    }
-
-
-
-
-    // Admin Bar Menu
-    function admin_bar_menus( \WP_Admin_Bar $wp_admin_bar ) {
-        $page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ): null;
-
-        if ( $page == "licenser" || $page == "licenser-plugins" || $page == "licenser-themes" || $page == "licenser-licenses" || $page == "licenser-settings" || $page == "licenser-sdk-generator" && $this->admin_menus == "toplevel_page_licenser"  ) {
-        
-
-            if ( !is_admin_bar_showing() )
-                return;
-
-            $parent_slug = 'licenser';
-
-            $wp_admin_bar->add_menu( array(
-                'id'    => $parent_slug,
-                'parent' => 'top-secondary',
-                'group'  => null,
-                'title' => __( 'License Manager', 'lmfwppt' ),
-                'href'  => admin_url('admin.php?page=licenser'),
-            ) );
-
-            $wp_admin_bar->add_menu( array(
-                'id'    => $parent_slug.'-dashboard',
-                'parent' => $parent_slug,
-                'group'  => null,
-                'title' => __( 'Dashboard', 'lmfwppt' ),
-                'href'  => admin_url('admin.php?page=licenser'),
-            ) );
-            
-            $wp_admin_bar->add_menu( array(
-                'id'    => $parent_slug.'-plugins',
-                'parent' => $parent_slug,
-                'group'  => null,
-                'title' => __( 'Plugins', 'lmfwppt' ),
-                'href'  => admin_url('admin.php?page=licenser-plugins'),
-                'meta' => [
-                    'title' => __( 'Menu Title', 'lmfwppt' ), //This title will show on hover
-                ]
-            ) );
-
-            $wp_admin_bar->add_menu( array(
-                'id'    => $parent_slug.'-plugins-add',
-                'parent' => $parent_slug.'-plugins',
-                'group'  => null,
-                'title' => __( 'Add New', 'lmfwppt' ),
-                'href'  => admin_url('admin.php?page=licenser-plugins&action=new'),
-                'meta' => [
-                    'title' => __( 'Menu Title', 'lmfwppt' ), //This title will show on hover
-                ]
-            ) );
-
-            $wp_admin_bar->add_menu( array(
-                'id'    => $parent_slug.'-themes',
-                'parent' => $parent_slug,
-                'group'  => null,
-                'title' => __( 'Themes', 'lmfwppt' ),
-                'href'  => admin_url('admin.php?page=licenser-themes'),
-                'meta' => [
-                    'title' => __( 'Menu Title', 'lmfwppt' ), //This title will show on hover
-                ]
-            ) );
-
-            $wp_admin_bar->add_menu( array(
-                'id' => $parent_slug.'-themes-add',
-                'parent' => $parent_slug.'-themes',
-                'group' => null,
-                'title' => __( 'Add New', 'lmfwppt' ),
-                'href' => admin_url('admin.php?page=licenser-themes&action=new'),
-                'meta' => [
-                    'title' => __( 'Menu Title', 'lmfwppt' ),
-                ]
-
-            ) );
-
-            $wp_admin_bar->add_menu( array(
-                'id'    => $parent_slug.'-license',
-                'parent' => $parent_slug,
-                'group'  => null,
-                'title' => __( 'Licenses', 'lmfwppt' ),
-                'href'  => admin_url('admin.php?page=licenser-licenses'),
-                'meta' => [
-                    'title' => __( 'Menu Title', 'lmfwppt' ), //This title will show on hover
-                ]
-            ) );
-
-            $wp_admin_bar->add_menu( array(
-                'id'    => $parent_slug.'-license-add',
-                'parent' => $parent_slug.'-license',
-                'group'  => null,
-                'title' => __( 'Add New', 'lmfwppt' ),
-                'href'  => admin_url('admin.php?page=licenser-licenses&action=new'),
-                'meta' => [
-                    'title' => __( 'Menu Title', 'lmfwppt' ), //This title will show on hover
-                ]
-            ) );
-
-            $wp_admin_bar->add_menu( array(
-                'id'    => $parent_slug.'-setting',
-                'parent' => $parent_slug,
-                'group'  => null,
-                'title' => __( 'Setting', 'lmfwppt' ),
-                'href'  => admin_url('admin.php?page=licenser-settings'),
-                'meta' => [
-                    'title' => __( 'Menu Title', 'lmfwppt' ), //This title will show on hover
-                ]
-            ) );
-            $wp_admin_bar->add_menu( array(
-                'id'    => $parent_slug.'-sdkgenerator',
-                'parent' => $parent_slug,
-                'group'  => null,
-                'title' => __( 'SDK-Generator', 'lmfwppt' ),
-                'href'  => admin_url('admin.php?page=licenser-sdk-generator'),
-                'meta' => [
-                    'title' => __( 'Menu Title', 'lmfwppt' ), //This title will show on hover
-                ]
-            ) );
-        }
-            
     }
 
     /**
