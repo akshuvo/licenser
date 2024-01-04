@@ -207,14 +207,11 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
   
 
             <div class="lmfwppt-buttons lmwppt-inner-card card-shameless">
-                <input type="hidden" name="action" value="product_add_form">
-                <input type="hidden" name="created_by" value="<?php esc_attr_e( get_current_user_id() ); ?>">
                 
                 <?php if( isset( $product_id ) ) : ?>
                     <input class="lmfwppt_edit_id" type="hidden" name="product_id" value="<?php esc_attr_e( $product_id ); ?>">
                 <?php endif; ?>
                 
-                <?php wp_nonce_field( 'lmfwppt-add-product-nonce' ); ?>
                 <div class="submit_btn_area"> 
                     <?php submit_button( $submit_button_label, 'primary', 'submit_product_license' ); ?> 
                     <span class="spinner"></span>
@@ -232,7 +229,6 @@ jQuery(document).on('submit', '#product-form', function(e) {
     let $this = jQuery(this);
 
     let formData = new FormData(this);
-    formData.append('action', 'product_add_form');
 
     // Convert FormData to JSON
     let jsonData = {};
@@ -250,7 +246,10 @@ jQuery(document).on('submit', '#product-form', function(e) {
         url: Licenser.rest_url + 'products',
         data: JSON.stringify(jsonData), // Convert JSON object to a string
         contentType: 'application/json', // Set content type to JSON
-        beforeSend: function(data) {
+        beforeSend: function(xhr) {
+            // Nonce
+            xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
+            
             $this.find('.spinner').addClass('is-active');
             $this.find('[type="submit"]').prop('disabled', true);
             jQuery(document).trigger("lmfwppt_notice", ['', 'remove']);

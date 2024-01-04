@@ -25,69 +25,50 @@ class DB {
     public $prefix;
 
     /**
-     * Boards table name
-     *
-     * @var string
+     * Product table name
      */
-    public $boards;
+    public $products;
 
     /**
-     * Board meta table name
-     *
-     * @var string
+     * Product releases table name
      */
-    public $board_meta;
+    public $product_releases;
 
     /**
-     * Columns table name
-     *
-     * @var string
+     * License packages table name
      */
-    public $columns;
+    public $license_packages;
 
     /**
-     * Column meta table name
-     *
-     * @var string
+     * Licenses table name
      */
-    public $column_meta;
+    public $licenses;
 
     /**
-     * Items table name
-     *
-     * @var string
+     * License domains table name
      */
-    public $items;
+    public $license_domains;
 
     /**
-     * Item meta table name
+     * Tables
      *
-     * @var string
+     * @var array
      */
-    public $item_meta;
-
-    /**
-     * Item collections table name
-     *
-     * @var string
-     */
-    public $item_groups;
-
     public $tables = [
-        'boards',
-        'board_meta',
-        'columns',
-        'column_meta',
-        'items',
-        'item_meta',
-        'item_groups',
+        'products',
+        'product_releases',
+        'license_packages',
+        'licenses',
+        'license_domains',
     ];
     
-
+    /**
+     * Initialize the class
+     */
     private function __construct() {
         global $wpdb;
         $this->wpdb = $wpdb;
-        $this->prefix = $this->wpdb->prefix . 'ttcrm_';
+        $this->prefix = $this->wpdb->prefix . 'licenser_';
         $this->set_table_names();
     }
 

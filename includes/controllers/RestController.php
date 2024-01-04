@@ -37,7 +37,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @return WP_Error|bool
 	 */
 	public function get_item_permissions_check( $request ) {
-		return true;
+		return current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -47,7 +47,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @return WP_Error|bool
 	 */
 	public function get_items_permissions_check( $request ) {
-		return true;
+		return current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -57,7 +57,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @return WP_Error|bool
 	 */
 	public function create_item_permissions_check( $request ) {
-		return true;
+		return current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -67,7 +67,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @return WP_Error|bool
 	 */
 	public function update_item_permissions_check( $request ) {
-		return true;
+		return current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -77,7 +77,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @return WP_Error|bool
 	 */
 	public function delete_item_permissions_check( $request ) {
-		return true;
+		return current_user_can( 'manage_options' );
 	}
 
 	/**
@@ -87,7 +87,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @return WP_Error|bool
 	 */
 	public function delete_items_permissions_check( $request ) {
-		return true;
+		return current_user_can( 'manage_options' );
 	}
 
 }

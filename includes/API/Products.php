@@ -1,13 +1,13 @@
 <?php
 namespace Licenser\API;
-use WP_Error;
 use Licenser\Controllers\RestController;
+use Licenser\Models\Product;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 
 /**
- * Addressbook Class
+ * REST Class
  */
 class Products extends RestController {
 
@@ -24,117 +24,70 @@ class Products extends RestController {
      * @return void
      */
     public function register_routes() {
-  
-        // Get all products
+
         register_rest_route(
             $this->namespace,
             '/' . $this->rest_base,
             [
-                'methods'             => WP_REST_Server::READABLE,
-                'callback'            => [ $this, 'get_items' ],
-                'permission_callback' => [ $this, 'get_items_permissions_check' ],
-                // 'args'                => [ 'context' => $this->get_context_param( [ 'default' => 'view' ] ), ],
-                // 'args'                => $this->get_collection_params(),
+                [
+                    'methods'             => WP_REST_Server::READABLE,
+                    'callback'            => [ $this, 'get_items' ],
+                    'permission_callback' => [ $this, 'get_items_permissions_check' ],
+                    'args'                => $this->get_collection_params(),
+                ],
+                [
+                    'methods'             => WP_REST_Server::CREATABLE,
+                    'callback'            => [ $this, 'create_item' ],
+                    'permission_callback' => [ $this, 'create_item_permissions_check' ],
+                    'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
+                ],
+                'schema' => [ $this, 'get_item_schema' ],
             ]
         );
     }
 
-
     /**
-     * Get the license data according to the action
+     * Get a collection of items
      *
-     * @param array $request Request data.
+     * @param WP_REST_Request $request Full data about the request.
      *
-     * @return Object|\WP_Error
+     * @return WP_Error|WP_REST_Response
      */
-    protected function get_license_response( $request ) {
+    public function get_items( $request ) {
 
-        // License Object Class
-        $licenseobj = new LMFWPPT_LicenseHandler();
-    
-        if( 'info' === $request['action'] ){
-            $response = $licenseobj->get_wp_license_details( $request );
+        $products = get_posts( [
+            'post_type'      => 'product',
+            'posts_per_page' => -1,
+        ] );
+
+        $data = [];
+
+        foreach ( $products as $product ) {
+            $data[] = [
+                'id'   => $product->ID,
+                'name' => $product->post_title,
+            ];
         }
 
-        if ( ! $response ) {
-            return new WP_Error(
-                'rest_license_invalid_id',
-                __( 'Invalid Action.' ),
-                [ 'status' => 404 ]
-            );
-        }
-
-        return $response;
+        return rest_ensure_response( $data );
     }
 
-    /**
-     * Checks if a given request has access to get a specific item.
-     *
-     * @param \WP_REST_Request $request
-     *
-     * @return \WP_Error|bool
-     */
-    public function get_item_permissions_check( $request ) {
-
-        return true;
-    }
 
     /**
-     * Retrieves one item from the collection.
+     * Create a single item
      *
-     * @param \WP_REST_Request $request
+     * @param WP_REST_Request $request Full data about the request.
      *
-     * @return \WP_Error|\WP_REST_Response
+     * @return WP_Error|WP_REST_Response
      */
-    public function get_item( $request ) {
+    public function create_item( $request ) {
+
+        $params = $request->get_params();
         
-        $action = $request->get_param( 'action' );
+        $product = Product::instance()->create( $params );
 
-        $request = [
-            'product_slug' => $request->get_param( 'product_slug' ),
-            'action'   => $action,
-            'license_key'   => $request->get_param( 'license_key' ),
-            'domain'   => $request->get_param( 'domain' ),
-        ];
-        
-        $response = $this->get_license_response( $request );
-    
-        // $response = $this->prepare_item_for_response( $contact, $request );
-        $response = rest_ensure_response( $response );
-
-        return $response;
+        return rest_ensure_response( $params );
     }
-
-    // Create Actions
-    public function create_actions( $request ) {
-        $action = $request->get_param( 'action' );
-
-        $request = [
-            'product_slug' => $request->get_param( 'product_slug' ),
-            'action'   => $action,
-            'license_key'   => $request->get_param( 'license_key' ),
-            'domain'   => $request->get_param( 'domain' ),
-        ];
-
-        // License Object Class
-        $licenseobj = new LMFWPPT_LicenseHandler();
-
-        // If action is activate_license then activate the license
-        if ( 'validate' === $action ) {
-            $response = $licenseobj->download_product( $request );
-        }
-
-        if ( ! $response ) {
-            return new WP_Error(
-                'rest_license_invalid_id',
-                __( 'Invalid Action.' ),
-                [ 'status' => 404 ]
-            );
-        }
-
-        return rest_ensure_response( $response );
-    }
-
 
 
 }

@@ -6,7 +6,9 @@
         "psr-4": {
             "Licenser\\": "includes/",
             "Licenser\\Controllers\\" : "includes/controllers/",
-            "Licenser\\Traits\\" : "includes/traits/"
+            "Licenser\\Traits\\" : "includes/traits/",
+            "Licenser\\Models\\" : "includes/models/"
+
         },
         "files": [ "includes/functions.php" ]
     },

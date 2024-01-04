@@ -59,6 +59,8 @@ class Admin {
         wp_localize_script( 'licenser-admin-script', 'Licenser',
             array(
                 'rest_url' => esc_url_raw( rest_url() . 'licenser/v1/' ),
+                'root' => esc_url_raw( rest_url() ),
+                'nonce' => wp_create_nonce( 'wp_rest' ),
                 'ajaxurl' => admin_url( 'admin-ajax.php' ),
             )
         );
