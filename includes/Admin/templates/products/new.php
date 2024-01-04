@@ -103,7 +103,7 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
 
                     <div class="lmfwppt-form-field">
                         <label for="author"><?php esc_html_e( 'Author Name', 'licenser' ); ?></label>
-                        <input type="text" name="author" id="author" class="regular-text product_name_input" placeholder="Author Name" value="<?php echo esc_attr( $author ); ?>">
+                        <input type="text" name="author_name" id="author" class="regular-text product_name_input" placeholder="Author Name" value="<?php echo esc_attr( $author ); ?>">
                     </div>
 
                     <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
@@ -209,7 +209,7 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
             <div class="lmfwppt-buttons lmwppt-inner-card card-shameless">
                 
                 <?php if( isset( $product_id ) ) : ?>
-                    <input class="lmfwppt_edit_id" type="hidden" name="product_id" value="<?php esc_attr_e( $product_id ); ?>">
+                    <input class="lmfwppt_edit_id" type="hidden" name="id" value="<?php esc_attr_e( $product_id ); ?>">
                 <?php endif; ?>
                 
                 <div class="submit_btn_area"> 
@@ -231,20 +231,33 @@ jQuery(document).on('submit', '#product-form', function(e) {
     let formData = new FormData(this);
 
     // Convert FormData to JSON
-    let jsonData = {};
+    let jsonObject = {};
     formData.forEach(function(value, key){
-        jsonData[key] = value;
+        // Handle fields with square bracket notation
+        if (key.includes("[") && key.includes("]")) {
+            var keys = key.match(/\w+/g); // Extract keys from the name attribute
+            var currentObject = jsonObject;
+            for (var i = 0; i < keys.length - 1; i++) {
+                currentObject[keys[i]] = currentObject[keys[i]] || {};
+                currentObject = currentObject[keys[i]];
+            }
+            currentObject[keys[keys.length - 1]] = value;
+        } else {
+            // Handle regular fields
+            jsonObject[key] = value;
+        }
+  
     });
 
     // Get Product type
     let productType = jQuery('#product_type').val();
 
-    console.log(jsonData);
+    console.log(jsonObject);
 
     jQuery.ajax({
         type: 'post',
         url: Licenser.rest_url + 'products',
-        data: JSON.stringify(jsonData), // Convert JSON object to a string
+        data: JSON.stringify(jsonObject), // Convert JSON object to a string
         contentType: 'application/json', // Set content type to JSON
         beforeSend: function(xhr) {
             // Nonce

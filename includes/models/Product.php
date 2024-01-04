@@ -37,58 +37,85 @@ class Product {
      * @return int
      */
     public function create( $data ) {
-//         id	int(11) Auto Increment	
-// name	varchar(255)	
-// slug	varchar(255)	
-// uuid	varchar(255)	
-// product_type	varchar(30) NULL	
-// tested	varchar(30) NULL	
-// requires	varchar(30) NULL	
-// requires_php	varchar(30) NULL	
-// banners	varchar(250) NULL	
-// description	text NULL	
-// author_name	varchar(220) NULL	
-// homepage_url	varchar(220) NULL	
-// demo_url	varchar(220) NULL	
-// created_by	int(20) unsigned	
-// status	varchar(30) NULL	
-// dated	datetime [CURRENT_TIMESTAMP]	
-
-
         $data = wp_parse_args( $data, [
             'name' => '',
             'slug' => '',
-            'uuid' => '',
             'product_type' => '',
             'tested' => '',
             'requires' => '',
             'requires_php' => '',
-            'banners' => '',
+            'banners' => [],
             'description' => '',
             'author_name' => '',
             'homepage_url' => '',
             'demo_url' => '',
             'created_by' => '',
-            'status' => '',
+            'status' => 'active',
         ] );
 
+        // Banner
+        if( !empty( $data['banners'] ) && is_array( $data['banners'] ) ){
+            $data['banners'] = json_encode( $data['banners'] );
+        }
+
+        error_log( print_r( $data, true ) );
         
 
         global $lwpdb;
 
-        $lwpdb->wpdb->insert(
-            $lwpdb->products,
-            [
-                'name' => $data['name'],
-                'slug' => $data['slug'],
-                'description' => $data['description'],
-                'product_type' => $data['product_type'],
-                'status' => $data['status'],
-                'created_at' => current_time( 'mysql' ),
-                'updated_at' => current_time( 'mysql' ),
-            ]
-        );
+        // Update
+        if( isset( $data['id'] ) && !empty( $data['id'] ) ){
+            $lwpdb->wpdb->update(
+                $lwpdb->products,
+                [
+                    'name' => sanitize_text_field( $data['name'] ),
+                    'slug' => sanitize_text_field( $data['slug'] ),
+                    'uuid' => sanitize_text_field( $data['uuid'] ),
+                    'product_type' => sanitize_text_field( $data['product_type'] ),
+                    'tested' => sanitize_text_field( $data['tested'] ),
+                    'requires' => sanitize_text_field( $data['requires'] ),
+                    'requires_php' => sanitize_text_field( $data['requires_php'] ),
+                    'banners' => sanitize_text_field( $data['banners'] ),
+                    'description' => sanitize_text_field( $data['description'] ),
+                    'author_name' => sanitize_text_field( $data['author_name'] ),
+                    'homepage_url' => sanitize_text_field( $data['homepage_url'] ),
+                    'demo_url' => sanitize_text_field( $data['demo_url'] ),
+                    'created_by' => sanitize_text_field( $data['created_by'] ),
+                    'status' => sanitize_text_field( $data['status'] ),
+                ],
+                [
+                    'id' => $data['id']
+                ]
+            );
 
-        return $lwpdb->wpdb->insert_id;
+            $insert_id = $data['id'];
+        } else {
+            $lwpdb->wpdb->insert(
+                $lwpdb->products,
+                [
+                    'name' => sanitize_text_field( $data['name'] ),
+                    'slug' => sanitize_text_field( $data['slug'] ),
+                    'uuid' => wp_generate_uuid4(),
+                    'product_type' => sanitize_text_field( $data['product_type'] ),
+                    'tested' => sanitize_text_field( $data['tested'] ),
+                    'requires' => sanitize_text_field( $data['requires'] ),
+                    'requires_php' => sanitize_text_field( $data['requires_php'] ),
+                    'banners' => sanitize_text_field( $data['banners'] ),
+                    'description' => sanitize_text_field( $data['description'] ),
+                    'author_name' => sanitize_text_field( $data['author_name'] ),
+                    'homepage_url' => esc_url_raw( $data['homepage_url'] ),
+                    'demo_url' => esc_url_raw( $data['demo_url'] ),
+                    'created_by' => get_current_user_id(),
+                    'status' => sanitize_text_field( $data['status'] ),
+                ] 
+            );
+
+            error_log( $lwpdb->wpdb->last_query );
+
+            $insert_id = $lwpdb->wpdb->insert_id;
+        }
+
+
+        return $insert_id;
     }
 }
