@@ -136,85 +136,6 @@ class Products {
         return do_action( 'lmfwppt_license_field_after_wrap', $output, $args );
     } 
 
-    // Section information Field add
-    function product_sections_ajax_add_action(){
-
-        $key = sanitize_text_field( $_POST['key'] );
-
-        ob_start();
-
-        echo self::product_sections_field( array(
-            //'key' => $key,
-            'thiskey' => $key,
-        ) );
-
-        $output = ob_get_clean();
-
-        echo $output;
-
-        die();
-    }
-
-    // Single Section field
-    public static function product_sections_field( $args ){
-
-        $defaults = array (
-            'key' => '',
-            'name' => '',
-            'content' => '',
-        );
-
-        // Parse incoming $args into an array and merge it with $defaults
-        $args = wp_parse_args( $args, $defaults );
-
-        // Let's extract the array to variable
-        extract( $args );
-
-        // Array key
-        //$key =  isset( $args['key'] ) ? $args['key'] : "";
-        $key =  !empty( $key ) ? $key : wp_generate_password( 3, false );
-   
-        $field_name = "lmfwppt[sections][$key]";
-
-        ob_start();
-        do_action( 'lmfwppt_license_field_before_wrap', $args );
-        ?>
-
-        <div id="postimagediv" class="postbox lmfwppt_license_field"> <!-- Wrapper Start -->
-            <a class="header lmfwppt-toggle-head" data-toggle="collapse">
-                <span id="poststuff">
-                    <h2 class="hndle">
-                        <input id="<?php esc_attr_e( $field_name ); ?>-section_name" class="prevent-toggle-head regular-text" type="text" name="<?php esc_attr_e( $field_name ); ?>[name]" value="<?php echo esc_attr( $name ); ?>" placeholder="<?php echo esc_attr( 'Section Title', 'lmfwppt' ); ?>" required />
-                        <span class="dashicons indicator_field"></span>
-                        <span class="delete_field">&times;</span>
-                    </h2>
-                </span>
-            </a>
-            <div class="collapse lmfwppt-toggle-wrap">
-                <div class="inside">
-                    <table class="form-table">
-
-                        <tr valign="top">
-                             
-                            <div class="section-content">
-                                <label for="<?php esc_attr_e( $field_name ); ?>-section_content"><?php esc_html_e( 'Section Content', 'lmfwppt' ); ?></label>
-                            </div>
-                             
-                            <td style="padding: 0; width: 100%;">
-                                <textarea style="width: 100%;" id="<?php esc_attr_e( $field_name ); ?>-section_content" name="<?php esc_attr_e( $field_name ); ?>[content]" rows="6" cols="100" placeholder="<?php echo esc_attr( 'Section Content', 'lmfwppt' ); ?>"><?php echo $content; ?></textarea>  
-                            </td>
-                             
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        <!-- Wrapper end below -->
-        </div>
-        <?php
-        $output = ob_get_clean();
-
-        return do_action( 'lmfwppt_license_field_after_wrap', $output, $args );
-    }
     
     // License Packages Content Render
     function license_content( $output, $args ){
@@ -357,22 +278,6 @@ class Products {
                 'product_id' => $product_id,
                 'update_period' => $update_period,
                 'domain_limit' => $domain_limit
-            ) );
-        }
-
-    }
-
-    // Generate html from Section array
-    public static function get_section_html( $get_sections = null ){
-        if( !$get_sections ){
-            return;
-        }
-
-        foreach ($get_sections as $section) {
-            self::product_sections_field( array(
-                'key' => sanitize_title($section['name']),
-                'name' => $section['name'],
-                'content' => $section['content']
             ) );
         }
 

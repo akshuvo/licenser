@@ -1,6 +1,4 @@
 <?php
-// License Class
-$license_handler = new Licenser\Licenses();
 
 // Product Class
 $product_handler = new Licenser\Products();
@@ -50,8 +48,6 @@ $banner = unserialize( $banners );
 $low = isset ( $banner['low'] ) ? $banner['low'] : '';
 $high = isset ( $banner['high'] ) ? $banner['high'] : '';
 
-// sections unserialize
-$sections_arr = unserialize($sections);
 
 ?>
 <div class="wrap">
@@ -126,46 +122,47 @@ $sections_arr = unserialize($sections);
                         <label for="description"><?php esc_html_e( 'Description', 'licenser' ); ?></label>
                         <textarea name="description" id="description" class="regular-text" placeholder="<?php esc_attr_e( 'Description', 'licenser' ); ?>"><?php echo esc_attr( $description ); ?></textarea>
                     </div>
-                    
-
-                    <!-- Release -->
-
-                    <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
-                        <div class="lwp-col-half">
-                            <label for="product_version"><?php esc_html_e( 'Product Version', 'licenser' ); ?></label>
-                            <input type="text" name="version" id="product_version" class="regular-text" placeholder="1.0" value="<?php echo esc_attr( $version ); ?>">
-                        </div>
-
-                        <div class="lwp-col-half">
-                            <label for="release_date"><?php esc_html_e( 'Release Date', 'licenser' ); ?></label>
-                            <input type="text" name="release_date" id="release_date" class="regular-text" placeholder="<?php esc_attr_e( '2021-01-01', 'licenser' ); ?>" value="<?php echo esc_attr( $release_date ); ?>">
-                        </div>
-                    </div>
-
-                    <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
-                        <div class="lwp-col-one-third">
-                            <label for="file_name"><?php esc_html_e( 'File Name', 'licenser' ); ?></label>
-                            <input type="text" name="version" id="file_name" class="regular-text" placeholder="<?php esc_attr_e( 'your-plugin-file-1.0.5.zip', 'licenser' ); ?>" value="<?php echo esc_attr( $file_name ); ?>">
-                        </div>
-
-                        <div class="lwp-col-two-third">
-                            <label for="download_link"><?php esc_html_e( 'File URL', 'licenser' ); ?></label>
-                            <div class="lmfwppt-file-field">
-                                <input type="text" name="download_link" id="download_link" class="regular-text" placeholder="<?php esc_attr_e( 'URL of the Theme/Plugin file', 'licenser' ); ?>" value="<?php echo esc_attr( $download_link ); ?>">
-                                <button title="Select Theme/Plugin ZIP File" class="button trigger_media_frame" data-push_selector="#download_link"  type="button" id="download_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="lmfwppt-form-field">
-                        <label for="changelog"><?php esc_html_e( 'Changelog', 'licenser' ); ?></label>
-                        <textarea name="changelog" id="changelog" class="regular-text" placeholder="<?php esc_attr_e( 'Changelog', 'licenser' ); ?>"><?php echo esc_attr( $changelog ); ?></textarea>
-                    </div>
-
-                    <!-- /Release -->
-
                 </div>
             </div>
+
+            <!-- Release -->
+            <div class="lmwppt-inner-card">
+                <h2><?php esc_html_e( 'Release Information', 'licenser' ); ?></h2>
+                <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
+                    <div class="lwp-col-half">
+                        <label for="product_version"><?php esc_html_e( 'Product Version', 'licenser' ); ?></label>
+                        <input type="text" name="version" id="product_version" class="regular-text" placeholder="1.0" value="<?php echo esc_attr( $version ); ?>">
+                    </div>
+
+                    <div class="lwp-col-half">
+                        <label for="release_date"><?php esc_html_e( 'Release Date', 'licenser' ); ?></label>
+                        <input type="text" name="release_date" id="release_date" class="regular-text" placeholder="<?php esc_attr_e( '01-23-2023', 'licenser' ); ?>" value="<?php echo esc_attr( $release_date ); ?>">
+                    </div>
+                </div>
+
+                <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
+                    <div class="lwp-col-one-third">
+                        <label for="file_name"><?php esc_html_e( 'File Name', 'licenser' ); ?></label>
+                        <input type="text" name="version" id="file_name" class="regular-text" placeholder="<?php esc_attr_e( 'your-plugin-file-1.0.5.zip', 'licenser' ); ?>" value="<?php echo esc_attr( $file_name ); ?>">
+                    </div>
+
+                    <div class="lwp-col-two-third">
+                        <label for="download_link"><?php esc_html_e( 'File URL', 'licenser' ); ?></label>
+                        <div class="lmfwppt-file-field">
+                            <input type="url" name="download_link" id="download_link" class="regular-text" placeholder="<?php esc_attr_e( 'URL of the Theme/Plugin file', 'licenser' ); ?>" value="<?php echo esc_attr( $download_link ); ?>">
+                            <button title="Select Theme/Plugin ZIP File" class="button trigger_media_frame" data-push_selector="#download_link"  type="button" id="download_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lmfwppt-form-field">
+                    <label for="changelog"><?php esc_html_e( 'Changelog', 'licenser' ); ?></label>
+                    <textarea name="changelog" id="changelog" class="regular-text" placeholder="<?php esc_attr_e( 'Changelog', 'licenser' ); ?>"><?php echo esc_attr( $changelog ); ?></textarea>
+                </div>
+            </div>
+            <!-- /Release -->
+
+            
             <div class="lmwppt-inner-card">
                 <div class="lmfwppt-form-section" id="license-information">
                     <h2><?php esc_html_e( 'License Packages', 'licenser' ); ?></h2>
@@ -183,7 +180,7 @@ $sections_arr = unserialize($sections);
                     <div class="lmfwppt-form-field">
                         <label for="icon_url"><?php esc_html_e( 'Icon', 'licenser' ); ?></label>
                         <div class="lmfwppt-file-field">
-                            <input type="text" name="icon_url" id="icon_url" class="regular-text" placeholder="<?php esc_attr_e( 'icon-128x128.png', 'licenser' ); ?>" value="<?php echo $low; ?>">
+                            <input type="url" name="icon_url" id="icon_url" class="regular-text" placeholder="<?php esc_attr_e( 'icon-128x128.png', 'licenser' ); ?>" value="<?php echo $low; ?>">
                             <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#icon_url" type="button" id="icon_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
                         </div>
                     </div> 
@@ -192,14 +189,14 @@ $sections_arr = unserialize($sections);
                         <div class="lwp-col-half">
                             <label for="banner_low"><?php esc_html_e( 'Banner Low', 'licenser' ); ?></label>
                             <div class="lmfwppt-file-field">
-                                <input type="text" name="banners[low]" id="banner_low" class="regular-text" placeholder="<?php esc_attr_e( 'banner-772x250.png', 'licenser' ); ?>" value="<?php echo $low; ?>">
+                                <input type="url" name="banners[low]" id="banner_low" class="regular-text" placeholder="<?php esc_attr_e( 'banner-772x250.png', 'licenser' ); ?>" value="<?php echo $low; ?>">
                                 <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#banner_low" type="button" id="banners_low_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
                             </div>
                         </div> 
                         <div class="lwp-col-half">
                             <label for="banner_high"><?php esc_html_e( 'Banner High Resolution', 'licenser' ); ?></label>
                             <div class="lmfwppt-file-field">
-                                <input type="text" name="banners[high]" id="banner_high" class="regular-text" placeholder="<?php esc_attr_e( 'banner-1544x500.png', 'licenser' ); ?>" value="<?php echo $high; ?>">
+                                <input type="url" name="banners[high]" id="banner_high" class="regular-text" placeholder="<?php esc_attr_e( 'banner-1544x500.png', 'licenser' ); ?>" value="<?php echo $high; ?>">
                                 <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#banner_high" type="button" id="banners_high_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
                             </div>
                         </div> 
@@ -207,19 +204,7 @@ $sections_arr = unserialize($sections);
 
                 </div>
             </div>
-            <!-- sections -->
-            <div class="lmwppt-inner-card">
-                <div class="lmfwppt-form-section" id="license-information">
-                    <h2><?php esc_html_e( 'Sections', 'licenser' ); ?></h2>
-                    <div id="section-information-fields">
-                        <?php $product_handler::get_section_html( $sections_arr ); ?>
-                    </div>
-                    <button class="button add-section-information" type="button"><?php esc_html_e( 'Add Section Package', 'licenser' ); ?></button>
-                </div>
-            </div>
-            <div class="lmwppt-inner-card">
-                
-            </div>
+  
 
             <div class="lmfwppt-buttons lmwppt-inner-card card-shameless">
                 <input type="hidden" name="lmaction" value="product_add_form">
