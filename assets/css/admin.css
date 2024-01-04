@@ -10,6 +10,28 @@
     margin-bottom: 0 !important;
 }
 
+.lwp-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.lwp-col-half {
+    width: 50%;
+}
+
+.lwp-col-one-third {
+    width: 33.33%;
+}
+
+.lwp-col-two-third {
+    width: 66.66%;
+}
+
+.lwp-col-gap-20 {
+    column-gap: 20px;
+}
+
 .lmwppt-inner-card {
     background: rgb(255, 255, 255);
     border-radius: 3px;
@@ -35,6 +57,7 @@
 }
 
 .lmfwppt-form-field input,
+.lmfwppt-form-field textarea,
 .lmfwppt-form-field select {
   background-color: #fff;
   border: 1px solid #a7aaad;
@@ -45,6 +68,10 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   margin: 0;
   width: 100%;
+}
+
+.lmfwppt-form-field textarea {
+    height: 130px;
 }
 
 .lmfwppt-form-field select {
@@ -256,7 +283,7 @@ p.submit {
     display: none;
 }
 
-button#generate_key {
+#generate_key {
     display: flex;
     align-items: center;
     justify-content: center;
