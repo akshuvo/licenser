@@ -109,6 +109,23 @@ $sections_arr = unserialize($sections);
                         <label for="author"><?php esc_html_e( 'Author Name', 'licenser' ); ?></label>
                         <input type="text" name="author" id="author" class="regular-text product_name_input" placeholder="Author Name" value="<?php echo esc_attr( $author ); ?>">
                     </div>
+
+                    <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
+                        <div class="lwp-col-half">
+                            <label for="homepage_url"><?php esc_html_e( 'Homepage URL', 'licenser' ); ?></label>
+                            <input type="text" name="homepage_url" id="homepage_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $homepage_url ); ?>">
+                        </div>
+
+                        <div class="lwp-col-half">
+                            <label for="demo_url"><?php esc_html_e( 'Demo URL', 'licenser' ); ?></label>
+                            <input type="text" name="demo_url" id="demo_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $demo_url ); ?>">
+                        </div>
+                    </div>
+
+                    <div class="lmfwppt-form-field">
+                        <label for="description"><?php esc_html_e( 'Description', 'licenser' ); ?></label>
+                        <textarea name="description" id="description" class="regular-text" placeholder="<?php esc_attr_e( 'Description', 'licenser' ); ?>"><?php echo esc_attr( $description ); ?></textarea>
+                    </div>
                     
 
                     <!-- Release -->
