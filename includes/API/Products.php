@@ -1,16 +1,21 @@
 <?php
 namespace Licenser\API;
+use WP_Error;
+use Licenser\Controllers\RestController;
+use WP_REST_Request;
+use WP_REST_Response;
+use WP_REST_Server;
+
 /**
  * Addressbook Class
  */
-class Licenses extends \WP_REST_Controller {
+class Products extends RestController {
 
     /**
      * Initialize the class
      */
     function __construct() {
-        $this->namespace = 'license-manager/v1';
-        $this->rest_base = 'licenses';
+        $this->rest_base = 'products';
     }
 
     /**
@@ -20,29 +25,16 @@ class Licenses extends \WP_REST_Controller {
      */
     public function register_routes() {
   
+        // Get all products
         register_rest_route(
             $this->namespace,
-            '/' . $this->rest_base . '/(?P<action>[\S]+)',
+            '/' . $this->rest_base,
             [
-                'args'   => [
-                    'action' => [
-                        'description' => __( 'Action name will through correct data.' ),
-                        'type'        => 'string',
-                    ],
-                ],
-                [
-                    'methods'             => \WP_REST_Server::CREATABLE,
-                    'callback'            => [ $this, 'create_actions' ],
-                    'permission_callback' => [ $this, 'get_item_permissions_check' ],
-                    // 'args'                => $this->get_endpoint_args_for_item_schema( true ),
-                ],
-                [
-                    'methods'             => \WP_REST_Server::READABLE,
-                    'callback'            => [ $this, 'get_item' ],
-                    'permission_callback' => [ $this, 'get_item_permissions_check' ],
-                    // 'args'                => [ 'context' => $this->get_context_param( [ 'default' => 'view' ] ), ],
-                    // 'args'                => $this->get_collection_params(),
-                ],
+                'methods'             => WP_REST_Server::READABLE,
+                'callback'            => [ $this, 'get_items' ],
+                'permission_callback' => [ $this, 'get_items_permissions_check' ],
+                // 'args'                => [ 'context' => $this->get_context_param( [ 'default' => 'view' ] ), ],
+                // 'args'                => $this->get_collection_params(),
             ]
         );
     }

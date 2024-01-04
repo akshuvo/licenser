@@ -54,6 +54,13 @@ class Admin {
 	    wp_enqueue_style( 'jquery-ui' );  
 
         wp_enqueue_style( 'lmfwppt-admin-style', LICENSER_ASSETS . '/css/admin.css', array(), LICENSER_VERSION );
-        wp_enqueue_script( 'lmfwppt-admin-script', LICENSER_ASSETS . '/js/admin.js', array( 'jquery' ), LICENSER_VERSION, true );
+        wp_enqueue_script( 'licenser-admin-script', LICENSER_ASSETS . '/js/admin.js', array( 'jquery' ), LICENSER_VERSION, true );
+
+        wp_localize_script( 'licenser-admin-script', 'Licenser',
+            array(
+                'rest_url' => esc_url_raw( rest_url() . 'licenser/v1/' ),
+                'ajaxurl' => admin_url( 'admin-ajax.php' ),
+            )
+        );
     }
 }

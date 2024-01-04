@@ -4,7 +4,9 @@
     "type": "wordpress-plugin",
     "autoload": {
         "psr-4": {
-            "Licenser\\": "includes/"
+            "Licenser\\": "includes/",
+            "Licenser\\Controllers\\" : "includes/controllers/",
+            "Licenser\\Traits\\" : "includes/traits/"
         },
         "files": [ "includes/functions.php" ]
     },

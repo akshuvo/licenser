@@ -89,7 +89,8 @@ final class Licenser {
             // new Licenser\Frontend();
         }
 
-        new Licenser\API();
+        // API
+        \Licenser\Api::instance()->init();
     }
 
     /**

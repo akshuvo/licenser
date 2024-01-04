@@ -177,51 +177,6 @@ jQuery(document).ready(function($){
         });
     }
 
-    // Add Product
-    $(document).on('submit', '#product-form', function(e) {
-        e.preventDefault();
-        let $this = $(this);
-
-        let formData = new FormData(this);
-        formData.append('action', 'product_add_form');
-
-        // Get Product type
-        let productType = jQuery('#product_type').val();
-
-        $.ajax({
-            type: 'post',
-            url: ajaxurl,
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function(data) {
-                $this.find('.spinner').addClass('is-active');
-                $this.find('[type="submit"]').prop('disabled', true);
-                $(document).trigger("lmfwppt_notice", ['', 'remove']);
-
-            },
-            complete: function(data) {
-                $this.find('.spinner').removeClass('is-active');
-                $this.find('[type="submit"]').prop('disabled', false);
-            },
-            success: function(data) {
-                // Success Message and Redirection
-                if ( jQuery('.lmfwppt_edit_id').val() ) {
-                    $(document).trigger("lmfwppt_notice", ['Product updated successfully.', 'success']);
-                } else {
-                    $(document).trigger("lmfwppt_notice", ['Product added successfully. Redirecting...', 'success']);
-                    window.location = '/wp-admin/admin.php?page=licenser-'+productType+'s&action=edit&id='+data+'&message=1';
-                }
-
-            },
-            error: function(data) {
-                $(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
-
-            },
-
-        });
-
-    });
 
     // Add License
     $(document).on('submit', '#license-add-form', function(e) {

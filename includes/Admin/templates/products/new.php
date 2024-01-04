@@ -109,12 +109,12 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
                     <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
                         <div class="lwp-col-half">
                             <label for="homepage_url"><?php esc_html_e( 'Homepage URL', 'licenser' ); ?></label>
-                            <input type="text" name="homepage_url" id="homepage_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $homepage_url ); ?>">
+                            <input type="url" name="homepage_url" id="homepage_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $homepage_url ); ?>">
                         </div>
 
                         <div class="lwp-col-half">
                             <label for="demo_url"><?php esc_html_e( 'Demo URL', 'licenser' ); ?></label>
-                            <input type="text" name="demo_url" id="demo_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $demo_url ); ?>">
+                            <input type="url" name="demo_url" id="demo_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $demo_url ); ?>">
                         </div>
                     </div>
 
@@ -207,11 +207,11 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
   
 
             <div class="lmfwppt-buttons lmwppt-inner-card card-shameless">
-                <input type="hidden" name="lmaction" value="product_add_form">
-                <input type="hidden" name="created_by" value="<?php _e( get_current_user_id() ); ?>">
+                <input type="hidden" name="action" value="product_add_form">
+                <input type="hidden" name="created_by" value="<?php esc_attr_e( get_current_user_id() ); ?>">
                 
                 <?php if( isset( $product_id ) ) : ?>
-                    <input class="lmfwppt_edit_id" type="hidden" name="product_id" value="<?php _e( $product_id ); ?>">
+                    <input class="lmfwppt_edit_id" type="hidden" name="product_id" value="<?php esc_attr_e( $product_id ); ?>">
                 <?php endif; ?>
                 
                 <?php wp_nonce_field( 'lmfwppt-add-product-nonce' ); ?>
@@ -221,10 +221,57 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
                 </div>   
                 <div class="lmfwppt-notices"></div> 
             </div>
-            
         </form>
-
     </div>
 </div>
 
- 
+<script>
+// Add Product
+jQuery(document).on('submit', '#product-form', function(e) {
+    e.preventDefault();
+    let $this = jQuery(this);
+
+    let formData = new FormData(this);
+    formData.append('action', 'product_add_form');
+
+    // Convert FormData to JSON
+    let jsonData = {};
+    formData.forEach(function(value, key){
+        jsonData[key] = value;
+    });
+
+    // Get Product type
+    let productType = jQuery('#product_type').val();
+
+    console.log(jsonData);
+
+    jQuery.ajax({
+        type: 'post',
+        url: Licenser.rest_url + 'products',
+        data: JSON.stringify(jsonData), // Convert JSON object to a string
+        contentType: 'application/json', // Set content type to JSON
+        beforeSend: function(data) {
+            $this.find('.spinner').addClass('is-active');
+            $this.find('[type="submit"]').prop('disabled', true);
+            jQuery(document).trigger("lmfwppt_notice", ['', 'remove']);
+        },
+        complete: function(data) {
+            $this.find('.spinner').removeClass('is-active');
+            $this.find('[type="submit"]').prop('disabled', false);
+        },
+        success: function(data) {
+            // Success Message and Redirection
+            if (jQuery('.lmfwppt_edit_id').val()) {
+                jQuery(document).trigger("lmfwppt_notice", ['Product updated successfully.', 'success']);
+            } else {
+                jQuery(document).trigger("lmfwppt_notice", ['Product added successfully. Redirecting...', 'success']);
+                // window.location = '/wp-admin/admin.php?page=licenser-'+productType+'s&action=edit&id='+data+'&message=1';
+            }
+        },
+        error: function(data) {
+            jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
+        },
+    });
+});
+
+</script>
