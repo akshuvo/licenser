@@ -14,14 +14,24 @@ class Product {
     public function get( $id ) {
         global $lwpdb;
 
-        $board = $lwpdb->wpdb->get_row(
+        $product = $lwpdb->wpdb->get_row(
             $lwpdb->wpdb->prepare(
                 "SELECT * FROM {$lwpdb->products} WHERE id = %d",
                 $id
             )
         );
 
-        return $board;
+        // Return if no product found
+        if( empty( $product ) ){
+            return false;
+        }
+
+        // Banners
+        if( !empty( $product->banners ) ){
+            $product->banners = json_decode( $product->banners );
+        }
+
+        return $product;
     }
 
     /**

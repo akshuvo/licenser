@@ -1,7 +1,9 @@
 <?php
+use Licenser\Models\Product;
 
-// Product Class
-$product_handler = new Licenser\Products();
+$product = Product::get( $_GET['id'] );
+
+echo '<pre>'; print_r( $product ); echo '</pre>';
 
 $product_defaults_args = array (
     'name' => '',
@@ -20,33 +22,13 @@ $product_defaults_args = array (
 );
 
 
-$get_product = array();
-$get_packages = null;
-
 $submit_button_label = __( 'Add Product', 'licenser' );
 
 if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id'] ) ) {
     $product_id = intval( $_GET['id'] );
 
-    // Get Product date 
-    $get_product = $product_handler->get_product( $product_id );
-
-    // Get packages data
-    $get_packages = $product_handler->get_packages( $product_id );
-
     $submit_button_label = __( 'Edit Product', 'licenser' );
-
 }
-
-// Parse incoming $args into an array and merge it with $defaults
-$get_product = wp_parse_args( $get_product, $product_defaults_args );
-// Let's extract the array to variable
-extract( $get_product );
-
-// banners unserialize
-$banner = unserialize( $banners );
-$low = isset ( $banner['low'] ) ? $banner['low'] : '';
-$high = isset ( $banner['high'] ) ? $banner['high'] : '';
 
 
 ?>
@@ -167,7 +149,7 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
                 <div class="lmfwppt-form-section" id="license-information">
                     <h2><?php esc_html_e( 'License Packages', 'licenser' ); ?></h2>
                     <div id="license-information-fields">
-                        <?php $product_handler->get_packages_html( $get_packages ); ?>
+                        
                     </div>
                     <button class="button add-license-information" type="button"><?php esc_html_e( 'Add License Package', 'licenser' ); ?></button>
                 </div>
