@@ -223,67 +223,137 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
 </div>
 
 <script>
-// Add Product
-jQuery(document).on('submit', '#product-form', function(e) {
-    e.preventDefault();
-    let $this = jQuery(this);
+    // Submit Product Form
+    jQuery(document).on('submit', '#product-form', function(e) {
+        e.preventDefault();
+        let $this = jQuery(this);
 
-    let formData = new FormData(this);
+        let formData = new FormData(this);
 
-    // Convert FormData to JSON
-    let jsonObject = {};
-    formData.forEach(function(value, key){
-        // Handle fields with square bracket notation
-        if (key.includes("[") && key.includes("]")) {
-            var keys = key.match(/\w+/g); // Extract keys from the name attribute
-            var currentObject = jsonObject;
-            for (var i = 0; i < keys.length - 1; i++) {
-                currentObject[keys[i]] = currentObject[keys[i]] || {};
-                currentObject = currentObject[keys[i]];
-            }
-            currentObject[keys[keys.length - 1]] = value;
-        } else {
-            // Handle regular fields
-            jsonObject[key] = value;
-        }
-  
-    });
-
-    // Get Product type
-    let productType = jQuery('#product_type').val();
-
-    console.log(jsonObject);
-
-    jQuery.ajax({
-        type: 'post',
-        url: Licenser.rest_url + 'products',
-        data: JSON.stringify(jsonObject), // Convert JSON object to a string
-        contentType: 'application/json', // Set content type to JSON
-        beforeSend: function(xhr) {
-            // Nonce
-            xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
-            
-            $this.find('.spinner').addClass('is-active');
-            $this.find('[type="submit"]').prop('disabled', true);
-            jQuery(document).trigger("lmfwppt_notice", ['', 'remove']);
-        },
-        complete: function(data) {
-            $this.find('.spinner').removeClass('is-active');
-            $this.find('[type="submit"]').prop('disabled', false);
-        },
-        success: function(data) {
-            // Success Message and Redirection
-            if (jQuery('.lmfwppt_edit_id').val()) {
-                jQuery(document).trigger("lmfwppt_notice", ['Product updated successfully.', 'success']);
+        // Convert FormData to JSON
+        let jsonObject = {};
+        formData.forEach(function(value, key){
+            // Handle fields with square bracket notation
+            if (key.includes("[") && key.includes("]")) {
+                var keys = key.match(/\w+/g); // Extract keys from the name attribute
+                var currentObject = jsonObject;
+                for (var i = 0; i < keys.length - 1; i++) {
+                    currentObject[keys[i]] = currentObject[keys[i]] || {};
+                    currentObject = currentObject[keys[i]];
+                }
+                currentObject[keys[keys.length - 1]] = value;
             } else {
-                jQuery(document).trigger("lmfwppt_notice", ['Product added successfully. Redirecting...', 'success']);
-                // window.location = '/wp-admin/admin.php?page=licenser-'+productType+'s&action=edit&id='+data+'&message=1';
+                // Handle regular fields
+                jsonObject[key] = value;
             }
-        },
-        error: function(data) {
-            jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
-        },
-    });
-});
+    
+        });
 
+        // Get Product type
+        let productType = jQuery('#product_type').val();
+
+        console.log(jsonObject);
+
+        jQuery.ajax({
+            type: 'post',
+            url: Licenser.rest_url + 'products',
+            data: JSON.stringify(jsonObject), // Convert JSON object to a string
+            contentType: 'application/json', // Set content type to JSON
+            beforeSend: function(xhr) {
+                // Nonce
+                xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
+                
+                $this.find('.spinner').addClass('is-active');
+                $this.find('[type="submit"]').prop('disabled', true);
+                jQuery(document).trigger("lmfwppt_notice", ['', 'remove']);
+            },
+            complete: function(data) {
+                $this.find('.spinner').removeClass('is-active');
+                $this.find('[type="submit"]').prop('disabled', false);
+            },
+            success: function(data) {
+                // Success Message and Redirection
+                if (jQuery('.lmfwppt_edit_id').val()) {
+                    jQuery(document).trigger("lmfwppt_notice", ['Product updated successfully.', 'success']);
+                } else {
+                    jQuery(document).trigger("lmfwppt_notice", ['Product added successfully. Redirecting...', 'success']);
+                    // window.location = '/wp-admin/admin.php?page=licenser-'+productType+'s&action=edit&id='+data+'&message=1';
+                }
+            },
+            error: function(data) {
+                jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
+            },
+        });
+    });
+
+
+        
+
+ 
+
+	// Add License Package Field
+    jQuery(document).on('click', '.add-license-information', function(){
+        let $this = jQuery(this);
+        let template = wp.template('license-package-field');
+        let fieldLength = jQuery('.lmfwppt_license_field').length;
+
+
+        // Data push
+        jQuery('#license-information-fields').append(template({
+            field_id: lwpGenerateUniqueId(),
+        }));
+
+        // Open last item
+        jQuery('#license-information-fields .lmfwppt-toggle-head').last().click();
+
+    });
+
+</script>
+
+<script type="text/html" id="tmpl-license-package-field">
+    <div class="postbox lmfwppt_license_field"> 
+        <!-- Wrapper Start -->
+        <input type="hidden" name="license_packages[{{{data.field_id}}}][id]" value="{{{data.id}}}" />
+        <a class="header lmfwppt-toggle-head" data-toggle="collapse">
+            <span id="poststuff">
+                <h2 class="hndle">
+                    <input type="text" class="prevent-toggle-head license-package-name regular-text" name="license_packages[{{{data.field_id}}}][label]" placeholder="License Title: 1yr unlimited domain." value="" title="Change title to anything you like. Make sure they are unique." required />
+                    <span class="dashicons indicator_field"></span>
+                    <span class="delete_field">&times;</span>
+                </h2>
+            </span>
+        </a>
+        <div class="collapse lmfwppt-toggle-wrap">
+            <div class="inside">
+                <table class="form-table">
+
+                    <tr valign="top">
+                        <th scope="row">
+                            <div class="tf-label">
+                                <label for="license_packages[{{{data.field_id}}}]-update_period">Update Period</label>
+                            </div>
+                        </th>
+                        <td>
+                            <input id="license_packages[{{{data.field_id}}}]-update_period" class="regular-text" type="number" min="1" name="license_packages[{{{data.field_id}}}][update_period]" value="" placeholder="Enter in Days"/>
+                            <p>Leave empty for lifetime updates.</p>
+                        </td>
+                    </tr>
+
+                    <tr valign="top">
+                        <th scope="row">
+                            <div class="tf-label">
+                                <label for="license_packages[{{{data.field_id}}}]-domain_limit">Domain Limit</label>
+                            </div>
+                        </th>
+                        <td>
+                            <input id="license_packages[{{{data.field_id}}}]-domain_limit" class="regular-text" type="number" min="1" name="license_packages[{{{data.field_id}}}][domain_limit]" value="" placeholder="How many domains allowed to get updates?" />
+                            <p>Leave empty for unlimited domain.</p>
+                        </td>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+    <!-- Wrapper end below -->
+    </div>
 </script>

@@ -1,18 +1,43 @@
+function lwpGenerateUniqueId() {
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+        // Use crypto API if available
+        const randomBytes = new Uint8Array(16);
+        crypto.getRandomValues(randomBytes);
+
+        // Set version (4) and variant bits (2 bits long)
+        randomBytes[6] = (randomBytes[6] & 0x0f) | 0x40;
+        randomBytes[8] = (randomBytes[8] & 0x3f) | 0x80;
+
+        // Convert to hexadecimal representation
+        return Array.from(randomBytes)
+            .map(byte => byte.toString(16).padStart(2, '0'))
+            .join('');
+    } else {
+        // Fallback to Math.random() if crypto API is not available
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+}
+
 jQuery(document).ready(function($){
 
-    // // Delete field
-    // $(document).on('click', 'span.delete_field', function(e){
-    //     e.preventDefault();
-    //     $(this).closest('.lmfwppt_license_field').remove();
-    //     return false;
-    // });
 
-    // // Field toggle
-    // $(document).on('click', '.lmfwppt-toggle-head', function(e){
-    // 	e.preventDefault();
-    //     $(this).parent().toggleClass('opened').find('.lmfwppt-toggle-wrap').slideToggle('fast');
-    //     return false;
-    // });
+
+    // Accordion Toggle
+    $(document).on('click', '.lmfwppt-toggle-head', function(e){
+    	e.preventDefault();
+        $(this).parent().toggleClass('opened').find('.lmfwppt-toggle-wrap').slideToggle('fast');
+        return false;
+    });
+
+    // Remove Section Field
+    $(document).on('click', '.delete_field', function(e){
+        e.preventDefault();
+        $(this).closest('.postbox').remove();
+    } );
 
     // // Add Section Field 
     // $(document).on('click', '.add-section-information', function(){
