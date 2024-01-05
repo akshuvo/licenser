@@ -34,14 +34,14 @@ class ProductRelease {
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
             $lwpdb->wpdb->update(
-                $lwpdb->products,
+                $lwpdb->product_releases,
                 [
-                    'product_id' => sanitize_text_field( $data['product_id'] ),
+                    'product_id' => intval( $data['product_id'] ),
                     'version' => sanitize_text_field( $data['version'] ),
                     'changelog' => sanitize_text_field( $data['changelog'] ),
                     'file_name' => sanitize_text_field( $data['file_name'] ),
-                    'download_link' => sanitize_text_field( $data['download_link'] ),
-                    'release_date' => sanitize_text_field( $data['release_date'] ),
+                    'download_link' => esc_url_raw( $data['download_link'] ),
+                    'release_date' => date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),
                 ],
                 [
                     'id' => $data['id']
@@ -51,18 +51,16 @@ class ProductRelease {
             $insert_id = $data['id'];
         } else {
             $lwpdb->wpdb->insert(
-                $lwpdb->products,
+                $lwpdb->product_releases,
                 [
-                    'product_id' => sanitize_text_field( $data['product_id'] ),
+                    'product_id' => intval( $data['product_id'] ),
                     'version' => sanitize_text_field( $data['version'] ),
                     'changelog' => sanitize_text_field( $data['changelog'] ),
                     'file_name' => sanitize_text_field( $data['file_name'] ),
-                    'download_link' => sanitize_text_field( $data['download_link'] ),
-                    'release_date' => sanitize_text_field( $data['release_date'] ),
+                    'download_link' => esc_url_raw( $data['download_link'] ),
+                    'release_date' => date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),
                 ] 
             );
-
-            error_log( $lwpdb->wpdb->last_query );
 
             $insert_id = $lwpdb->wpdb->insert_id;
         }

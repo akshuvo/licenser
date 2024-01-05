@@ -75,12 +75,11 @@ class Installer {
 	        $schema[] = "CREATE TABLE `{$table_prefix}license_packages` (
 	          `id` int(128) NOT NULL AUTO_INCREMENT,
 	          `product_id` int(128) NOT NULL,
-	          `label` varchar(100) NOT NULL,
-	          `package_id` varchar(100) NOT NULL,
+	          `label` varchar(255) NOT NULL,
+	          `package_id` varchar(255) NOT NULL UNIQUE,
 	          `update_period` int(128),
 	          `domain_limit` int(128),
-	          PRIMARY KEY (`id`),
-	          UNIQUE (`package_id`)
+	          PRIMARY KEY (`id`)
 	        ) $charset_collate";
 
 	        // Drop Below Table

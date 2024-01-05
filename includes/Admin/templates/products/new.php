@@ -131,25 +131,25 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
                 <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
                     <div class="lwp-col-half">
                         <label for="product_version"><?php esc_html_e( 'Product Version', 'licenser' ); ?></label>
-                        <input type="text" name="release_args[version]" id="product_version" class="regular-text" placeholder="1.0" value="<?php echo esc_attr( $version ); ?>">
+                        <input type="text" name="version" id="product_version" class="regular-text" placeholder="1.0" value="<?php echo esc_attr( $version ); ?>">
                     </div>
 
                     <div class="lwp-col-half">
                         <label for="release_date"><?php esc_html_e( 'Release Date', 'licenser' ); ?></label>
-                        <input type="text" name="release_args[release_date]" id="release_date" class="regular-text" placeholder="<?php esc_attr_e( '01-23-2023', 'licenser' ); ?>" value="<?php echo esc_attr( $release_date ); ?>">
+                        <input type="text" name="release_date" id="release_date" class="regular-text" placeholder="<?php esc_attr_e( '01-23-2023', 'licenser' ); ?>" value="<?php echo esc_attr( $release_date ); ?>">
                     </div>
                 </div>
 
                 <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
                     <div class="lwp-col-one-third">
                         <label for="file_name"><?php esc_html_e( 'File Name', 'licenser' ); ?></label>
-                        <input type="text" name="release_args[version]" id="file_name" class="regular-text" placeholder="<?php esc_attr_e( 'your-plugin-file-1.0.5.zip', 'licenser' ); ?>" value="<?php echo esc_attr( $file_name ); ?>">
+                        <input type="text" name="file_name" id="file_name" class="regular-text" placeholder="<?php esc_attr_e( 'your-plugin-file-1.0.5.zip', 'licenser' ); ?>" value="<?php echo esc_attr( $file_name ); ?>">
                     </div>
 
                     <div class="lwp-col-two-third">
                         <label for="download_link"><?php esc_html_e( 'File URL', 'licenser' ); ?></label>
                         <div class="lmfwppt-file-field">
-                            <input type="url" name="release_args[download_link]" id="download_link" class="regular-text" placeholder="<?php esc_attr_e( 'URL of the Theme/Plugin file', 'licenser' ); ?>" value="<?php echo esc_attr( $download_link ); ?>">
+                            <input type="url" name="download_link" id="download_link" class="regular-text" placeholder="<?php esc_attr_e( 'URL of the Theme/Plugin file', 'licenser' ); ?>" value="<?php echo esc_attr( $download_link ); ?>">
                             <button title="Select Theme/Plugin ZIP File" class="button trigger_media_frame" data-push_selector="#download_link"  type="button" id="download_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
                         </div>
                     </div>
@@ -157,7 +157,7 @@ $high = isset ( $banner['high'] ) ? $banner['high'] : '';
 
                 <div class="lmfwppt-form-field">
                     <label for="changelog"><?php esc_html_e( 'Changelog', 'licenser' ); ?></label>
-                    <textarea name="release_args[changelog]" id="changelog" class="regular-text" placeholder="<?php esc_attr_e( 'Changelog', 'licenser' ); ?>"><?php echo esc_attr( $changelog ); ?></textarea>
+                    <textarea name="changelog" id="changelog" class="regular-text" placeholder="<?php esc_attr_e( 'Changelog', 'licenser' ); ?>"><?php echo esc_attr( $changelog ); ?></textarea>
                 </div>
             </div>
             <!-- /Release -->

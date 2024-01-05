@@ -93,6 +93,12 @@ class Product {
             'demo_url' => '',
             'created_by' => '',
             'status' => 'active',
+
+            'version' => '',
+            'changelog' => '',
+            'file_name' => '',
+            'download_link' => '',
+            'release_date' => '',
         ] );
 
         // Banner
@@ -112,7 +118,6 @@ class Product {
                 [
                     'name' => sanitize_text_field( $data['name'] ),
                     'slug' => sanitize_text_field( $data['slug'] ),
-                    'uuid' => sanitize_text_field( $data['uuid'] ),
                     'product_type' => sanitize_text_field( $data['product_type'] ),
                     'tested' => sanitize_text_field( $data['tested'] ),
                     'requires' => sanitize_text_field( $data['requires'] ),
@@ -155,7 +160,17 @@ class Product {
             $insert_id = $lwpdb->wpdb->insert_id;
         }
 
-        // 
+        // Product Release
+        if( !empty( $data['version'] ) && !empty( $data['download_link'] ) && !empty( $data['release_date'] ) ){
+            $product_release = ProductRelease::instance()->create([
+                'product_id' => $insert_id,
+                'version' => $data['version'],
+                'changelog' => $data['changelog'],
+                'file_name' => $data['file_name'],
+                'download_link' => $data['download_link'],
+                'release_date' => $data['release_date'],
+            ]);
+        }
 
         return $insert_id;
     }
