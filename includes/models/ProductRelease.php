@@ -6,12 +6,6 @@ class ProductRelease {
 
     use \Licenser\Traits\SingletonTraitSelf;
 
-    public function __construct() {
-     
-
-        error_log( ' Release Model' );
-    }
-
     /**
      * Create Product Release
      * 

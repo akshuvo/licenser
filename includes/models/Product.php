@@ -6,12 +6,6 @@ class Product {
 
     use \Licenser\Traits\SingletonTraitSelf;
 
-    public function __construct() {
-     
-
-        error_log( 'Product Model' );
-    }
-
     /**
      * Get Product
      *
@@ -99,6 +93,8 @@ class Product {
             'file_name' => '',
             'download_link' => '',
             'release_date' => '',
+
+            'license_packages' => [],
         ] );
 
         // Banner
@@ -170,6 +166,21 @@ class Product {
                 'download_link' => $data['download_link'],
                 'release_date' => $data['release_date'],
             ]);
+        }
+
+        // License Package
+        if( !empty( $data['license_packages'] ) && is_array( $data['license_packages'] ) ){
+            foreach( $data['license_packages'] as $package ){
+                error_log( print_r( $package, true ) );
+                $license_package = LicensePackage::instance()->create([
+                    'id' => isset( $package['id'] ) ? $package['id'] : '',
+                    'product_id' => $insert_id,
+                    'package_id' => isset( $package['package_id'] ) ? $package['package_id'] : wp_generate_uuid4(),
+                    'label' => $package['label'],
+                    'update_period' => $package['update_period'],
+                    'domain_limit' => $package['domain_limit'],
+                ]);
+            }
         }
 
         return $insert_id;
