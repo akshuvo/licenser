@@ -31,6 +31,48 @@ class Product {
     }
 
     /**
+     * Get Products
+     *
+     * @var int
+     */
+    public function get_all( $args = [] ) {
+        global $lwpdb;
+
+        $defaults = [
+            'number' => 20,
+            'offset' => 0,
+            'orderby' => 'id',
+            'order' => 'DESC',
+            'count_total' => true,
+            'status' => 'active',
+        ];
+
+        $args = wp_parse_args( $args, $defaults );
+
+        $where = '';
+
+        if( !empty( $args['status'] ) ){
+            $where .= " AND status = '{$args['status']}'";
+        }
+
+        $query = "SELECT * FROM {$lwpdb->products} WHERE 1=1 {$where}";
+
+        if( !empty( $args['orderby'] ) && !empty( $args['order'] ) ){
+            $query .= " ORDER BY {$args['orderby']} {$args['order']}";
+        }
+
+        if( !empty( $args['number'] ) && !empty( $args['offset'] ) ){
+            $query .= " LIMIT {$args['offset']}, {$args['number']}";
+        }
+
+        error_log( $query );
+
+        $products = $lwpdb->wpdb->get_results( $query );
+
+        return $products;
+    }
+
+    /**
      * Create Product
      * 
      * @param array $data
@@ -110,11 +152,10 @@ class Product {
                 ] 
             );
 
-            error_log( $lwpdb->wpdb->last_query );
-
             $insert_id = $lwpdb->wpdb->insert_id;
         }
 
+        // 
 
         return $insert_id;
     }
