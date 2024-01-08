@@ -1,25 +1,16 @@
 <?php
 use Licenser\Models\Product;
 
-$product = Product::instance()->get( $_GET['id'] );
+// Product instance
+$product_model = Product::instance();
 
-echo '<pre>'; print_r( $product ); echo '</pre>';
+// Product ID
+$product_id = isset( $_GET['id'] ) ? intval( $_GET['id'] ) : '';
 
-$product_defaults_args = array (
-    'name' => '',
-    'slug' => '',
-    'product_type' => '',
-    'version' => '',
-    'tested' => '',
-    'requires' => '',
-    'requires_php' => '',
-    'download_link' => '',
-    'banners' => '',
-    'sections' => '',
-    'author' => '',
-    'created_by' => '',
-    'dated' => '',
-);
+// Get Product
+$product = $product_model->get( $product_id );
+
+echo '<pre>'; print_r($product); echo '</pre>';
 
 
 $submit_button_label = __( 'Add Product', 'licenser' );
@@ -50,59 +41,61 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
                     <div class="lmfwppt-form-field">
                         <label for="name"><?php esc_html_e( 'Product Name', 'licenser' ); ?></label>
-                        <input type="text" name="name" id="name" class="regular-text product_name_input" placeholder="Your Theme or Plugin Name" value="<?php echo esc_attr( $name ); ?>" required>
+                        <input type="text" name="name" id="name" class="regular-text product_name_input" placeholder="Your Theme or Plugin Name" value="<?php echo esc_attr( $product->name ); ?>" required>
                     </div>
 
                     <div class="lmfwppt-form-field">
                         <label for="slug"><?php esc_html_e( 'Product Slug', 'licenser' ); ?></label>
-                        <input type="text" name="slug" id="slug" class="regular-text product_slug_input" placeholder="your-theme-or-plugin-name" value="<?php echo esc_attr( $slug ); ?>" required>
+                        <input type="text" name="slug" id="slug" class="regular-text product_slug_input" placeholder="your-theme-or-plugin-name" value="<?php echo esc_attr( $product->slug ); ?>" required>
                     </div>
 
                     <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
                         <div class="lwp-col-half">
                             <label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
                             <select name="product_type" id="product_type">
-                                <option value="plugin" <?php selected( $product_type, 'plugin' ); ?> ><?php esc_html_e( 'Plugin', 'licenser' ); ?></option>
-                                <option value="theme" <?php selected( $product_type, 'theme' ); ?> ><?php esc_html_e( 'Theme', 'licenser' ); ?></option>
+                                <option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
+                                <?php foreach( $product_model->get_types() as $key => $value ) : ?>
+                                    <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $product->product_type, $key ); ?> ><?php echo esc_html( $value ); ?></option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="lwp-col-half">
                             <label for="requires_php"><?php esc_html_e( 'Requires PHP Version', 'licenser' ); ?></label>
-                            <input type="text" name="requires_php" id="requires_php" class="regular-text" placeholder="<?php esc_attr_e( '7.4', 'licenser' ); ?>" value="<?php echo esc_attr( $requires_php ); ?>">
+                            <input type="text" name="requires_php" id="requires_php" class="regular-text" placeholder="<?php esc_attr_e( '7.4', 'licenser' ); ?>" value="<?php echo esc_attr( $product->requires_php ); ?>">
                         </div>
                     </div>
 
                     <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
                         <div class="lwp-col-half">
                             <label for="requires"><?php esc_html_e( 'Requires WordPress Version', 'licenser' ); ?></label>
-                            <input type="text" name="requires" id="requires" class="regular-text" placeholder="<?php esc_attr_e( '4.7', 'licenser' ); ?>" value="<?php echo esc_attr( $requires ); ?>">
+                            <input type="text" name="requires" id="requires" class="regular-text" placeholder="<?php esc_attr_e( '4.7', 'licenser' ); ?>" value="<?php echo esc_attr( $product->requires ); ?>">
                         </div>
                         <div class="lwp-col-half">
                             <label for="product_tested"><?php esc_html_e( 'Tested up to', 'licenser' ); ?></label>
-                            <input type="text" name="tested" id="product_tested" class="regular-text" placeholder="<?php esc_attr_e( '5.7', 'licenser' ); ?>" value="<?php echo esc_attr( $tested ); ?>">
+                            <input type="text" name="tested" id="product_tested" class="regular-text" placeholder="<?php esc_attr_e( '5.7', 'licenser' ); ?>" value="<?php echo esc_attr( $product->tested ); ?>">
                         </div>
                     </div>
 
                     <div class="lmfwppt-form-field">
                         <label for="author"><?php esc_html_e( 'Author Name', 'licenser' ); ?></label>
-                        <input type="text" name="author_name" id="author" class="regular-text product_name_input" placeholder="Author Name" value="<?php echo esc_attr( $author ); ?>">
+                        <input type="text" name="author_name" id="author" class="regular-text product_name_input" placeholder="Author Name" value="<?php echo esc_attr( $product->author_name ); ?>">
                     </div>
 
                     <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
                         <div class="lwp-col-half">
                             <label for="homepage_url"><?php esc_html_e( 'Homepage URL', 'licenser' ); ?></label>
-                            <input type="url" name="homepage_url" id="homepage_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $homepage_url ); ?>">
+                            <input type="url" name="homepage_url" id="homepage_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $product->homepage_url ); ?>">
                         </div>
 
                         <div class="lwp-col-half">
                             <label for="demo_url"><?php esc_html_e( 'Demo URL', 'licenser' ); ?></label>
-                            <input type="url" name="demo_url" id="demo_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $demo_url ); ?>">
+                            <input type="url" name="demo_url" id="demo_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $product->demo_url ); ?>">
                         </div>
                     </div>
 
                     <div class="lmfwppt-form-field">
                         <label for="description"><?php esc_html_e( 'Description', 'licenser' ); ?></label>
-                        <textarea name="description" id="description" class="regular-text" placeholder="<?php esc_attr_e( 'Description', 'licenser' ); ?>"><?php echo esc_attr( $description ); ?></textarea>
+                        <textarea name="description" id="description" class="regular-text" placeholder="<?php esc_attr_e( 'Description', 'licenser' ); ?>"><?php echo esc_attr( $product->description ); ?></textarea>
                     </div>
                 </div>
             </div>

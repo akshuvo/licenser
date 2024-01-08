@@ -7,6 +7,46 @@ class ProductRelease {
     use \Licenser\Traits\SingletonTraitSelf;
 
     /**
+     * Get Product Releases
+     *
+     * @var int
+     */
+    public function get_all( $args = [] ) {
+        global $lwpdb;
+
+        $defaults = [
+            'number' => 20,
+            'offset' => 0,
+            'orderby' => 'id',
+            'order' => 'DESC',
+            'count_total' => true,
+            'product_id' => '',
+        ];
+
+        $args = wp_parse_args( $args, $defaults );
+
+        $where = ' 1=1 ';
+
+        if( !empty( $args['product_id'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $args['product_id'] );
+        }
+
+        // Order
+        $where .= " ORDER BY {$args['orderby']} {$args['order']}";
+
+        $limit = '';
+        if( !empty( $args['number'] ) ){
+            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+        }
+
+        $query = "SELECT * FROM {$lwpdb->product_releases} WHERE {$where} {$limit}";
+
+        $items = $lwpdb->wpdb->get_results( $query );
+
+        return $items;
+    }
+
+    /**
      * Create Product Release
      * 
      * @param array $data

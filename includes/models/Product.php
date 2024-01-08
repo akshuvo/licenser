@@ -7,6 +7,16 @@ class Product {
     use \Licenser\Traits\SingletonTraitSelf;
 
     /**
+     * Get Product Types
+     */
+    public function get_types() {
+        return apply_filters( 'licenser_product_types', [
+            'plugin' => __( 'Plugin', 'licenser' ),
+            'theme' => __( 'Theme', 'licenser' ),
+        ] );
+    }
+
+    /**
      * Get Product
      *
      * @var int
@@ -34,6 +44,13 @@ class Product {
         // Banners
         if( !empty( $product->banners ) ){
             $product->banners = json_decode( $product->banners );
+        }
+
+        // Releases
+        if( $args['inc_releases'] ){
+            $product->releases = ProductRelease::instance()->get_all([
+                'product_id' => $product->id,
+            ]);
         }
 
         // Packages

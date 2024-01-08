@@ -59,14 +59,15 @@ class LicensePackage {
             $where .= $lwpdb->wpdb->prepare( " AND package_id = %s", $args['package_id'] );
         }
 
-        $order = " ORDER BY {$args['orderby']} {$args['order']}";
+        // Order
+        $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
         $limit = '';
         if( !empty( $args['number'] ) ){
             $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
-        $query = "SELECT * FROM {$lwpdb->license_packages} WHERE {$where} {$order} {$limit}";
+        $query = "SELECT * FROM {$lwpdb->license_packages} WHERE {$where} {$limit}";
 
         $packages = $lwpdb->wpdb->get_results( $query );
 
