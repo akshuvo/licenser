@@ -88,7 +88,7 @@ class ProductRelease {
                 [
                     'product_id' => intval( $data['product_id'] ),
                     'version' => sanitize_text_field( $data['version'] ),
-                    'changelog' => sanitize_text_field( $data['changelog'] ),
+                    'changelog' => wp_kses_post( $data['changelog'] ),
                     'file_name' => sanitize_text_field( $data['file_name'] ),
                     'download_link' => esc_url_raw( $data['download_link'] ),
                     'release_date' => date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),
@@ -105,7 +105,7 @@ class ProductRelease {
                 [
                     'product_id' => intval( $data['product_id'] ),
                     'version' => sanitize_text_field( $data['version'] ),
-                    'changelog' => sanitize_text_field( $data['changelog'] ),
+                    'changelog' => wp_kses_post( $data['changelog'] ),
                     'file_name' => sanitize_text_field( $data['file_name'] ),
                     'download_link' => esc_url_raw( $data['download_link'] ),
                     'release_date' => date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),

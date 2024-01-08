@@ -10,6 +10,9 @@ $product_id = isset( $_GET['id'] ) ? intval( $_GET['id'] ) : '';
 // Get Product
 $product = !empty( $product_id ) ? $product_model->get( $product_id ) : (object) $product_model->default_fields;
 
+// Product Packages
+$product_packages = isset( $product->packages ) ? $product->packages : [];
+
 echo '<pre>'; print_r($product); echo '</pre>';
 
 
@@ -156,10 +159,10 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
             <div class="lmwppt-inner-card">
                 <div class="lmfwppt-form-section" id="license-information">
                     <h2><?php esc_html_e( 'License Packages', 'licenser' ); ?></h2>
-                    <div id="license-information-fields">
+                    <div id="license-packages-fields">
                         
                     </div>
-                    <button class="button add-license-information" type="button"><?php esc_html_e( 'Add License Package', 'licenser' ); ?></button>
+                    <button class="button add-license-package" type="button"><?php esc_html_e( 'Add License Package', 'licenser' ); ?></button>
                 </div>
             </div>
             <!-- banner -->
@@ -242,8 +245,6 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
         // Get Product type
         let productType = jQuery('#product_type').val();
 
-        console.log(jsonObject);
-
         jQuery.ajax({
             type: 'post',
             url: Licenser.rest_url + 'products',
@@ -277,19 +278,18 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
     });
 
 	// Add License Package Field
-    jQuery(document).on('click', '.add-license-information', function(){
+    jQuery(document).on('click', '.add-license-package', function(){
         let $this = jQuery(this);
         let template = wp.template('license-package-field');
         let fieldLength = jQuery('.lmfwppt_license_field').length;
 
-
         // Data push
-        jQuery('#license-information-fields').append(template({
+        jQuery('#license-packages-fields').append(template({
             field_id: lwpGenerateUniqueId(),
         }));
 
         // Open last item
-        jQuery('#license-information-fields .lmfwppt-toggle-head').last().click();
+        jQuery('#license-packages-fields .lmfwppt-toggle-head').last().click();
 
     });
 
@@ -316,6 +316,33 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
         jQuery('.hide-on-add-release').show();
     });
 
+    // Load Product Packages
+    jQuery(document).on('load_product_packages', function(){
+        let productPackages = <?php echo json_encode( $product_packages ); ?>;
+        let template = wp.template('license-package-field');
+
+        // Data push
+        jQuery('#license-packages-fields').html('');
+
+        // Loop through packages
+        jQuery.each( productPackages, function( index, value ) {
+            jQuery('#license-packages-fields').append(template({
+                field_id: value.id,
+                id: value.id,
+                label: value.label,
+                update_period: value.update_period,
+                domain_limit: value.domain_limit,
+            }));
+        });
+
+    });
+
+
+    // Document Ready
+    jQuery(document).ready(function(){
+        jQuery(document).trigger('load_product_packages');
+    });
+
 </script>
 
 <script type="text/html" id="tmpl-license-package-field">
@@ -325,7 +352,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
         <a class="header lmfwppt-toggle-head" data-toggle="collapse">
             <span id="poststuff">
                 <h2 class="hndle">
-                    <input type="text" class="prevent-toggle-head license-package-name regular-text" name="license_packages[{{{data.field_id}}}][label]" placeholder="License Title: 1yr unlimited domain." value="" title="Change title to anything you like. Make sure they are unique." required />
+                    <input type="text" class="prevent-toggle-head license-package-name regular-text" name="license_packages[{{{data.field_id}}}][label]" placeholder="License Title: 1yr unlimited domain." value="{{{data.label}}}" title="Change title to anything you like. Make sure they are unique." required />
                     <span class="dashicons indicator_field"></span>
                     <span class="delete_field">&times;</span>
                 </h2>
@@ -342,7 +369,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
                             </div>
                         </th>
                         <td>
-                            <input id="license_packages[{{{data.field_id}}}]-update_period" class="regular-text" type="number" min="1" name="license_packages[{{{data.field_id}}}][update_period]" value="" placeholder="Enter in Days"/>
+                            <input id="license_packages[{{{data.field_id}}}]-update_period" class="regular-text" type="number" min="1" name="license_packages[{{{data.field_id}}}][update_period]" value="{{{data.update_period}}}" placeholder="Enter in Days"/>
                             <p>Leave empty for lifetime updates.</p>
                         </td>
                     </tr>
@@ -354,7 +381,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
                             </div>
                         </th>
                         <td>
-                            <input id="license_packages[{{{data.field_id}}}]-domain_limit" class="regular-text" type="number" min="1" name="license_packages[{{{data.field_id}}}][domain_limit]" value="" placeholder="How many domains allowed to get updates?" />
+                            <input id="license_packages[{{{data.field_id}}}]-domain_limit" class="regular-text" type="number" min="1" name="license_packages[{{{data.field_id}}}][domain_limit]" value="{{{data.domain_limit}}}" placeholder="How many domains allowed to get updates?" />
                             <p>Leave empty for unlimited domain.</p>
                         </td>
                     </tr>
