@@ -11,7 +11,12 @@ class Product {
      *
      * @var int
      */
-    public function get( $id ) {
+    public function get( $id, $args = [] ) {
+        $args = wp_parse_args( $args, [
+            'status' => 'active',
+            'inc_releases' => true,
+            'inc_packages' => true,
+        ] );
         global $lwpdb;
 
         $product = $lwpdb->wpdb->get_row(
@@ -29,6 +34,13 @@ class Product {
         // Banners
         if( !empty( $product->banners ) ){
             $product->banners = json_decode( $product->banners );
+        }
+
+        // Packages
+        if( $args['inc_packages'] ){
+            $product->packages = LicensePackage::instance()->get_all([
+                'product_id' => $product->id,
+            ]);
         }
 
         return $product;

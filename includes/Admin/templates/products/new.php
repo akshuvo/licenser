@@ -1,7 +1,7 @@
 <?php
 use Licenser\Models\Product;
 
-$product = Product::get( $_GET['id'] );
+$product = Product::instance()->get( $_GET['id'] );
 
 echo '<pre>'; print_r( $product ); echo '</pre>';
 

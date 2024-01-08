@@ -44,48 +44,39 @@ class LicensePackage {
             'orderby' => 'id',
             'order' => 'DESC',
             'count_total' => true,
+            'product_id' => '',
         ];
 
         $args = wp_parse_args( $args, $defaults );
 
-        $where = '';
+        $where = ' 1=1 ';
 
         if( !empty( $args['product_id'] ) ){
-            $where .= " AND product_id = '{$args['product_id']}'";
+            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $args['product_id'] );
         }
 
         if( !empty( $args['package_id'] ) ){
-            $where .= " AND package_id = '{$args['package_id']}'";
+            $where .= $lwpdb->wpdb->prepare( " AND package_id = %s", $args['package_id'] );
         }
 
-        if( !empty( $args['label'] ) ){
-            $where .= " AND label = '{$args['label']}'";
-        }
-
-        if( !empty( $args['update_period'] ) ){
-            $where .= " AND update_period = '{$args['update_period']}'";
-        }
-
-        if( !empty( $args['domain_limit'] ) ){
-            $where .= " AND domain_limit = '{$args['domain_limit']}'";
-        }
-
-        $order_by = $args['orderby'] . ' ' . $args['order'];
+        $order = " ORDER BY {$args['orderby']} {$args['order']}";
 
         $limit = '';
         if( !empty( $args['number'] ) ){
-            $limit = "LIMIT {$args['number']}";
+            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
-        if( !empty( $args['offset'] ) ){
-            $limit .= " OFFSET {$args['offset']}";
-        }
+        $query = "SELECT * FROM {$lwpdb->license_packages} WHERE {$where} {$order} {$limit}";
 
-        $packages = $lwpdb->wpdb->get_results(
-            "SELECT * FROM {$lwpdb->license_packages} WHERE 1=1 {$where} ORDER BY {$order_by} {$limit}"
-        );
+        $packages = $lwpdb->wpdb->get_results( $query );
+
+        // Return if no package found
+        if( empty( $packages ) ){
+            return false;
+        }
 
         return $packages;
+    }
 
     /**
      * Create Product License Package
