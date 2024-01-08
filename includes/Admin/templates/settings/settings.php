@@ -65,3 +65,68 @@ $license_generate_method = isset( $lmfwppt_settings['license_generate_method'] )
       </form>
 
 </div>
+
+
+<script>
+   jQuery(document).on('submit', '#setting-add-form', function(e) {
+        e.preventDefault();
+        let $this = jQuery(this);
+
+        let formData = new FormData(this);
+
+        // Convert FormData to JSON
+        let jsonObject = {};
+        formData.forEach(function(value, key){
+            // Handle fields with square bracket notation
+            if (key.includes("[") && key.includes("]")) {
+                var keys = key.match(/\w+/g); // Extract keys from the name attribute
+                var currentObject = jsonObject;
+                for (var i = 0; i < keys.length - 1; i++) {
+                    currentObject[keys[i]] = currentObject[keys[i]] || {};
+                    currentObject = currentObject[keys[i]];
+                }
+                currentObject[keys[keys.length - 1]] = value;
+            } else {
+                // Handle regular fields
+                jsonObject[key] = value;
+            }
+    
+        });
+
+        // Get Product type
+        let productType = jQuery('#product_type').val();
+
+        console.log(jsonObject);
+
+        jQuery.ajax({
+            type: 'post',
+            url: Licenser.rest_url + 'settings',
+            data: JSON.stringify(jsonObject), // Convert JSON object to a string
+            contentType: 'application/json', // Set content type to JSON
+            beforeSend: function(xhr) {
+                // Nonce
+                xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
+                
+                $this.find('.spinner').addClass('is-active');
+                $this.find('[type="submit"]').prop('disabled', true);
+                jQuery(document).trigger("lmfwppt_notice", ['', 'remove']);
+            },
+            complete: function(data) {
+                $this.find('.spinner').removeClass('is-active');
+                $this.find('[type="submit"]').prop('disabled', false);
+            },
+            success: function(data) {
+                // Success Message and Redirection
+                if (jQuery('.lmfwppt_edit_id').val()) {
+                    jQuery(document).trigger("lmfwppt_notice", ['Settings updated successfully.', 'success']);
+                } else {
+                    jQuery(document).trigger("lmfwppt_notice", ['Settings added successfully.', 'success']);
+                    // window.location = '/wp-admin/admin.php?page=licenser-'+productType+'s&action=edit&id='+data+'&message=1';
+                }
+            },
+            error: function(data) {
+                jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
+            },
+        });
+    });
+</script>

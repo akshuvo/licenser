@@ -42,11 +42,7 @@ class Settings extends RestController {
                     'args'                => [
                         'lmfwppt_settings' => [
                             'description' => __( 'Settings data.' ),
-                            'type'        => 'array',
                             'required'    => true,
-                            'items'       => [
-                                'type' => 'object',
-                            ],
                         ],
                     ]
                 ],
@@ -91,10 +87,11 @@ class Settings extends RestController {
      */
     public function create_item( $request ) {
 
-        $params = $request->get_params();
+        $params = $request->get_params('lmfwppt_settings');
         
-        $product = Product::instance()->create( $params );
+        $existing_settings = get_option('lmfwppt_settings', array());
 
+        update_option('lmfwppt_settings', $params);
         return rest_ensure_response( $params );
     }
 
