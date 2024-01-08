@@ -23,6 +23,7 @@ class Api {
         $controllers = [
             'products' => 'Products',
             'licenses'  => 'Licenses',
+            'settings'  => 'Settings',
         ];
 
         // // Load controller routes based on url
