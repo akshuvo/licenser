@@ -47,6 +47,7 @@ class Installer {
 	          `author_name` varchar(220) DEFAULT NULL,
 			  `homepage_url` varchar(220) DEFAULT NULL,
 			  `demo_url` varchar(220) DEFAULT NULL,
+			  `icon_url` varchar(220) DEFAULT NULL,
 	          `created_by` int(20) unsigned NOT NULL,
               `status` varchar(30) DEFAULT NULL,
 	          `dated` datetime NOT NULL DEFAULT NOW(),

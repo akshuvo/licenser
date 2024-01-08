@@ -7,6 +7,22 @@ class ProductRelease {
     use \Licenser\Traits\SingletonTraitSelf;
 
     /**
+     * Get Stable Release
+     */
+    public function get_stable( $product_id ) {
+        global $lwpdb;
+
+        $release = $lwpdb->wpdb->get_row(
+            $lwpdb->wpdb->prepare(
+                "SELECT * FROM {$lwpdb->product_releases} WHERE product_id = %d ORDER BY id DESC LIMIT 1",
+                $product_id
+            )
+        );
+
+        return $release;
+    }
+
+    /**
      * Get Product Releases
      *
      * @var int

@@ -6,6 +6,27 @@ class Product {
 
     use \Licenser\Traits\SingletonTraitSelf;
 
+    // Product Default Fields
+    public $default_fields = [
+        'name' => '',
+        'slug' => '',
+        'product_type' => '',
+        'tested' => '',
+        'requires' => '',
+        'requires_php' => '',
+        'banners' => [
+            'low' => '',
+            'high' => '',
+        ],
+        'description' => '',
+        'author_name' => '',
+        'homepage_url' => '',
+        'demo_url' => '',
+        'icon_url' => '',
+        'created_by' => '',
+        'status' => 'active',
+    ];
+
     /**
      * Get Product Types
      */
@@ -24,7 +45,8 @@ class Product {
     public function get( $id, $args = [] ) {
         $args = wp_parse_args( $args, [
             'status' => 'active',
-            'inc_releases' => true,
+            'inc_stable_release' => true,
+            'inc_releases' => false,
             'inc_packages' => true,
         ] );
         global $lwpdb;
@@ -43,7 +65,12 @@ class Product {
 
         // Banners
         if( !empty( $product->banners ) ){
-            $product->banners = json_decode( $product->banners );
+            $product->banners = json_decode( $product->banners, true );
+        }
+
+        // Stable Release
+        if( $args['inc_stable_release'] ){
+            $product->stable_release = ProductRelease::instance()->get_stable( $product->id );
         }
 
         // Releases
@@ -124,6 +151,7 @@ class Product {
             'author_name' => '',
             'homepage_url' => '',
             'demo_url' => '',
+            'icon_url' => '',
             'created_by' => '',
             'status' => 'active',
 
@@ -139,10 +167,7 @@ class Product {
         // Banner
         if( !empty( $data['banners'] ) && is_array( $data['banners'] ) ){
             $data['banners'] = json_encode( $data['banners'] );
-        }
-
-        error_log( print_r( $data, true ) );
-        
+        }        
 
         global $lwpdb;
 
@@ -162,6 +187,7 @@ class Product {
                     'author_name' => sanitize_text_field( $data['author_name'] ),
                     'homepage_url' => sanitize_text_field( $data['homepage_url'] ),
                     'demo_url' => sanitize_text_field( $data['demo_url'] ),
+                    'icon_url' => sanitize_text_field( $data['icon_url'] ),
                     'created_by' => sanitize_text_field( $data['created_by'] ),
                     'status' => sanitize_text_field( $data['status'] ),
                 ],
@@ -187,6 +213,7 @@ class Product {
                     'author_name' => sanitize_text_field( $data['author_name'] ),
                     'homepage_url' => esc_url_raw( $data['homepage_url'] ),
                     'demo_url' => esc_url_raw( $data['demo_url'] ),
+                    'icon_url' => esc_url_raw( $data['icon_url'] ),
                     'created_by' => get_current_user_id(),
                     'status' => sanitize_text_field( $data['status'] ),
                 ] 
