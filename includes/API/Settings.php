@@ -87,11 +87,11 @@ class Settings extends RestController {
      */
     public function create_item( $request ) {
 
-        $params = $request->get_params('lmfwppt_settings');
+        $params = $request->get_params();
         
         $existing_settings = get_option('lmfwppt_settings', array());
 
-        update_option('lmfwppt_settings', $params);
+        $settings = Settings::instance()->create( $params );
         return rest_ensure_response( $params );
     }
 

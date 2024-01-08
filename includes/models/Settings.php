@@ -7,50 +7,40 @@ class Settings {
     use \Licenser\Traits\SingletonTraitSelf;
 
     /**
-     * Create Product Release
+     * Create Settings
      * 
      * @param array $data
      * @return int
      */
     public function create( $data ) {
-
-        $data = wp_parse_args( $data, [
-            'license_code_prefix' => '',
-            'license_generate_method' => '',
-            'license_code_character_limit' => ''
-        ] );
-
-        global $lwpdb;
-
-        // Update
-        if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $lwpdb->wpdb->update(
-                $lwpdb->lmfwppt_settings,
-                [
-                    'license_code_prefix' => sanitize_text_field( $data['license_code_prefix'] ),
-                    'license_generate_method' => sanitize_text_field( $data['license_generate_method'] ),
-                    'license_code_character_limit' => sanitize_text_field( $data['license_code_character_limit'] ),
-                ],
-                [
-                    'id' => $data['id']
-                ]
-            );
-
-            $insert_id = $data['id'];
-        } else {
-            $lwpdb->wpdb->insert(
-                $lwpdb->lmfwppt_settings,
-                [
-                    'license_code_prefix' => sanitize_text_field( $data['license_code_prefix'] ),
-                    'license_generate_method' => sanitize_text_field( $data['license_generate_method'] ),
-                    'license_code_character_limit' => sanitize_text_field( $data['license_code_character_limit'] ),
-                ] 
-            );
-
-            $insert_id = $lwpdb->wpdb->insert_id;
-        }
-
-
-        return $insert_id;
+        update_option('lmfwppt_settings', $data);
     }
+
+    /**
+     * Get Settings
+     * 
+     * @return array
+     */
+    public function get( $name = '' ) {
+        // Get all
+        $settings = $this->get_all();
+
+        // $settings = [
+        //     'license_key' => "asdfa",
+        //     'license_status' => "asdfa",
+        // ];
+
+        return isset( $settings[$name] ) ? $settings[$name] : '';
+    }
+
+    /**
+     * Get Settings
+     * 
+     * @return array
+     */
+    public function get_all() {
+        return get_option('lmfwppt_settings');
+    }
+
+
 }

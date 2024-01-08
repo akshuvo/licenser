@@ -9,6 +9,9 @@ $hide_order_email = isset( $lmfwppt_settings['hide_wclm_info_from_ordermeta'] ) 
 $license_generate_method = isset( $lmfwppt_settings['license_generate_method'] ) ? sanitize_text_field( $lmfwppt_settings['license_generate_method'] ) : 'microtime';
  
 
+// $code_prefix = Settings::get('license_code_prefix');
+
+
 ?>
 
 
