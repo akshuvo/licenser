@@ -101,6 +101,38 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
             <!-- Release -->
             <div class="lmwppt-inner-card">
                 <h2><?php esc_html_e( 'Release Information', 'licenser' ); ?></h2>
+
+                <!-- [stable_release] => stdClass Object
+        (
+            [id] => 28
+            [product_id] => 30
+            [version] => Qui vero cumque arch
+            [changelog] => At dolor aut incidun
+            [file_name] => Brielle Preston
+            [download_link] => https://www.salasejitaqon.cc
+            [release_date] => 1981-02-09 00:00:00
+        ) -->
+                <div class="lmfwppt-form-field">
+                    <div class="postbox lwp-postbox"> 
+                        <a class="header lmfwppt-toggle-head" data-toggle="collapse">
+                            <span id="poststuff">
+                                <h2 class="hndle">
+                                    <span class="release-head">
+                                        <span class="release-version"><?php echo esc_html( $product->stable_release->version ); ?></span>
+                                        <span class="release-date"><?php echo esc_html( $product->stable_release->release_date ); ?></span>
+                                        
+                                    </span>
+                                    <span class="dashicons indicator_field last-icon"></span>
+                                </h2>
+                            </span>
+                        </a>
+                        <div class="collapse lmfwppt-toggle-wrap" style="display: none;">
+                            <div class="inside">
+                                jkl
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
                     <div class="lwp-col-half">
                         <label for="product_version"><?php esc_html_e( 'Product Version', 'licenser' ); ?></label>
@@ -284,7 +316,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 </script>
 
 <script type="text/html" id="tmpl-license-package-field">
-    <div class="postbox lmfwppt_license_field"> 
+    <div class="postbox lwp-postbox lmfwppt_license_field"> 
         <!-- Wrapper Start -->
         <input type="hidden" name="license_packages[{{{data.field_id}}}][id]" value="{{{data.id}}}" />
         <a class="header lmfwppt-toggle-head" data-toggle="collapse">

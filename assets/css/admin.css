@@ -92,7 +92,7 @@
     margin-right: 3px;
 }
 
-.lmfwppt_license_field .hndle {
+.lwp-postbox .hndle {
     cursor: pointer !IMPORTANT;
     position: relative;
 }
@@ -116,8 +116,14 @@
     transition: all .3s ease;
 }
 
+
 .indicator_field:before {
     content: "\f347";
+}
+
+
+.indicator_field.last-icon {
+    right: 0;
 }
 
 span.delete_field {
@@ -150,11 +156,11 @@ span.delete_field:hover{
     display: block;
 }
 
-.postbox.lmfwppt_license_field {
+.postbox.lwp-postbox {
     margin-bottom: 5px;
 }
 
-.lmfwppt_license_field .hndle:hover {
+.lwp-postbox .hndle:hover {
     background-color: #f9f9f9;
 }
 

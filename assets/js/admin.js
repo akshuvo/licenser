@@ -36,7 +36,7 @@ jQuery(document).ready(function($){
     // Remove Section Field
     $(document).on('click', '.delete_field', function(e){
         e.preventDefault();
-        $(this).closest('.postbox').remove();
+        $(this).closest('.lwp-postbox').remove();
     } );
 
     // // Add Section Field 
