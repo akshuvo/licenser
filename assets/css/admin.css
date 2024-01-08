@@ -6,8 +6,24 @@
     box-sizing: border-box;
 }
 
+.d-flex {
+    display: flex;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
 .mb-0{
     margin-bottom: 0 !important;
+}
+
+.mb-15{
+    margin-bottom: 15px !important;
 }
 
 .lwp-row {
@@ -32,6 +48,11 @@
     column-gap: 20px;
 }
 
+.twp-spacer {
+    display: inline-block;
+    width: 10px;
+}
+
 .lmwppt-inner-card {
     background: rgb(255, 255, 255);
     border-radius: 3px;
@@ -40,6 +61,7 @@
     margin: 0 auto;
     padding: 30px;
     margin-bottom: 30px;
+    position: relative;
 }
 
 .lmfwppt-form-field {
@@ -305,4 +327,60 @@ p.submit {
 
 .lmwppt-inner-card h2:first-child {
     margin-top: 0;
+}
+
+.release-head {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    color: #646970;
+}
+
+.release-head>span {
+    margin-right: 15px;
+}
+
+.lwp-tag {
+    background-color: #656a70;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.lwp-tag-success {
+    background-color: #00c875;
+}
+
+.twp-not-found {
+    text-align: center;
+    padding: 30px;
+    border: 1px solid rgb(226, 228, 231);
+}
+
+.twp-not-found .dashicons {
+    font-size: 60px;
+    height: auto;
+    width: auto;
+}
+
+.cancel-release {
+    font-size: 30px;
+    position: absolute;
+    right: 7px;
+    top: 7px;
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.cancel-release:hover {
+    background-color: #f1f1f1;
+    color: #dc3545;
 }
