@@ -103,8 +103,13 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
             <!-- Release -->
             <div class="lmwppt-inner-card release-information">
-                <h2><?php esc_html_e( 'Release Information', 'licenser' ); ?></h2>
-                
+                <div class="d-flex justify-content-between mb-15">
+                    <h2 class="mb-0"><?php esc_html_e( 'Release Information', 'licenser' ); ?></h2>
+                    <?php if( isset( $product->stable_release->download_link ) && !empty( $product->stable_release->download_link ) ) : ?>
+                        <button class="button twp-btn twp-btn-lg add-release-btn hide-on-add-release" type="button"><?php esc_html_e( 'Add New Release', 'licenser' ); ?></button>
+                    <?php endif; ?>
+                </div>
+                <div class="add-release-form"></div>
                 <?php if( isset( $product->stable_release->download_link ) && !empty( $product->stable_release->download_link ) ) : ?>
                     <div class="lmfwppt-form-field">
                         <div class="postbox lwp-postbox"> 
@@ -139,7 +144,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
                             </div>
                         </div>
                     </div>
-                    <button class="button twp-btn twp-btn-lg add-release-btn hide-on-add-release" type="button"><?php esc_html_e( 'Add New Release', 'licenser' ); ?></button>
+                    
                 <?php else: ?>
                     <div class="twp-not-found hide-on-add-release">
                         <span class="dashicons dashicons-info-outline"></span>
@@ -151,7 +156,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
                 <?php endif; ?>
 
-                <div class="add-release-form"></div>
+               
             </div>
             <!-- /Release -->
 
