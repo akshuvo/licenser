@@ -2,9 +2,11 @@
 namespace Licenser\API;
 use Licenser\Controllers\RestController;
 use Licenser\Models\Product;
+use Licenser\Models\LicensePackage;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
+use WP_Error;
 
 /**
  * REST Class
@@ -44,6 +46,47 @@ class Products extends RestController {
                 'schema' => [ $this, 'get_item_schema' ],
             ]
         );
+
+        // Delete Product Package
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/packages/(?P<id>[\d]+)',
+            [
+                [
+                    'methods'             => WP_REST_Server::DELETABLE,
+                    'callback'            => [ $this, 'delete_package' ],
+                    'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+                    'args'                => [
+                        'id' => [
+                            'description' => __( 'Package ID.' ),
+                            'type'        => 'integer',
+                            'required'    => true,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        // Product Single Route
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/(?P<id>[\d]+)',
+            [
+                [
+                    'methods'             => WP_REST_Server::DELETABLE,
+                    'callback'            => [ $this, 'delete_item' ],
+                    'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+                    'args'                => [
+                        'id' => [
+                            'description' => __( 'Product ID.' ),
+                            'type'        => 'integer',
+                            'required'    => true,
+                        ],
+                    ],
+                ],
+            ]
+        );
+        
     }
 
     /**
@@ -90,4 +133,51 @@ class Products extends RestController {
     }
 
 
+
+    /**
+     * Delete a single item
+     *
+     * @param WP_REST_Request $request Full data about the request.
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    public function delete_item( $request ) {
+
+        $id = $request->get_param( 'id' );
+
+        $product = Product::instance()->delete( $id );
+
+        return rest_ensure_response( $product );
+    }
+
+    /**
+     * Delete a single package
+     *
+     * @param WP_REST_Request $request Full data about the request.
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    public function delete_package( $request ) {
+
+        $id = $request->get_param( 'id' );
+
+        // Get Package
+        $package = LicensePackage::instance()->get( $id );
+
+        if ( ! $package ) {
+            return new WP_Error(
+                'not_found',
+                __( 'Invalid Package ID.' ),
+                [ 'status' => 404 ]
+            );
+        }
+
+        // Delete Package
+        $deleted = LicensePackage::instance()->delete( $id );
+
+        return rest_ensure_response( [
+            'deleted' => $deleted,
+            'package' => $package,
+        ] );
+    }
 }

@@ -132,4 +132,23 @@ class LicensePackage {
 
         return $insert_id;
     }
+
+    /**
+     * Delete Product License Package
+     * 
+     * @param int $id
+     * @return int
+     */
+    public function delete( $id ) {
+        global $lwpdb;
+
+        $lwpdb->wpdb->delete(
+            $lwpdb->license_packages,
+            [
+                'id' => $id
+            ]
+        );
+
+        return true;
+    }
 }

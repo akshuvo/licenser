@@ -342,24 +342,64 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
     });
 
+    // Remove Package
+    jQuery(document).on('lwp_postbox_removed', function(e, postBox){
+        let $this = jQuery(postBox);
+
+        // Return if attr is not lwp_delete_package
+        if( $this.attr('data-postbox-id') != 'lwp_delete_package' ){
+            return;
+        }
+
+        // PostBox ID
+        let postBoxId = $this.find('.license-package-id').val();
+
+        // Return if no id
+        if( !postBoxId ){
+            return;
+        }
+        
+
+        console.log(postBoxId);
+
+        // Remove from database
+        jQuery.ajax({
+            type: 'delete',
+            url: Licenser.rest_url + 'products/packages/' + postBoxId,
+            beforeSend: function(xhr) {
+                // Nonce
+                xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
+            },
+            success: function(data) {
+                jQuery(document).trigger('load_product_packages');
+            },
+            error: function(data) {
+                jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
+            },
+
+        });
+    });
+
 
     // Document Ready
     jQuery(document).ready(function(){
         jQuery(document).trigger('load_product_packages');
     });
 
+    
+
 </script>
 
 <script type="text/html" id="tmpl-license-package-field">
-    <div class="postbox lwp-postbox lmfwppt_license_field"> 
+    <div class="postbox lwp-postbox lmfwppt_license_field" data-postbox-id="lwp_delete_package">
         <!-- Wrapper Start -->
-        <input type="hidden" name="license_packages[{{{data.field_id}}}][id]" value="{{{data.id}}}" />
+        <input type="hidden" name="license_packages[{{{data.field_id}}}][id]" value="{{{data.id}}}" class="license-package-id">
         <a class="header lmfwppt-toggle-head" data-toggle="collapse">
             <span id="poststuff">
                 <h2 class="hndle">
                     <input type="text" class="prevent-toggle-head license-package-name regular-text" name="license_packages[{{{data.field_id}}}][label]" placeholder="License Title: 1yr unlimited domain." value="{{{data.label}}}" title="Change title to anything you like. Make sure they are unique." required />
                     <span class="dashicons indicator_field"></span>
-                    <span class="delete_field">&times;</span>
+                    <span class="delete_field remove-lwp-postbox">&times;</span>
                 </h2>
             </span>
         </a>

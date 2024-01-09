@@ -27,16 +27,22 @@ jQuery(document).ready(function($){
 
 
     // Accordion Toggle
-    $(document).on('click', '.lmfwppt-toggle-head', function(e){
+    jQuery(document).on('click', '.lmfwppt-toggle-head', function(e){
     	e.preventDefault();
-        $(this).parent().toggleClass('opened').find('.lmfwppt-toggle-wrap').slideToggle('fast');
+        jQuery(this).parent().toggleClass('opened').find('.lmfwppt-toggle-wrap').slideToggle('fast');
         return false;
     });
 
     // Remove Section Field
-    $(document).on('click', '.delete_field', function(e){
+    jQuery(document).on('click', '.remove-lwp-postbox', function(e){
         e.preventDefault();
-        $(this).closest('.lwp-postbox').remove();
+        let postBox = jQuery(this).closest('.lwp-postbox');
+
+        // Trigger change
+        jQuery(document).trigger('lwp_postbox_removed', postBox );
+
+        // Remove
+        postBox.remove();
     } );
 
     // // Add Section Field 
