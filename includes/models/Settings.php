@@ -12,7 +12,7 @@ class Settings {
      * @param array $data
      * @return int
      */
-    public function create( $data ) {
+    public function update( $data ) {
         update_option('lmfwppt_settings', $data);
     }
 
@@ -24,11 +24,6 @@ class Settings {
     public function get( $name = '' ) {
         // Get all
         $settings = $this->get_all();
-
-        // $settings = [
-        //     'license_key' => "asdfa",
-        //     'license_status' => "asdfa",
-        // ];
 
         return isset( $settings[$name] ) ? $settings[$name] : '';
     }

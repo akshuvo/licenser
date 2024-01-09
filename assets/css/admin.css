@@ -311,6 +311,10 @@ p.submit {
     display: none;
 }
 
+.key-spinner.is-active{
+    display: inline-block
+}
+
 #generate_key {
     display: flex;
     align-items: center;

@@ -45,6 +45,22 @@ class Licenses extends RestController {
                 'schema' => [ $this, 'get_item_schema' ],
             ]
         );
+
+        // Generate Key
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/generate-key',
+            [
+                [
+                    'methods'             => WP_REST_Server::CREATABLE,
+                    'callback'            => function( $request ) {
+                        return rest_ensure_response( License::instance()->generate_key() );
+                    },
+                    'permission_callback' => [ $this, 'create_item_permissions_check' ],
+                    'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
+                ],
+            ]
+        );
   
         register_rest_route(
             $this->namespace,

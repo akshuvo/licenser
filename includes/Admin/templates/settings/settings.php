@@ -3,6 +3,7 @@
 use Licenser\Models\Settings;
 
 $settings = Settings::instance()->get_all(); 
+
 $lmfwppt_settings = get_option( 'lmfwppt_settings' );
 
 
@@ -46,7 +47,7 @@ $license_generate_method = isset( $lmfwppt_settings['license_generate_method'] )
                      <p><?php esc_html_e( '(Without License Code Prefix)', 'lmfwppt' ); ?></p>
                   </td>
                </tr>
-            <?php if( class_exists('LMFWPPTWCEXT')): ?>
+            <?php //if( class_exists('LMFWPPTWCEXT')): ?>
                <tr>
                   <th scope="row"><?php esc_html_e( 'Hide License Info from WooCommerce', 'lmfwppt' ); ?></th>
                    <td>
@@ -58,7 +59,7 @@ $license_generate_method = isset( $lmfwppt_settings['license_generate_method'] )
                        </fieldset>
                    </td>
                </tr>
-            <?php endif; ?> 
+            <?php //endif; ?> 
 
             </tbody>
          </table>

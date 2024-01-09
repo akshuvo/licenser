@@ -236,4 +236,32 @@ $get_domains = $license_handler->get_domains( $license_id );
             },
         });
     });
+
+    // Generate License Key
+    jQuery(document).on('click', '#generate_key', function(e) {
+        e.preventDefault();
+        let $this = jQuery(this);
+
+        jQuery.ajax({
+            type: 'post',
+            url: Licenser.rest_url + 'licenses/generate-key',
+            beforeSend: function(xhr) {
+                // Nonce
+                xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
+                
+                $this.find('.spinner').addClass('is-active');
+                $this.find('.generate-key-label').hide();
+            },
+            complete: function(data) {
+                $this.find('.spinner').removeClass('is-active');
+                $this.find('.generate-key-label').show();
+            },
+            success: function(data) {
+                jQuery('#license_key').val(data);
+            },
+            error: function(data) {
+                jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
+            },
+        });
+    });
 </script>
