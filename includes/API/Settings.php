@@ -39,12 +39,7 @@ class Settings extends RestController {
                     'methods'             => WP_REST_Server::CREATABLE,
                     'callback'            => [ $this, 'create_item' ],
                     'permission_callback' => [ $this, 'create_item_permissions_check' ],
-                    'args'                => [
-                        'lmfwppt_settings' => [
-                            'description' => __( 'Settings data.' ),
-                            'required'    => true,
-                        ],
-                    ]
+                    'args'                => []
                 ],
                 'schema' => [ $this, 'get_item_schema' ],
             ]
@@ -87,11 +82,12 @@ class Settings extends RestController {
      */
     public function create_item( $request ) {
 
-        $params = $request->get_params();
         
-        Settings::instance()->create( $params );
+        $params = $request->get_params();
 
-        return rest_ensure_response( Settings::instance()->get_all() );
+        $createdata = SettingsModel::instance()->create( $params );
+        
+        return rest_ensure_response( SettingsModel::instance()->get_all() );
     }
 
 
