@@ -1,2 +1,2 @@
-# license-manager-for-wordpress-plugins-themes
-Self-Hosted license manager WordPress Plugins
+# Licenser
+License management system for your digital assets.
