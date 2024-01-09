@@ -98,7 +98,7 @@ $get_domains = $license_handler->get_domains( $license_id );
                     </div>
                     <div class="lmfwppt-form-field">
                         <label for="product_type"><?php esc_html_e( 'Product Type', 'lmfwppt' ); ?></label>
-                        <select name="product_type" id="product_type" required>
+                        <select name="product_type" id="product_type" >
                             <option value=""><?php esc_html_e( 'Select Product Type', 'lmfwppt' ); ?></option>
                             <option value="theme" <?php selected( $product_type, 'theme' ); ?> ><?php esc_html_e( 'Theme', 'lmfwppt' ); ?></option>
                             <option value="plugin" <?php selected( $product_type, 'plugin' ); ?> ><?php esc_html_e( 'Plugin', 'lmfwppt' ); ?></option>
@@ -108,7 +108,7 @@ $get_domains = $license_handler->get_domains( $license_id );
                     <!-- Select Product -->
                     <div class="lmfwppt-form-field lmfwppt_theme_products">
                         <label for="product_theme_list"><?php esc_html_e( 'Select Product', 'lmfwppt' ); ?></label>
-                        <select name="product_list" class="products_list" id="product_theme_list" required>
+                        <select name="product_list" class="products_list" id="product_theme_list" >
                             <option value="" class="blank">Select Product</option>
                             <?php
                                 $items = lmfwppt_get_product_list("theme");
@@ -126,7 +126,7 @@ $get_domains = $license_handler->get_domains( $license_id );
                     <!--  License Package -->
                     <div class="lmfwppt-form-field lmfwppt_license_package" id="lmfwppt_license_package">
                         <label for="lmfwppt_package_list"><?php esc_html_e( 'Select Package', 'lmfwppt' ); ?></label>
-                        <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php esc_attr_e( $package_id, 'lmfwppt' ); ?>" required>
+                        <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php esc_attr_e( $package_id, 'lmfwppt' ); ?>" >
                              <option value="" class="blank"><?php esc_html_e( 'Select Package', 'lmfwppt' ); ?></option>
                              
                         </select>
@@ -174,4 +174,66 @@ $get_domains = $license_handler->get_domains( $license_id );
  
 </div>
 
- 
+
+<script>
+    // Submit Product Form
+    jQuery(document).on('submit', '#license-add-form', function(e) {
+        e.preventDefault();
+        let $this = jQuery(this);
+
+        let formData = new FormData(this);
+
+        // Convert FormData to JSON
+        let jsonObject = {};
+        formData.forEach(function(value, key){
+            // Handle fields with square bracket notation
+            if (key.includes("[") && key.includes("]")) {
+                var keys = key.match(/\w+/g); // Extract keys from the name attribute
+                var currentObject = jsonObject;
+                for (var i = 0; i < keys.length - 1; i++) {
+                    currentObject[keys[i]] = currentObject[keys[i]] || {};
+                    currentObject = currentObject[keys[i]];
+                }
+                currentObject[keys[keys.length - 1]] = value;
+            } else {
+                // Handle regular fields
+                jsonObject[key] = value;
+            }
+    
+        });
+
+        // Get Product type
+        let productType = jQuery('#product_type').val();
+
+        jQuery.ajax({
+            type: 'post',
+            url: Licenser.rest_url + 'licenses',
+            data: JSON.stringify(jsonObject), // Convert JSON object to a string
+            contentType: 'application/json', // Set content type to JSON
+            beforeSend: function(xhr) {
+                // Nonce
+                xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
+                
+                $this.find('.spinner').addClass('is-active');
+                $this.find('[type="submit"]').prop('disabled', true);
+                jQuery(document).trigger("lmfwppt_notice", ['', 'remove']);
+            },
+            complete: function(data) {
+                $this.find('.spinner').removeClass('is-active');
+                $this.find('[type="submit"]').prop('disabled', false);
+            },
+            success: function(data) {
+                // Success Message and Redirection
+                if (jQuery('.lmfwppt_edit_id').val()) {
+                    jQuery(document).trigger("lmfwppt_notice", ['License updated successfully.', 'success']);
+                } else {
+                    jQuery(document).trigger("lmfwppt_notice", ['License added successfully. Redirecting...', 'success']);
+                    // window.location = '/wp-admin/admin.php?page=licenser-'+productType+'s&action=edit&id='+data+'&message=1';
+                }
+            },
+            error: function(data) {
+                jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
+            },
+        });
+    });
+</script>

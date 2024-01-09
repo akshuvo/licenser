@@ -59,7 +59,7 @@ class Installer {
 
             // Product Releases Table
             $schema[] = "CREATE TABLE `{$table_prefix}product_releases` (
-              `id` int(11) NOT NULL AUTO_INCREMENT,
+              `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
               `product_id` int(11) NOT NULL,
               `version` varchar(30) DEFAULT NULL,
               `changelog` text DEFAULT NULL,
@@ -88,14 +88,15 @@ class Installer {
 
 	        // Generated Licenses
 	        $schema[] = "CREATE TABLE `{$table_prefix}licenses` (
-	          `id` int NOT NULL AUTO_INCREMENT,
+	          `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	          `status` tinyint(1) NOT NULL DEFAULT 1,
 	          `license_key` varchar(255) NOT NULL DEFAULT '',
-	          `package_id` varchar(100) NOT NULL,
-	          `order_id` int,
-	          `end_date` datetime DEFAULT NOW(),
+	          `package_id` INT(128) NOT NULL,
+			  `source` varchar(100) NULL,
+	          `source_id` bigint(20) unsigned NOT NULL DEFAULT 0,
+	          `end_date` datetime DEFAULT NULL,
 	          `is_lifetime` tinyint(1) NOT NULL DEFAULT 0,
-	          `domain_limit` int(100),
+	          `domain_limit` INT(128) NULL,
 	          `dated` datetime NOT NULL DEFAULT NOW(),
 	          PRIMARY KEY (`id`)
 	        ) $charset_collate";
@@ -105,8 +106,8 @@ class Installer {
 
 	        // Activated Domains
 	        $schema[] = "CREATE TABLE `{$table_prefix}license_domains` (
-	          `id` int NOT NULL AUTO_INCREMENT,
-	          `license_id` int NOT NULL,
+	          `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	          `license_id` bigint(20) unsigned NOT NULL,
 	          `domain` varchar(255) NOT NULL,
 	          `status` tinyint(1) NOT NULL DEFAULT 1,
 	          `dated` datetime NOT NULL DEFAULT NOW(),
