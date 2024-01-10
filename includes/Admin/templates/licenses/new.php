@@ -1,63 +1,42 @@
 <?php
-// Default args
-$defaults_args = array (
-    'id' => '',
-    'status' => '',
-    'license_key' => '',
-    'package_id' => '',
-    'order_id' => '',
-    'end_date' => '',
-    'is_lifetime' => '',
-    'domain_limit' => '',
-);
+use Licenser\Models\License;
+use Licenser\Models\Product;
 
-// License Class
-$license_handler = new Licenser\Licenses();
+// Product instance
+$product_model = Product::instance();
 
-// Product Class
-$product_handler = new Licenser\Products();
-
-$get_product = array();
-$get_packages = null;
+// License instance
+$license_model = License::instance();
 
 // License ID
-$license_id = isset( $_GET['id'] ) ? intval( sanitize_text_field( $_GET['id'] ) ) : 0;
+$license_id = isset( $_GET['id'] ) ? intval( $_GET['id'] ) : '';
+
+// Get License
+$license = $license_model->get( $license_id );
+
+
+// Products
+$products = $product_model->get_all([
+    'status' => 'active',
+    'number' => -1,
+    'inc_packages' => true,
+    'columns' => 'id, name, product_type',
+]);
+
+
+echo "<pre>"; print_r($products); echo "</pre>";
+
+
 
 // Submit button label for Add
-$submit_button_label = __( 'Add License', 'lmfwppt' );
+$submit_button_label = __( 'Add License', 'licenser' );
 
 if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
 
-    // Get Product date 
-    $get_product = $license_handler->get_license( $license_id );
-
-    // Get packages data
-    $get_packages = $product_handler->get_packages( $license_id );
-
     // Submit button label for Edit
-    $submit_button_label = __( 'Edit License', 'lmfwppt' );
+    $submit_button_label = __( 'Edit License', 'licenser' );
 
 }
-
-// Parse incoming $args into an array and merge it with $defaults
-$get_product = wp_parse_args( $get_product, $defaults_args );
-// Let's extract the array to variable
-extract( $get_product );
-
-// If lifetime the remove end date
-if ( $is_lifetime || empty( $end_date ) || $end_date == "0000-00-00 00:00:00" ) {
-    $end_date = '';
-} else {
-    $end_date = date('Y-m-d', strtotime($end_date));
-}
-
-//license edit
-$product_details = $product_handler->get_product_details_by_package_id($package_id);
-$product_type = isset( $product_details['product_type'] ) ? $product_details['product_type'] : '' ;
-$product_id = isset( $product_details['product_id'] ) ? $product_details['product_id'] : '';
-
-// Get Domains 
-$get_domains = $license_handler->get_domains( $license_id );
 
 ?>
 <div class="wrap">
@@ -66,9 +45,9 @@ $get_domains = $license_handler->get_domains( $license_id );
 
         <div class="lmwppt-inner-card card-shameless">
             <?php if( isset( $_GET['id'] ) ) : ?>
-                <h1><?php _e( 'Edit License', 'lmfwppt' ); ?></h1>
+                <h1><?php _e( 'Edit License', 'licenser' ); ?></h1>
             <?php else : ?>
-                <h1><?php _e( 'Add New License', 'lmfwppt' ); ?></h1>
+                <h1><?php _e( 'Add New License', 'licenser' ); ?></h1>
             <?php endif; ?>
         </div>
 
@@ -76,15 +55,15 @@ $get_domains = $license_handler->get_domains( $license_id );
             
             <div class="lmwppt-inner-card">
                 <div class="lmfwppt-form-section" id="product-information">
-                    <h2><?php esc_html_e( 'Product Information', 'lmfwppt' ); ?></h2>
+                    <h2><?php esc_html_e( 'Product Information', 'licenser' ); ?></h2>
 
                     <div class="lmfwppt-form-field">
-                        <label for="download_link"><?php esc_html_e( 'License Key', 'lmfwppt' ); ?></label>
+                        <label for="download_link"><?php esc_html_e( 'License Key', 'licenser' ); ?></label>
                         <div class="lmfwppt-file-field">
-                            <input type="text" name="license_key" id="license_key" class="regular-text" placeholder="<?php esc_attr_e( 'License Key', 'lmfwppt' ); ?>" value="<?php echo esc_attr( $license_key );?>" readonly required />
+                            <input type="text" name="license_key" id="license_key" class="regular-text" placeholder="<?php esc_attr_e( 'License Key', 'licenser' ); ?>" value="<?php echo esc_attr( $license_key );?>" readonly required />
 
                             <button class="button" type="button" id="generate_key">
-                            <span class="generate-key-label"><?php esc_html_e( 'Generate Key', 'lmfwppt' ); ?></span>
+                            <span class="generate-key-label"><?php esc_html_e( 'Generate Key', 'licenser' ); ?></span>
                             <span class="spinner key-spinner"></span>
                             </button>
                             
@@ -92,56 +71,50 @@ $get_domains = $license_handler->get_domains( $license_id );
                     </div>
 
                     <div class="lmfwppt-form-field">
-                        <label for="order_id"><?php esc_html_e( 'Order ID', 'lmfwppt' ); ?></label>
+                        <label for="order_id"><?php esc_html_e( 'Order ID', 'licenser' ); ?></label>
                          
                         <input type="number" name="order_id" id="order_id" class="regular-text" placeholder="Order ID" value="<?php echo esc_attr( $order_id ); ?>">
                     </div>
                     <div class="lmfwppt-form-field">
-                        <label for="product_type"><?php esc_html_e( 'Product Type', 'lmfwppt' ); ?></label>
-                        <select name="product_type" id="product_type" >
-                            <option value=""><?php esc_html_e( 'Select Product Type', 'lmfwppt' ); ?></option>
-                            <option value="theme" <?php selected( $product_type, 'theme' ); ?> ><?php esc_html_e( 'Theme', 'lmfwppt' ); ?></option>
-                            <option value="plugin" <?php selected( $product_type, 'plugin' ); ?> ><?php esc_html_e( 'Plugin', 'lmfwppt' ); ?></option>
+                        <label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
+                        <select name="product_type" id="product_type">
+                            <option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
+                            <?php foreach( $product_model->get_types() as $key => $value ) : ?>
+                                <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $product->product_type, $key ); ?> ><?php echo esc_html( $value ); ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     
                     <!-- Select Product -->
                     <div class="lmfwppt-form-field lmfwppt_theme_products">
-                        <label for="product_theme_list"><?php esc_html_e( 'Select Product', 'lmfwppt' ); ?></label>
-                        <select name="product_list" class="products_list" id="product_theme_list" >
+                        <label for="product_list"><?php esc_html_e( 'Select Product', 'licenser' ); ?></label>
+                        <select name="product_list" class="products_list" id="product_list" >
                             <option value="" class="blank">Select Product</option>
-                            <?php
-                                $items = lmfwppt_get_product_list("theme");
-                                foreach ($items as $products_list):?>   
-                                <option value="<?php echo $products_list->id; ?>" class="theme-opt" <?php selected( $product_id, $products_list->id ); ?>><?php echo $products_list->name; ?></option>
-                               <?php endforeach; ?>
-                           <?php
-                                $items = lmfwppt_get_product_list("plugin");
-                                foreach ($items as $products_list):?>
-                                <option value="<?php echo $products_list->id; ?>" class="plugin-opt" <?php selected( $product_id, $products_list->id ); ?>><?php echo $products_list->name; ?></option>
-                                <?php endforeach; ?> 
+                            <?php foreach ( $products as $product ): ?>   
+                                <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>" <?php selected( $product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                      
                     <!--  License Package -->
                     <div class="lmfwppt-form-field lmfwppt_license_package" id="lmfwppt_license_package">
-                        <label for="lmfwppt_package_list"><?php esc_html_e( 'Select Package', 'lmfwppt' ); ?></label>
-                        <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php esc_attr_e( $package_id, 'lmfwppt' ); ?>" >
-                             <option value="" class="blank"><?php esc_html_e( 'Select Package', 'lmfwppt' ); ?></option>
+                        <label for="lmfwppt_package_list"><?php esc_html_e( 'Select Package', 'licenser' ); ?></label>
+                        <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php esc_attr_e( $package_id, 'licenser' ); ?>" >
+                             <option value="" class="blank"><?php esc_html_e( 'Select Package', 'licenser' ); ?></option>
                              
                         </select>
                     </div>
 
                     <div class="lmfwppt-form-field">
-                        <label for="end_date"><?php esc_html_e( 'License End Date', 'lmfwppt' ); ?></label>
+                        <label for="end_date"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
                         <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $end_date ); ?>">
-                        <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'lmfwppt' ); ?></div>
+                        <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
                     </div>
 
                     <div class="lmfwppt-form-field">
-                        <label for="end_date"><?php esc_html_e( 'License Domain Limit', 'lmfwppt' ); ?></label>
+                        <label for="end_date"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
                         <input type="number" name="domain_limit" id="domain_limit" class="regular-text product_name_input" placeholder="Enter Domain Limit" value="<?php echo esc_attr( $domain_limit ); ?>">
-                        <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'lmfwppt' ); ?></div>
+                        <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
                     </div>
                 </div>
             </div>
@@ -149,7 +122,7 @@ $get_domains = $license_handler->get_domains( $license_id );
                 <div class="lmfwppt-form-section" id="license-information">
                     <h2>Activated Domains</h2>
                     <div id="lmfwppt_domains_fields">
-                        <?php $license_handler::get_domains_html( $get_domains ); ?>
+                        <?php //$license_handler::get_domains_html( $get_domains ); ?>
                     </div>
                     <button class="button lmfwppt-domain-activate" type="button">Add Domain</button>
                 </div>
@@ -263,5 +236,15 @@ $get_domains = $license_handler->get_domains( $license_id );
                 jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
             },
         });
+    });
+
+    // Document Ready
+    jQuery(document).ready(function() {
+        
+        // Generate license key if #license_key is empty
+        if ( jQuery('#license_key').val() == '' ) {
+            jQuery('#generate_key').trigger('click');
+        }
+
     });
 </script>

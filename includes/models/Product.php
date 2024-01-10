@@ -104,32 +104,69 @@ class Product {
             'orderby' => 'id',
             'order' => 'DESC',
             'count_total' => true,
+            'name' => '',
+            'slug' => '',
+            'uuid' => '',
+            'product_type' => '',
             'status' => 'active',
+            'inc_packages' => false,
+            'columns' => '*',
         ];
 
         $args = wp_parse_args( $args, $defaults );
 
-        $where = '';
+        $where = ' 1=1 ';
+
+        if( !empty( $args['name'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND name = %s", $args['name'] );
+        }
+
+        if( !empty( $args['slug'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND slug = %s", $args['slug'] );
+        }
+
+        if( !empty( $args['uuid'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND uuid = %s", $args['uuid'] );
+        }
+
+        if( !empty( $args['product_type'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND product_type = %s", $args['product_type'] );
+        }
 
         if( !empty( $args['status'] ) ){
-            $where .= " AND status = '{$args['status']}'";
+            $where .= $lwpdb->wpdb->prepare( " AND status = %s", $args['status'] );
         }
 
-        $query = "SELECT * FROM {$lwpdb->products} WHERE 1=1 {$where}";
+        // Order
+        $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
-        if( !empty( $args['orderby'] ) && !empty( $args['order'] ) ){
-            $query .= " ORDER BY {$args['orderby']} {$args['order']}";
+        $limit = '';
+        if( $args['number'] != -1 ){
+            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
-        if( !empty( $args['number'] ) && !empty( $args['offset'] ) ){
-            $query .= " LIMIT {$args['offset']}, {$args['number']}";
+        // Columns
+        $columns = sanitize_text_field( $args['columns'] );
+
+        $query = "SELECT {$columns} FROM {$lwpdb->products} WHERE {$where} {$limit}";
+
+        $items = $lwpdb->wpdb->get_results( $query );
+
+        // Return if no product found
+        if( empty( $items ) ){
+            return false;
         }
 
-        error_log( $query );
+        // Include Packages
+        if( $args['inc_packages'] ){
+            foreach( $items as $item ){
+                $item->packages = isset( $item->id ) ? LicensePackage::instance()->get_all([
+                    'product_id' => $item->id,
+                ]) : [];
+            }
+        }
 
-        $products = $lwpdb->wpdb->get_results( $query );
-
-        return $products;
+        return $items;
     }
 
     /**

@@ -6,7 +6,41 @@ class License {
 
     use \Licenser\Traits\SingletonTraitSelf;
 
+    // Default Fields
+    public $default_fields = [
+        'status' => '',
+        'license_key' => '',
+        'package_id' => '',
+        'order_id' => '',
+        'end_date' => '',
+        'is_lifetime' => '',
+        'domain_limit' => '',
+        'source' => '',
+        'source_id' => '',
+    ];
 
+    /**
+     * Get Product License
+     *
+     * @var int
+     */
+    public function get( $id ) {
+        global $lwpdb;
+
+        $license = $lwpdb->wpdb->get_row(
+            $lwpdb->wpdb->prepare(
+                "SELECT * FROM {$lwpdb->licenses} WHERE id = %d",
+                $id
+            )
+        );
+
+        // Return if no license found
+        if( empty( $license ) ){
+            return false;
+        }
+
+        return $license;
+    }
 
     /**
      * Create License

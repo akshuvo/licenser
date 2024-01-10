@@ -480,29 +480,6 @@ class Licenses {
         die();
     }
 
-    // License Key Genarate Ajax Hook
-    function ajax_generate_license_key(){
-        echo self::generate_license_key();
-        die();
-    }
-
-    // License Key Genarate function
-    public static function generate_license_key() {
-        
-
-        $method = licenser_get_option('license_generate_method');
-        if ( $method == 'wp_generate' ) {
-            $limit = licenser_get_option('license_code_character_limit');
-            $key = wp_generate_password( $limit, false, false );
-        } else {
-            $key = md5( microtime() . rand() );
-        }
-
-        $prefix = licenser_get_option('license_code_prefix');
-        
-        return $prefix.$key;
-    }
-
     // Delete License Id
     function lmfwppt_delete_license( $id ) {
         global $wpdb;
