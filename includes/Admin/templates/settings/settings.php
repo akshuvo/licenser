@@ -2,16 +2,16 @@
 // Get Settings
 use Licenser\Models\Settings;
 
-$settings = Settings::instance()->get_all(); 
+$settings = Settings::instance()->get_all();
 
-$lmfwppt_settings = get_option( 'lmfwppt_settings' );
+//$lmfwppt_settings = get_option( 'lmfwppt_settings' );
 
 
-$code_prefix = isset( $lmfwppt_settings['license_code_prefix'] ) ? sanitize_text_field( $lmfwppt_settings['license_code_prefix'] ) : '';
-$character_limit = isset( $lmfwppt_settings['license_code_character_limit'] ) ? $lmfwppt_settings['license_code_character_limit'] : '32';
-$hide_cart_checkout = isset( $lmfwppt_settings['hide_wclm_info_from_cart'] ) ? sanitize_text_field( $lmfwppt_settings['hide_wclm_info_from_cart'] ) : '';
-$hide_order_email = isset( $lmfwppt_settings['hide_wclm_info_from_ordermeta'] ) ? sanitize_text_field( $lmfwppt_settings['hide_wclm_info_from_ordermeta'] ) : '';
-$license_generate_method = isset( $lmfwppt_settings['license_generate_method'] ) ? sanitize_text_field( $lmfwppt_settings['license_generate_method'] ) : 'microtime';
+$code_prefix = isset( $settings['license_code_prefix'] ) ? sanitize_text_field( $settings['license_code_prefix'] ) : '';
+$character_limit = isset( $settings['license_code_character_limit'] ) ? $settings['license_code_character_limit'] : '32';
+$hide_cart_checkout = isset( $settings['hide_wclm_info_from_cart'] ) ? sanitize_text_field( $settings['hide_wclm_info_from_cart'] ) : '';
+$hide_order_email = isset( $settings['hide_wclm_info_from_ordermeta'] ) ? sanitize_text_field( $settings['hide_wclm_info_from_ordermeta'] ) : '';
+$license_generate_method = isset( $settings['license_generate_method'] ) ? sanitize_text_field( $settings['license_generate_method'] ) : 'microtime';
  
 
 // $code_prefix = Settings::get('license_code_prefix');
