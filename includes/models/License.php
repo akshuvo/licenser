@@ -54,7 +54,8 @@ class License {
             'status' => 1,
             'license_key' => '',
             'package_id' => '',
-            'order_id' => '',
+            'source' => '',
+            'source_id' => '',
             'end_date' => '',
             'is_lifetime' => 0,
             'domain_limit' => '',
@@ -62,6 +63,7 @@ class License {
         ] );
 
         global $lwpdb;
+
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
@@ -71,7 +73,8 @@ class License {
                     'status' => intval( $data['status'] ),
                     'license_key' => sanitize_text_field( $data['license_key'] ),
                     'package_id' => sanitize_text_field( $data['package_id'] ),
-                    'order_id' => intval( $data['order_id'] ),
+                    'source' => sanitize_text_field( $data['source'] ),
+                    'source_id' => intval( $data['source_id'] ),
                     'end_date' => date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
                     'is_lifetime' => intval( $data['is_lifetime'] ),
                     'domain_limit' => intval( $data['domain_limit'] )
@@ -89,7 +92,8 @@ class License {
                     'status' => intval( $data['status'] ),
                     'license_key' => sanitize_text_field( $data['license_key'] ),
                     'package_id' => sanitize_text_field( $data['package_id'] ),
-                    'order_id' => intval( $data['order_id'] ),
+                    'source' => sanitize_text_field( $data['source'] ),
+                    'source_id' => intval( $data['source_id'] ),
                     'end_date' => date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
                     'is_lifetime' => intval( $data['is_lifetime'] ),
                     'domain_limit' => intval( $data['domain_limit'] ),

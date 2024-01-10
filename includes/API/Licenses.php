@@ -117,6 +117,11 @@ class Licenses extends RestController {
     public function create_item( $request ) {
 
         $params = $request->get_params();
+
+        // Is Lifetime Checkbox Checked
+        if( $params['is_lifetime'] == 'on' ){
+            $params['is_lifetime'] = 1;
+        }
         
         $license = License::instance()->create( $params );
         

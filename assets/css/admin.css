@@ -26,6 +26,10 @@
     margin-bottom: 15px !important;
 }
 
+.mr-15{
+    margin-right: 15px !important;
+}
+
 .lwp-row {
     display: flex;
     align-items: center;
@@ -78,7 +82,7 @@
     line-height: 21px;
 }
 
-.lmfwppt-form-field input,
+.lmfwppt-form-field input:not([type="checkbox"]):not([type="radio"]),
 .lmfwppt-form-field textarea,
 .lmfwppt-form-field select {
   background-color: #fff;

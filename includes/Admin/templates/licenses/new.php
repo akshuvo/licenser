@@ -70,11 +70,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         </div>
                     </div>
 
-                    <div class="lmfwppt-form-field">
-                        <label for="order_id"><?php esc_html_e( 'Order ID', 'licenser' ); ?></label>
-                         
-                        <input type="number" name="order_id" id="order_id" class="regular-text" placeholder="Order ID" value="<?php echo esc_attr( $order_id ); ?>">
-                    </div>
+                   
                     <div class="lmfwppt-form-field">
                         <label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
                         <select name="product_type" id="product_type">
@@ -105,19 +101,38 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         </select>
                     </div>
 
+                
+                    <div class="lmfwppt-form-field">
+                        <div class="d-flex">
+                            <label for="end_date" class="mr-15"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
+                            <label>
+                                <input type="checkbox" name="is_lifetime"  <?php checked( $is_lifetime, '1' ); ?>>
+                                <?php esc_html_e( 'Lifetime', 'licenser' ); ?>
+                            </label>
+                        </div>
+                        <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $end_date ); ?>">
+                    
+                            
+                        
+                    </div>
+
+                    <div class="lmfwppt-form-field">
+                        <label for="end_date"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
+                        <input type="number" name="domain_limit" id="domain_limit" class="regular-text product_name_input" placeholder="Enter Domain Limit" value="<?php echo esc_attr( $domain_limit ); ?>">
+                        <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
+                    </div>
+                
                     <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
                         <div class="lwp-col-half">
-                            <label for="end_date"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
-                            <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $end_date ); ?>">
-                            <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
+                            <label for="source"><?php esc_html_e( 'Source', 'licenser' ); ?></label>
+                            <input type="text" name="source" id="source" class="regular-text" value="<?php echo esc_attr( $source ); ?>">
                         </div>
 
                         <div class="lwp-col-half">
-                            <label for="end_date"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
-                            <input type="number" name="domain_limit" id="domain_limit" class="regular-text product_name_input" placeholder="Enter Domain Limit" value="<?php echo esc_attr( $domain_limit ); ?>">
-                            <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
+                            <label for="source_id"><?php esc_html_e( 'Source ID', 'licenser' ); ?></label>
+                            <input type="number" name="source_id" id="source_id" class="regular-text" placeholder="" value="<?php echo esc_attr( $source_id ); ?>">
                         </div>
-                        </div>
+                    </div>
                 </div>
             </div>
             <div class="lmwppt-inner-card">
@@ -263,6 +278,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
 
         e.preventDefault();
         let $this = jQuery(this);
+        let packageSelect = jQuery('#lmfwppt_package_list');
 
         jQuery.ajax({
             type: 'get',
@@ -273,16 +289,35 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
             beforeSend: function(xhr) {
                 // Nonce
                 xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
-                
-                $this.find('.spinner').addClass('is-active');
-                $this.find('.generate-key-label').hide();
             },
             complete: function(data) {
-                $this.find('.spinner').removeClass('is-active');
-                $this.find('.generate-key-label').show();
+                
             },
-            success: function(data) {
-                jQuery('#license_key').val(data);
+            success: function(packages) {
+                let options = '';
+                if ( packages.length ) {
+
+                    options = '<option value="" class="blank">Select Package</option>';
+                    
+                    packages.forEach( function( package ) {
+                        options += '<option value="'+package.id+'">'+package.label+'</option>';
+                    });
+                    
+                    // Disable package select
+                    packageSelect.prop('disabled', false);
+
+                    // handle edit
+                    if ( is_edit ) {
+                        jQuery("#lmfwppt_package_list").find( 'option[value="'+selected+'"]' ).prop('selected', 1);
+                    }
+                } else {
+                    options = '<option value="" class="blank">No Package Found</option>';
+
+                    // Disable package select
+                    packageSelect.prop('disabled', true);
+                }
+                packageSelect.html( options );
+
             },
             error: function(data) {
                 jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
