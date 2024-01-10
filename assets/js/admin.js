@@ -283,34 +283,7 @@ jQuery(document).ready(function($){
     //     })
     // });
 
-    // //space remove dash add
-    // $(document).on('keyup', '#slug', function(e) {
-    //     e.preventDefault();
-    //     let value = $(this).val().replace(" ", "-");
-    //     $(this).val(value);
-        
-    // });
-
-    // $(document).on('change', '#product_type', function(e, is_edit) {
-    //     let thisVal = $(this).val();
-        
-    //     $(".theme-opt").hide();
-    //     $(".plugin-opt").hide();
-
-    //     if ( !is_edit ) {
-    //         jQuery('.products_list').val('');
-    //         jQuery('#lmfwppt_package_list').val('');
-    //     }
-
-    //     if(thisVal == "theme"){
-    //         $(".theme-opt").show();
-    //         $(".plugin-opt").hide();
-             
-    //     } else if(thisVal == "plugin"){
-    //         $(".plugin-opt").show();
-    //         $(".theme-opt").hide();
-    //     }
-    // });
+ 
 
     // jQuery('#product_type').trigger('change',['true']);
     // jQuery('.products_list').trigger('change',['true']);

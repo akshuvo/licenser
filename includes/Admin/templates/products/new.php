@@ -380,6 +380,21 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
         });
     });
 
+    // Slugify
+    jQuery(document).on('input', '#slug', function(e) {
+        e.preventDefault();
+        let value = jQuery(this).val();
+        
+        // Replace spaces with hyphens
+        value = value.replace(/\s+/g, '-');
+        
+        // Remove characters other than letters, numbers, hyphens, and underscores
+        value = value.replace(/[^a-zA-Z0-9-_]/g, '');
+
+        jQuery(this).val(value);
+    });
+
+
 
     // Document Ready
     jQuery(document).ready(function(){

@@ -91,7 +91,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         <select name="product_list" class="products_list" id="product_list" >
                             <option value="" class="blank">Select Product</option>
                             <?php foreach ( $products as $product ): ?>   
-                                <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>" <?php selected( $product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
+                                <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt' ); ?>" <?php selected( $product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -105,17 +105,19 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         </select>
                     </div>
 
-                    <div class="lmfwppt-form-field">
-                        <label for="end_date"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
-                        <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $end_date ); ?>">
-                        <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
-                    </div>
+                    <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
+                        <div class="lwp-col-half">
+                            <label for="end_date"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
+                            <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $end_date ); ?>">
+                            <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
+                        </div>
 
-                    <div class="lmfwppt-form-field">
-                        <label for="end_date"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
-                        <input type="number" name="domain_limit" id="domain_limit" class="regular-text product_name_input" placeholder="Enter Domain Limit" value="<?php echo esc_attr( $domain_limit ); ?>">
-                        <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
-                    </div>
+                        <div class="lwp-col-half">
+                            <label for="end_date"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
+                            <input type="number" name="domain_limit" id="domain_limit" class="regular-text product_name_input" placeholder="Enter Domain Limit" value="<?php echo esc_attr( $domain_limit ); ?>">
+                            <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
+                        </div>
+                        </div>
                 </div>
             </div>
             <div class="lmwppt-inner-card">
@@ -236,6 +238,24 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                 jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
             },
         });
+    });
+
+    // Product Type Change
+    jQuery(document).on('change', '#product_type', function(e, is_edit) {
+        let thisVal = jQuery(this).val();
+        
+        jQuery('.theme-opt, .plugin-opt').hide();
+        
+        console.log(thisVal);
+
+        if ( !is_edit ) {
+            jQuery('.products_list').val('');
+            jQuery('#lmfwppt_package_list').val('');
+        }
+
+        // Show product type options
+        jQuery( '.'+thisVal+'-opt').show();
+           
     });
 
     // Document Ready

@@ -201,16 +201,8 @@ span.delete_field:hover{
     text-align: right;
 }
 
-.lmfwppt_license_package{
-    display: none;
-}
-
 .section-content label {
     font-weight: 600;
-}
-
-.lmfwppt_theme_products{
-    /*display: none;*/
 }
 
 .plugin-opt{
