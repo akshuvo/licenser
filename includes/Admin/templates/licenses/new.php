@@ -91,7 +91,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         <select name="product_list" class="products_list" id="product_list" >
                             <option value="" class="blank">Select Product</option>
                             <?php foreach ( $products as $product ): ?>   
-                                <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt' ); ?>" <?php selected( $product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
+                                <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>" <?php selected( $product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -257,6 +257,74 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
         jQuery( '.'+thisVal+'-opt').show();
            
     });
+
+    // Add package
+    jQuery(document).on('change', '.products_list', function(e, is_edit){
+
+        e.preventDefault();
+        let $this = jQuery(this);
+
+        jQuery.ajax({
+            type: 'get',
+            data: {
+                product_id: $this.val()
+            },
+            url: Licenser.rest_url + 'products/packages',
+            beforeSend: function(xhr) {
+                // Nonce
+                xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
+                
+                $this.find('.spinner').addClass('is-active');
+                $this.find('.generate-key-label').hide();
+            },
+            complete: function(data) {
+                $this.find('.spinner').removeClass('is-active');
+                $this.find('.generate-key-label').show();
+            },
+            success: function(data) {
+                jQuery('#license_key').val(data);
+            },
+            error: function(data) {
+                jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
+            },
+        });
+
+        // if ( !is_edit ) {
+        //     jQuery('#lmfwppt_package_list').val('');
+        // }
+
+        // jQuery(".lmfwppt_license_package").show();
+        // let id = jQuery(this).val();
+        // if(id==''){
+        //     return;
+        // }
+        // let selected = jQuery('#lmfwppt_package_list').attr('data-pack_value'); 
+
+        // jQuery.ajax({
+        //     type:"POST",
+        //     url: ajaxurl,
+        //     data:{
+        //         action:'get_packages_option',
+        //         id:id,
+        //         selected:selected
+        //     },
+        //     cache:false,
+        //     success:function(data){
+        //          if( data ){
+        //             jQuery("#lmfwppt_package_list").html( data );
+
+        //             // handle edit
+        //             if ( is_edit ) {
+        //                 jQuery("#lmfwppt_package_list").find( 'option[value="'+selected+'"]' ).prop('selected', 1);
+        //             }
+        //          }
+        //     },
+        //     error:function(data){
+        //         console.log(data);
+        //     }
+        // });
+    });
+  
 
     // Document Ready
     jQuery(document).ready(function() {

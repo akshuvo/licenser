@@ -47,7 +47,7 @@ class Products extends RestController {
             ]
         );
 
-        // Delete Product Package
+        // Delete Product Package - By Package ID
         register_rest_route(
             $this->namespace,
             '/' . $this->rest_base . '/packages/(?P<id>[\d]+)',
@@ -64,6 +64,58 @@ class Products extends RestController {
                         ],
                     ],
                 ],
+            ]
+        );
+
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/packages',
+            [
+                [
+                    'methods'             => WP_REST_Server::CREATABLE,
+                    'callback'            => [ $this, 'create_package' ],
+                    'permission_callback' => [ $this, 'create_item_permissions_check' ],
+                    'args'                => [
+                        'product_id' => [
+                            'description' => __( 'Product ID.' ),
+                            'type'        => 'integer',
+                            'required'    => true,
+                        ],
+                        'package_id' => [
+                            'description' => __( 'Package ID.' ),
+                            'type'        => 'string',
+                            'required'    => true,
+                        ],
+                        'label' => [
+                            'description' => __( 'Package Label.' ),
+                            'type'        => 'string',
+                            'required'    => true,
+                        ],
+                        'update_period' => [
+                            'description' => __( 'Update Period.' ),
+                            'type'        => 'integer',
+                            'required'    => true,
+                        ],
+                        'domain_limit' => [
+                            'description' => __( 'Domain Limit.' ),
+                            'type'        => 'integer',
+                            'required'    => true,
+                        ],
+                    ],
+                ],
+                [
+                    'methods'             => WP_REST_Server::READABLE,
+                    'callback'            => [ $this, 'get_packages' ],
+                    'permission_callback' => [ $this, 'get_items_permissions_check' ],
+                    'args'                => [
+                        'product_id' => [
+                            'description' => __( 'Product ID.' ),
+                            'type'        => 'integer',
+                            'required'    => true,
+                        ],
+                    ],
+                ],
+                'schema' => [ $this, 'get_item_schema' ],
             ]
         );
 
@@ -179,5 +231,39 @@ class Products extends RestController {
             'deleted' => $deleted,
             'package' => $package,
         ] );
+    }
+
+    /**
+     * Create a single package
+     *
+     * @param WP_REST_Request $request Full data about the request.
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    public function create_package( $request ) {
+
+        $params = $request->get_params();
+        
+        $package = LicensePackage::instance()->create( $params );
+
+        return rest_ensure_response( $params );
+    }
+
+    /**
+     * Get a collection of packages
+     *
+     * @param WP_REST_Request $request Full data about the request.
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    public function get_packages( $request ) {
+        $args = $request->get_params();
+        $packages = LicensePackage::instance()->get_all( $args );
+
+        if ( ! $packages ) {
+            $packages = [];
+        }
+
+        return rest_ensure_response( $packages );
     }
 }

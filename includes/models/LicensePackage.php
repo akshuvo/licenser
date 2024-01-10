@@ -63,7 +63,7 @@ class LicensePackage {
         $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
         $limit = '';
-        if( !empty( $args['number'] ) ){
+        if( $args['number'] != -1 ){
             $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 

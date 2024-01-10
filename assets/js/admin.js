@@ -216,72 +216,8 @@ jQuery(document).ready(function($){
 
     // });
 
-    // // Add package
-    // $(document).on('change', '.products_list', function(e, is_edit){
-
-    //     if ( !is_edit ) {
-    //         jQuery('#lmfwppt_package_list').val('');
-    //     }
-
-    //     $(".lmfwppt_license_package").show();
-    //     let id = $(this).val();
-    //     if(id==''){
-    //         return;
-    //     }
-    //     let selected = $('#lmfwppt_package_list').attr('data-pack_value'); 
-
-    //     $.ajax({
-    //         type:"POST",
-    //         url: ajaxurl,
-    //         data:{
-    //             action:'get_packages_option',
-    //             id:id,
-    //             selected:selected
-    //         },
-    //         cache:false,
-    //         success:function(data){
-    //              if( data ){
-    //                 $("#lmfwppt_package_list").html( data );
-
-    //                 // handle edit
-    //                 if ( is_edit ) {
-    //                     $("#lmfwppt_package_list").find( 'option[value="'+selected+'"]' ).prop('selected', 1);
-    //                 }
-    //              }
-    //         },
-    //         error:function(data){
-    //             console.log(data);
-    //         }
-    //     });
-    // });
   
-    // // Generate License Key
-    // $(document).on('click', '#generate_key', function(e){
-    //     e.preventDefault();
-    //     let $this = $(this);
-
-    //     $.ajax({
-    //         type:'POST',
-    //         url:ajaxurl,
-    //         data:{
-    //             action:'license_key',
-    //         },
-    //         cache:false,
-    //         beforeSend: function(data) {
-    //             $this.find('.spinner').addClass('is-active').show();  
-    //             $('#generate_key').prop('disabled', true).find('.generate-key-label').hide();  
-    //         },
-    //         complete: function(data) {
-    //             $this.find('.spinner').removeClass('is-active').hide();
-    //             $('#generate_key').prop('disabled', false).find('.generate-key-label').show();
-    //         },
-    //         success:function(data){
-    //             if(data){
-    //                 $("#license_key").val(data);
-    //             }
-    //         }
-    //     })
-    // });
+ 
 
  
 
