@@ -24,7 +24,7 @@ $products = $product_model->get_all([
 ]);
 
 
-echo "<pre>"; print_r($products); echo "</pre>";
+echo "<pre>"; print_r($license); echo "</pre>";
 
 
 
@@ -60,7 +60,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                     <div class="lmfwppt-form-field">
                         <label for="download_link"><?php esc_html_e( 'License Key', 'licenser' ); ?></label>
                         <div class="lmfwppt-file-field">
-                            <input type="text" name="license_key" id="license_key" class="regular-text" placeholder="<?php esc_attr_e( 'License Key', 'licenser' ); ?>" value="<?php echo esc_attr( $license_key );?>" readonly required />
+                            <input type="text" name="license_key" id="license_key" class="regular-text" placeholder="<?php esc_attr_e( 'License Key', 'licenser' ); ?>" value="<?php echo esc_attr( $license->license_key );?>" readonly required />
 
                             <button class="button" type="button" id="generate_key">
                             <span class="generate-key-label"><?php esc_html_e( 'Generate Key', 'licenser' ); ?></span>
@@ -95,7 +95,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                     <!--  License Package -->
                     <div class="lmfwppt-form-field lmfwppt_license_package" id="lmfwppt_license_package">
                         <label for="lmfwppt_package_list"><?php esc_html_e( 'Select Package', 'licenser' ); ?></label>
-                        <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php esc_attr_e( $package_id, 'licenser' ); ?>" >
+                        <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php echo esc_attr_e( $license->package_id ); ?>" >
                              <option value="" class="blank"><?php esc_html_e( 'Select Package', 'licenser' ); ?></option>
                              
                         </select>
@@ -106,11 +106,11 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         <div class="d-flex">
                             <label for="end_date" class="mr-15"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
                             <label>
-                                <input type="checkbox" name="is_lifetime"  <?php checked( $is_lifetime, '1' ); ?>>
+                                <input type="checkbox" name="is_lifetime"  <?php checked( $license->is_lifetime, '1' ); ?>>
                                 <?php esc_html_e( 'Lifetime', 'licenser' ); ?>
                             </label>
                         </div>
-                        <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $end_date ); ?>">
+                        <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $license->end_date ); ?>">
                     
                             
                         
@@ -118,19 +118,19 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
 
                     <div class="lmfwppt-form-field">
                         <label for="end_date"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
-                        <input type="number" name="domain_limit" id="domain_limit" class="regular-text product_name_input" placeholder="Enter Domain Limit" value="<?php echo esc_attr( $domain_limit ); ?>">
+                        <input type="number" name="domain_limit" id="domain_limit" class="regular-text product_name_input" placeholder="Enter Domain Limit" value="<?php echo esc_attr( $license->domain_limit ); ?>">
                         <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
                     </div>
                 
                     <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
                         <div class="lwp-col-half">
                             <label for="source"><?php esc_html_e( 'Source', 'licenser' ); ?></label>
-                            <input type="text" name="source" id="source" class="regular-text" value="<?php echo esc_attr( $source ); ?>">
+                            <input type="text" name="source" id="source" class="regular-text" value="<?php echo esc_attr( $license->source ); ?>">
                         </div>
 
                         <div class="lwp-col-half">
                             <label for="source_id"><?php esc_html_e( 'Source ID', 'licenser' ); ?></label>
-                            <input type="number" name="source_id" id="source_id" class="regular-text" placeholder="" value="<?php echo esc_attr( $source_id ); ?>">
+                            <input type="number" name="source_id" id="source_id" class="regular-text" placeholder="" value="<?php echo esc_attr( $license->source_id ); ?>">
                         </div>
                     </div>
                 </div>
@@ -140,6 +140,18 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                     <h2>Activated Domains</h2>
                     <div id="lmfwppt_domains_fields">
                         <?php //$license_handler::get_domains_html( $get_domains ); ?>
+                        <div id="postimagediv" class="postbox lmfwppt_license_field"> <!-- Wrapper Start -->
+            <span id="poststuff">
+                <h2 class="hndle">
+                     
+                    <input id="<?php echo esc_attr( $field_name ); ?>-lmfwppt_domain" class="regular-text" type="text" name="<?php echo esc_attr( $field_name ); ?>[url]" value="<?php echo esc_attr( $url ); ?>" placeholder="<?php echo esc_attr__( 'Enter Domain/URL', 'lmfwppt' ); ?>" required />
+                    <label class="lmfwppt_label_space">
+                        <input name="<?php echo esc_attr( $field_name ); ?>[deactivate]" type="checkbox" id="<?php echo esc_attr( $field_name ); ?>-lmfwppt_deactivate" <?php checked($deactivate, "on"); ?>><?php esc_html_e( 'Deactivate', 'lmfwppt' ); ?>
+                    </label>
+                    <span class="delete_field">&times;</span>
+                </h2>
+            </span>
+        </div>
                     </div>
                     <button class="button lmfwppt-domain-activate" type="button">Add Domain</button>
                 </div>

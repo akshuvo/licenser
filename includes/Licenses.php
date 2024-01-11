@@ -31,67 +31,6 @@ class Licenses {
         
     }
 
-    // Section information Field add
-    function domain_ajax_add_action(){
-
-        $key = sanitize_text_field( $_POST['key'] );
-
-        ob_start();
-
-        echo self::domain_sections_field( array(
-            //'key' => $key,
-            'thiskey' => $key,
-        ) );
-
-        $output = ob_get_clean();
-
-        echo $output;
-
-        die();
-    }
-
-    // Single Section field
-    public static function domain_sections_field( $args ){
-
-        $defaults = array (
-            'key' => '',
-            'url' => '',
-            'deactivate' => '',
-        );
-
-        // Parse incoming $args into an array and merge it with $defaults
-        $args = wp_parse_args( $args, $defaults );
-
-        // Let's extract the array to variable
-        extract( $args );
-
-        // Array key
-        //$key =  isset( $args['key'] ) ? $args['key'] : "";
-        $key =  !empty( $key ) ? $key : wp_generate_password( 3, false );
-   
-        $field_name = "lmfwppt[domains][$key]";
-
-        ob_start();
-        do_action( 'lmfwppt_license_field_before_wrap', $args );
-        ?>
-
-         <div id="postimagediv" class="postbox lmfwppt_license_field"> <!-- Wrapper Start -->
-            <span id="poststuff">
-                <h2 class="hndle">
-                     
-                    <input id="<?php echo esc_attr( $field_name ); ?>-lmfwppt_domain" class="regular-text" type="text" name="<?php echo esc_attr( $field_name ); ?>[url]" value="<?php echo esc_attr( $url ); ?>" placeholder="<?php echo esc_attr__( 'Enter Domain/URL', 'lmfwppt' ); ?>" required />
-                    <label class="lmfwppt_label_space">
-                        <input name="<?php echo esc_attr( $field_name ); ?>[deactivate]" type="checkbox" id="<?php echo esc_attr( $field_name ); ?>-lmfwppt_deactivate" <?php checked($deactivate, "on"); ?>><?php esc_html_e( 'Deactivate', 'lmfwppt' ); ?>
-                    </label>
-                    <span class="delete_field">&times;</span>
-                </h2>
-            </span>
-        </div>
-        <?php
-        $output = ob_get_clean();
-
-        return do_action( 'lmfwppt_license_field_after_wrap', $output, $args );
-    }
 
     // Get domains by license id
     function get_domains( $license_id = 0 ){
