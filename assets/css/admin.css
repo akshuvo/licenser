@@ -107,9 +107,10 @@
 .lmfwppt-file-field {
     display: flex;
     align-items: center;
+    column-gap: 5px;
 }
 
-.lmfwppt-file-field button {
+.lmfwppt-file-field .button {
     height: 56px;
     width: 150px;
 }
@@ -384,3 +385,52 @@ p.submit {
     background-color: #f1f1f1;
     color: #dc3545;
 }
+
+
+.lwp-subtext {
+    color: #757575;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+/* Compact Layout */
+.lwp-compact-layout .lmfwppt-form-field input:not([type="checkbox"]):not([type="radio"]),
+.lwp-compact-layout .lmfwppt-form-field textarea,
+.lwp-compact-layout .lmfwppt-form-field select {
+    background-color: #fff;
+    border: 1px solid #bbb;
+    border-radius: 2px;
+    height: 40px;
+    padding: 6px 8px;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    margin: 0;
+    width: 100%;
+    font-size: 13px;
+    min-height: 36px;
+    line-height: normal;
+}
+
+
+.lwp-compact-layout .lmfwppt-form-field {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.lwp-compact-layout .lmfwppt-form-field label {
+    display: block;
+    color: #646970;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 16px;
+    margin: 0 0 8px;
+}
+
+.lwp-compact-layout .lmfwppt-file-field .button {
+    height: 40px;
+    width: 104px;
+    padding: 0 20px;
+}
+/* ./Compact Layout */

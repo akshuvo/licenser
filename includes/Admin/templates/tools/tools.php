@@ -1,3 +1,17 @@
+<?php
+use Licenser\Models\Product;
+
+// Product Model
+$product_model = Product::instance();
+
+// Products
+$products = $product_model->get_all([
+   'status' => 'active',
+   'number' => -1,
+   'inc_packages' => true,
+   'columns' => 'id, name, product_type',
+]);
+?>
 <div class="wrap">
       <div class="lmwppt-wrap">
          <div class="lmwppt-inner-card card-shameless">
@@ -10,9 +24,10 @@
                   <div class="lmfwppt-form-field">
                      <label for="product_type"><?php esc_html_e( 'Product Type', 'lmfwppt' ); ?></label>
                      <select name="product_type" class="product_type" id="product_type" required>
-                        <option value=""><?php esc_html_e( 'Select Product Type', 'lmfwppt' ); ?></option>
-                        <option value="<?php echo esc_attr( 'theme','lmfwppt' ); ?>"><?php esc_html_e( 'Theme', 'lmfwppt' ); ?></option>
-                        <option value="<?php echo esc_attr( 'plugin','lmfwppt' ); ?>"><?php esc_html_e( 'Plugin', 'lmfwppt' ); ?></option>
+                        <option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
+                           <?php foreach( $product_model->get_types() as $key => $value ) : ?>
+                              <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $product->product_type, $key ); ?> ><?php echo esc_html( $value ); ?></option>
+                           <?php endforeach; ?>
                      </select>
                   </div>
 
@@ -20,17 +35,8 @@
                      <label for="select_product"><?php esc_html_e( 'Select Product', 'lmfwppt' ); ?></label>
                      <select id="select_product" name="select_product" class="select_product products_list" required>
                         <option value="" class="blank">Select Product</option>
-                        <?php
-                        $items = lmfwppt_get_product_list("theme");
-                        foreach ($items as $products_list): ?>
-                                 
-                           <option value="<?php echo $products_list->id; ?>" class="theme-opt"><?php echo $products_list->name; ?></option>
-                        <?php endforeach; ?>
-                            
-                        <?php
-                        $items = lmfwppt_get_product_list("plugin");
-                        foreach ($items as $products_list): ?>
-                           <option value="<?php echo $products_list->id; ?>" class="plugin-opt"><?php echo $products_list->name; ?></option>
+                        <?php foreach ( $products as $product ): ?>   
+                           <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>" <?php selected( $product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
                         <?php endforeach; ?>
                      </select>
                   </div>
@@ -76,8 +82,7 @@
             <div class="lmwppt-inner-card lmfwppt-buttons card-shameless">
                
                <div class="submit_btn_area"> 
-                  <input type="hidden" name="lmaction" value="sdk_generator_add_form">
-                  <?php wp_nonce_field( 'lmfwppt_nonce' ); ?>
+      
                   <?php submit_button( __( 'Generate', 'lmfwppt' ), 'primary' ); ?> 
                   <span class="spinner"></span>
                </div>
