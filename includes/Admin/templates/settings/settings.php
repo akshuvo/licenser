@@ -6,14 +6,12 @@ $settings = Settings::instance()->get_all();
 
 //$lmfwppt_settings = get_option( 'lmfwppt_settings' );
 
-
-$code_prefix = isset( $settings['license_code_prefix'] ) ? sanitize_text_field( $settings['license_code_prefix'] ) : '';
-$character_limit = isset( $settings['license_code_character_limit'] ) ? $settings['license_code_character_limit'] : '32';
-$hide_cart_checkout = isset( $settings['hide_wclm_info_from_cart'] ) ? sanitize_text_field( $settings['hide_wclm_info_from_cart'] ) : '';
-$hide_order_email = isset( $settings['hide_wclm_info_from_ordermeta'] ) ? sanitize_text_field( $settings['hide_wclm_info_from_ordermeta'] ) : '';
-$license_generate_method = isset( $settings['license_generate_method'] ) ? sanitize_text_field( $settings['license_generate_method'] ) : 'microtime';
+// $code_prefix = isset( $settings['license_code_prefix'] ) ? sanitize_text_field( $settings['license_code_prefix'] ) : '';
+// $character_limit = isset( $settings['license_code_character_limit'] ) ? $settings['license_code_character_limit'] : '32';
+// $hide_cart_checkout = isset( $settings['hide_wclm_info_from_cart'] ) ? sanitize_text_field( $settings['hide_wclm_info_from_cart'] ) : '';
+// $hide_order_email = isset( $settings['hide_wclm_info_from_ordermeta'] ) ? sanitize_text_field( $settings['hide_wclm_info_from_ordermeta'] ) : '';
+// $license_generate_method = isset( $settings['license_generate_method'] ) ? sanitize_text_field( $settings['license_generate_method'] ) : 'microtime';
  
-
 // $code_prefix = Settings::get('license_code_prefix');
 
 ?>
@@ -27,23 +25,23 @@ $license_generate_method = isset( $settings['license_generate_method'] ) ? sanit
             <tbody>
                <tr>
                   <th scope="row"><label for="license_code_prefix"><?php esc_html_e('License Code Prefix', 'lmfwppt') ?></label></th>
-                  <td><input type="text" name="license_code_prefix" id="license_code_prefix" class="regular-text" placeholder="<?php esc_attr_e( 'License Code Prefix', 'lmfwppt' ); ?>" value="<?php echo $code_prefix  ?>"></td>
+                  <td><input type="text" name="license_code_prefix" id="license_code_prefix" class="regular-text" placeholder="<?php esc_attr_e( 'License Code Prefix', 'lmfwppt' ); ?>" value="<?php echo isset( $settings['license_code_prefix'] ) ? sanitize_text_field( $settings['license_code_prefix'] ) : '';  ?>"></td>
                </tr>
                <tr>
                   <th scope="row"><?php esc_html_e( 'License Generate Method', 'lmfwppt' ); ?></th>
                    <td>
                        <fieldset><label>
-                           <input name="license_generate_method" type="radio" value="microtime" <?php checked($license_generate_method, "microtime"); ?>><?php esc_html_e( 'Microtime Based', 'lmfwppt' ); ?></label>
+                           <input name="license_generate_method" type="radio" value="microtime" <?php checked(isset( $settings['license_generate_method'] ) ? sanitize_text_field( $settings['license_generate_method'] ) : 'microtime', "microtime"); ?>><?php esc_html_e( 'Microtime Based', 'lmfwppt' ); ?></label>
                        </fieldset>
                        <fieldset><label>
-                           <input name="license_generate_method" type="radio" value="wp_generate" <?php checked($license_generate_method, "wp_generate"); ?>><?php esc_html_e( 'WP Password Based', 'lmfwppt' ); ?></label>
+                           <input name="license_generate_method" type="radio" value="wp_generate" <?php checked(isset( $settings['license_generate_method'] ) ? sanitize_text_field( $settings['license_generate_method'] ) : 'microtime', "wp_generate"); ?>><?php esc_html_e( 'WP Password Based', 'lmfwppt' ); ?></label>
                        </fieldset>
                    </td>
                </tr>
                <tr>
                   <th scope="row"><label for="license_code_character_limit"><?php esc_html_e('License Code Character Limit', 'lmfwppt') ?></label></th>
                   <td>
-                     <input type="number" min="8" name="license_code_character_limit" id="license_code_character_limit" class="regular-text" placeholder="<?php esc_attr_e( 'License Code Character Limit', 'lmfwppt' ); ?>" value="<?php echo $character_limit; ?>" required>
+                     <input type="number" min="8" name="license_code_character_limit" id="license_code_character_limit" class="regular-text" placeholder="<?php esc_attr_e( 'License Code Character Limit', 'lmfwppt' ); ?>" value="<?php echo isset( $settings['license_code_character_limit'] ) ? $settings['license_code_character_limit'] : '32'; ?>" required>
                      <p><?php esc_html_e( '(Without License Code Prefix)', 'lmfwppt' ); ?></p>
                   </td>
                </tr>
@@ -52,10 +50,10 @@ $license_generate_method = isset( $settings['license_generate_method'] ) ? sanit
                   <th scope="row"><?php esc_html_e( 'Hide License Info from WooCommerce', 'lmfwppt' ); ?></th>
                    <td>
                        <fieldset><label>
-                           <input name="hide_wclm_info_from_cart" type="checkbox" id="hide_cart_checkout" <?php checked($hide_cart_checkout, "on"); ?>><?php esc_html_e( 'Hide from Cart & Checkout', 'lmfwppt' ); ?></label>
+                           <input name="hide_wclm_info_from_cart" type="checkbox" id="hide_cart_checkout" <?php checked(isset( $settings['hide_wclm_info_from_cart'] ) ? sanitize_text_field( $settings['hide_wclm_info_from_cart'] ) : '', "on"); ?>><?php esc_html_e( 'Hide from Cart & Checkout', 'lmfwppt' ); ?></label>
                        </fieldset>
                        <fieldset><label>
-                           <input name="hide_wclm_info_from_ordermeta" type="checkbox" id="hide_order_email" <?php checked($hide_order_email, "on"); ?>><?php esc_html_e( 'Hide from Order Email', 'lmfwppt' ); ?></label>
+                           <input name="hide_wclm_info_from_ordermeta" type="checkbox" id="hide_order_email" <?php checked( isset( $settings['hide_wclm_info_from_ordermeta'] ) ? sanitize_text_field( $settings['hide_wclm_info_from_ordermeta'] ) : '', "on"); ?>><?php esc_html_e( 'Hide from Order Email', 'lmfwppt' ); ?></label>
                        </fieldset>
                    </td>
                </tr>
