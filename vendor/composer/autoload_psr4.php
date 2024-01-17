@@ -6,5 +6,9 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Licenser\\Traits\\' => array($baseDir . '/includes/traits'),
+    'Licenser\\Models\\' => array($baseDir . '/includes/models'),
+    'Licenser\\Controllers\\' => array($baseDir . '/includes/controllers'),
+    'Licenser\\Addons\\' => array($baseDir . '/addons'),
     'Licenser\\' => array($baseDir . '/includes'),
 );

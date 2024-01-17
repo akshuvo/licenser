@@ -49,7 +49,7 @@ final class Licenser {
     /**
      * Initializes a singleton instance
      *
-     * @return \WeDevs_Academy
+     * @return \Licenser
      */
     public static function init() {
         static $instance = false;
@@ -97,6 +97,9 @@ final class Licenser {
 
         // API
         \Licenser\Api::instance()->init();
+
+        // Addons
+        $addons = Licenser\Controllers\Addons::instance();
     }
 
     /**

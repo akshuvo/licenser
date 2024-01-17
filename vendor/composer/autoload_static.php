@@ -13,11 +13,31 @@ class ComposerStaticInit9a6455830056de176c2ea970279cca3f
     public static $prefixLengthsPsr4 = array (
         'L' => 
         array (
+            'Licenser\\Traits\\' => 16,
+            'Licenser\\Models\\' => 16,
+            'Licenser\\Controllers\\' => 21,
+            'Licenser\\Addons\\' => 16,
             'Licenser\\' => 9,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Licenser\\Traits\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/includes/traits',
+        ),
+        'Licenser\\Models\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/includes/models',
+        ),
+        'Licenser\\Controllers\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/includes/controllers',
+        ),
+        'Licenser\\Addons\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/addons',
+        ),
         'Licenser\\' => 
         array (
             0 => __DIR__ . '/../..' . '/includes',

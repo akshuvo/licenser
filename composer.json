@@ -7,7 +7,8 @@
             "Licenser\\": "includes/",
             "Licenser\\Controllers\\" : "includes/controllers/",
             "Licenser\\Traits\\" : "includes/traits/",
-            "Licenser\\Models\\" : "includes/models/"
+            "Licenser\\Models\\" : "includes/models/",
+            "Licenser\\Addons\\" : "addons/"
 
         },
         "files": [ "includes/functions.php" ]

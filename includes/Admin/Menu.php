@@ -25,8 +25,8 @@ class Menu {
         $capability = 'manage_options';
 
         $hook = add_menu_page(
-            __( 'License manager for WordPress Themes and Plugins', 'licenser' ),
-            __( 'License manager', 'licenser' ),
+            __( 'Licenser', 'licenser' ),
+            __( 'Licenser', 'licenser' ),
             $capability,
             $parent_slug,
             [ $this, 'dashboard_page' ],
@@ -35,18 +35,19 @@ class Menu {
 
         $this->admin_menus = $hook;
 
-        add_submenu_page( $parent_slug, __( 'Plugins - License manager for WordPress Themes and Plugins', 'licenser' ), __( 'Dashboard', 'licenser' ), $capability, $parent_slug, [ $this, 'dashboard_page' ] );
+        add_submenu_page( $parent_slug, __( 'Plugins - Licenser', 'licenser' ), __( 'Dashboard', 'licenser' ), $capability, $parent_slug, [ $this, 'dashboard_page' ] );
 
-        add_submenu_page( $parent_slug, __( 'Plugins - License manager for WordPress Themes and Plugins', 'licenser' ), __( 'Plugins', 'licenser' ), $capability, $parent_slug.'-plugins', [ $this, 'plugins_page' ] );
+        add_submenu_page( $parent_slug, __( 'Plugins - Licenser', 'licenser' ), __( 'Plugins', 'licenser' ), $capability, $parent_slug.'-plugins', [ $this, 'plugins_page' ] );
 
-        add_submenu_page( $parent_slug, __( 'Themes - License manager for WordPress Themes and Plugins', 'licenser' ), __( 'Themes', 'licenser' ), $capability, $parent_slug.'-themes', [ $this, 'themes_page' ] );
+        add_submenu_page( $parent_slug, __( 'Themes - Licenser', 'licenser' ), __( 'Themes', 'licenser' ), $capability, $parent_slug.'-themes', [ $this, 'themes_page' ] );
 
-        add_submenu_page( $parent_slug, __( 'License manager for WordPress Themes and Plugins', 'licenser' ), __( 'Licenses', 'licenser' ), $capability, $parent_slug.'-licenses', [ $this, 'licenses_page' ] );
+        add_submenu_page( $parent_slug, __( 'Licenser', 'licenser' ), __( 'Licenses', 'licenser' ), $capability, $parent_slug.'-licenses', [ $this, 'licenses_page' ] );
 
         add_submenu_page( $parent_slug, __( 'Settings', 'licenser' ), __( 'Settings', 'licenser' ), $capability, 'licenser-settings', [ $this, 'settings_page' ] );
 
 
         add_submenu_page( $parent_slug, __( 'SDK Generator', 'licenser' ), __( 'SDK Generator', 'licenser' ), $capability, 'licenser-sdk-generator', [ $this, 'sdk_generator_page' ] );
+        add_submenu_page( $parent_slug, __( 'Addons', 'licenser' ), __( 'Addons', 'licenser' ), $capability, 'licenser-addons', [ $this, 'addons_page' ] );
 
         add_action( 'admin_head-' . $hook, [ $this, 'enqueue_assets' ] );
     }
@@ -159,6 +160,19 @@ class Menu {
      */
     public function sdk_generator_page() {
         $template = __DIR__ . '/templates/tools/tools.php';
+        
+        if ( file_exists( $template ) ) {
+            include $template;
+        }
+    }
+
+    /**
+     * Handles the addons page
+     *
+     * @return void
+     */
+    public function addons_page() {
+        $template = __DIR__ . '/templates/addons/addons.php';
         
         if ( file_exists( $template ) ) {
             include $template;
