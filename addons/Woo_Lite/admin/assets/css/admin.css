@@ -1,0 +1,16 @@
+
+p[class*="theme_product_list"]{
+	display: none;
+}
+p[class*="plugin_product_list"]{
+	display: none;
+}
+p[class*="select_package"]{
+	display: none;
+}
+div[class*="lmfwpptwcext_product_fields"]{
+	display: none;
+}
+.license_details p{
+	margin: 0px !important;
+}
