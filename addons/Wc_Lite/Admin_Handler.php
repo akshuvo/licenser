@@ -57,8 +57,6 @@ class Admin_Handler{
      * @return void
      */
     public function save_fields_simple_product($post_id){
-        $post_data = $_POST;
-
         // Save Custom Fields
         $this->save_fields( $post_id );
     }
@@ -70,8 +68,6 @@ class Admin_Handler{
      * @return void
      */
     public function save_fields_variable_product($post_id, $loop){
-        $post_data = $_POST;
-
         // Save Custom Fields
         $this->save_fields( $post_id, $loop );
     }
@@ -150,37 +146,27 @@ class Admin_Handler{
      * Save Custom Fields
      *
      * @param int $post_id
+     * @param string $loop_index
      * @return void
      */
-    public function save_fields( $post_id, $loop_index = '' ){
-
-        $post_data = $_POST;
+    public function save_fields($post_id, $loop_index = '') {
 
         // Loop Index
-        $maybe_loop = $loop_index || $loop_index == 0 ? '_' . $loop_index : '';
+        $maybe_loop = $loop_index || $loop_index === 0 ? '_' . $loop_index : '';
 
-        // Activate License Management
-        $active_licensing = isset( $post_data['licenser_active_licensing' . $maybe_loop]  ) ? sanitize_text_field( $post_data['licenser_active_licensing' . $maybe_loop]  ) : '';
+        // Fields to update
+        $fields_to_update = array(
+            'licenser_active_licensing',
+            'licenser_product_type',
+            'licenser_product_id',
+            'licenser_package_id',
+        );
 
-        // Product Type
-        $product_type = isset( $post_data['licenser_product_type' . $maybe_loop]  ) ? sanitize_text_field( $post_data['licenser_product_type' . $maybe_loop]  ) : '';
-
-        // Product ID
-        $product_id = isset( $post_data['licenser_product_id' . $maybe_loop]  ) ? sanitize_text_field( $post_data['licenser_product_id' . $maybe_loop]  ) : '';
-
-        // Package ID
-        $package_id = isset( $post_data['licenser_package_id' . $maybe_loop]  ) ? sanitize_text_field( $post_data['licenser_package_id' . $maybe_loop]  ) : '';
-
-        // Update Product Type
-        update_post_meta( $post_id, 'licenser_product_type', $product_type );
-
-        // Update Product ID
-        update_post_meta( $post_id, 'licenser_product_id', $product_id );
-
-        // Update Package ID
-        update_post_meta( $post_id, 'licenser_package_id', $package_id );
-
-        // Update License Management
-        update_post_meta( $post_id, 'licenser_active_licensing', $active_licensing );
+        foreach ($fields_to_update as $field) {
+            $field_value = isset($_POST[$field . $maybe_loop]) ? sanitize_text_field($_POST[$field . $maybe_loop]) : '';
+            update_post_meta($post_id, $field, $field_value);
+        }
     }
+
+
 }

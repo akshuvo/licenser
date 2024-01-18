@@ -6,20 +6,10 @@ namespace Licenser\Addons\Wc_Lite;
 class Admin_Handler{
 
 	function __construct(){
-        //Tab initilize
-        add_filter('woocommerce_product_data_tabs', [$this, 'lmfwpptwcext_product_settings_tabs' ] );
 
-        // Tab Content
-        add_action( 'woocommerce_product_data_panels', [$this, 'lmfwpptwcext_product_panels'] );
 
-        //Tab Content data save
-        add_action( 'woocommerce_process_product_meta', [$this, 'lmfwpptwcext_save_fields'], 10, 2 );
-         
-        //Add Variations
-        add_action( 'woocommerce_product_after_variable_attributes', [$this, 'lmfwpptwcext_add_custom_field_to_variations'], 10, 3 );
 
-        //Product Variations save
-        add_action( 'woocommerce_save_product_variation', [$this, 'lmfwpptwcext_save_custom_field_variations'], 10, 2 );
+        
 
         //Add A Menu on My Account menu tab 
         add_filter ( 'woocommerce_account_menu_items', [$this, 'licenses_link_my_account'] );
@@ -55,102 +45,7 @@ class Admin_Handler{
 
 	}
 
-    /*
-    * 
-     * Custom Meta Box And Tab
-     */
-    function lmfwpptwcext_product_settings_tabs( $tabs ){
-     
-        $tabs['lmfwpptwcext'] = array(
-            'label'    => __('License Manager', 'lmfwpptwcext'),
-            'target'   => 'lmfwpptwcext_product_data',
-            'class'   => 'show_if_simple',
-            'priority' => 21,
-        );
-        return $tabs;
-     
-    }
-     
-    /*
-     * Tab content
-     */
-    function lmfwpptwcext_product_panels(){
 
-        $post_id = get_the_ID();
-     
-        echo '<div id="lmfwpptwcext_product_data" class="lmfwpptwcext_product_data panel woocommerce_options_panel">';
-     
-        woocommerce_wp_checkbox( array(
-            'id'           => 'licenser_active_license_management',
-            'class'       => 'lmfwpptwcext_checkbox',
-            'value'        => get_post_meta( $post_id, 'licenser_active_license_management', true ),
-            'label'        => __('Active License Management', 'lmfwpptwcext')
-        ) );
-
-            echo '<div class="lmfwpptwcext_product_fields">';
-
-                woocommerce_wp_select( array(
-                    'id'          => 'licenser_product_type',
-                    'class'       => 'licenser_product_type',
-                    'value'       => get_post_meta( $post_id, 'licenser_product_type', true ),
-                    'label'       => __('Select Products Type', 'lmfwpptwcext'),
-                    'options'     => array( '' => 'Please select', 'theme' => 'Theme', 'plugin' => 'Plugin'),
-                ) );
-
-                woocommerce_wp_select( array(
-                    'id'          => 'theme_product_list',
-                    'class'          => 'select_product_list theme_product_list',
-                    'value'       => get_post_meta( $post_id, 'theme_product_list', true ),
-                    'label'       => __('Select Product', 'lmfwpptwcext'),
-                    'options'     => $this->lmfwpptwcext_generate(lmfwppt_get_product_list("theme")),
-                ) );
-
-                woocommerce_wp_select( array(
-                    'id'          => 'plugin_product_list',
-                    'class'          => 'select_product_list plugin_product_list',
-                    'value'       => get_post_meta( $post_id, 'plugin_product_list', true ),
-                    'label'       => __('Select Product', 'lmfwpptwcext'),
-                    'options'     => $this->lmfwpptwcext_generate(lmfwppt_get_product_list("plugin")),
-                ) );
-
-                woocommerce_wp_select( array(
-                    'id'          => 'select_package',
-                    'class'          => 'select_package',
-                    'value'       => get_post_meta( $post_id, 'select_package', true ),
-                    'label'       => __('Select Package', 'lmfwpptwcext'),
-                    'options'     => array( '' => 'Please select'),
-                    'custom_attributes' => ['data-pack_value' => get_post_meta( $post_id, 'select_package', true )]
-                ) );
-         
-            echo '</div>';
-        echo '</div>';
-
-    }
-
-    /*
-    *
-    * Custom Meta box save
-    */
-    function lmfwpptwcext_save_fields( $id, $post ){
-        
-        update_post_meta( $id, 'licenser_active_license_management', $_POST['licenser_active_license_management'] );
-        
-        if( !empty( $_POST['licenser_product_type'] ) ) {
-            update_post_meta( $id, 'licenser_product_type', $_POST['licenser_product_type'] );
-        } 
-
-        if( !empty( $_POST['theme_product_list'] ) ) {
-            update_post_meta( $id, 'theme_product_list', $_POST['theme_product_list'] );
-        }
-
-        if( !empty( $_POST['plugin_product_list'] ) ) {
-            update_post_meta( $id, 'plugin_product_list', $_POST['plugin_product_list'] );
-        }
-     
-        if( !empty( $_POST['select_package'] ) ) {
-            update_post_meta( $id, 'select_package', $_POST['select_package'] );
-        }  
-    }
 
     /*
     *
@@ -165,88 +60,6 @@ class Admin_Handler{
         return $return;
     }
 
-    /*
-    *
-    * custom field on product Add Variations
-    */
-    function lmfwpptwcext_add_custom_field_to_variations( $loop, $variation_data, $variation ) {
-     
-       $post_id = $variation->ID;
-
-        echo '<div id="lmfwpptwcext_product_data" class="lmfwpptwcext_product_data panel woocommerce_options_panel_variation">';
-         
-            woocommerce_wp_checkbox( array(
-                'id'          => 'licenser_active_license_management[' . $loop . ']',
-                'class'       => 'lmfwpptwcext_checkbox',
-                'value'       => get_post_meta( $post_id, 'licenser_active_license_management', true ),
-                'label'       => __('Active License Management', 'lmfwpptwcext'),
-            ) );
-
-            echo '<div class="lmfwpptwcext_product_fields">';
-
-                woocommerce_wp_select( array(
-                    'id'          => 'licenser_product_type[' . $loop . ']',
-                    'class'          => 'licenser_product_type',
-                    'value'       => get_post_meta( $post_id, 'licenser_product_type', true ),
-                    'label'       => __('Select Products Type', 'lmfwpptwcext'),
-                    'options'     => array( '' => 'Please select', 'theme' => 'Theme', 'plugin' => 'Plugin'),
-                ) );
-
-                woocommerce_wp_select( array(
-                    'id'          => 'theme_product_list[' . $loop . ']',
-                    'class'          => 'select_product_list theme_product_list',
-                    'value'       => get_post_meta( $post_id, 'theme_product_list', true ),
-                    'label'       => __('Select Product', 'lmfwpptwcext'),
-                    'options'     => $this->lmfwpptwcext_generate(lmfwppt_get_product_list("theme")),
-                ) );
-
-                woocommerce_wp_select( array(
-                    'id'          => 'plugin_product_list[' . $loop . ']',
-                    'class'          => 'select_product_list plugin_product_list',
-                    'value'       => get_post_meta( $post_id, 'plugin_product_list', true ),
-                    'label'       => __('Select Product', 'lmfwpptwcext'),
-                    'options'     => $this->lmfwpptwcext_generate(lmfwppt_get_product_list("plugin")),
-                ) );
-
-                woocommerce_wp_select( array(
-                    'id'          => 'select_package[' . $loop . ']',
-                    'class'       => 'select_package',
-                    'value'       => get_post_meta( $post_id, 'select_package', true ),
-                    'label'       => __('Select Package', 'lmfwpptwcext'),
-                    'options'     => array( '' => 'Please select'),
-                    'custom_attributes' => ['data-pack_value' => get_post_meta( $post_id, 'select_package', true )]
-                ) );
-             
-                echo '</div>';
-            echo '</div>';
-    }
-
-
-    /*
-    *
-    * Save custom field on product variation save
-    */ 
-    function lmfwpptwcext_save_custom_field_variations( $variation_id, $i ) {
-
-        update_post_meta( $variation_id, 'licenser_active_license_management', esc_attr( $_POST['licenser_active_license_management'][$i] ) );
-
-        if( !empty( $_POST['licenser_product_type'][$i] ) ) {
-            update_post_meta( $variation_id, 'licenser_product_type', esc_attr( $_POST['licenser_product_type'][$i] ) );
-        }   
-
-        if( !empty( $_POST['theme_product_list'][$i] ) ) {
-            update_post_meta( $variation_id, 'theme_product_list', esc_attr( $_POST['theme_product_list'][$i] ) );
-        }
-
-        if( !empty( $_POST['plugin_product_list'][$i] ) ) {
-            update_post_meta( $variation_id, 'plugin_product_list', esc_attr( $_POST['plugin_product_list'][$i] ) );
-        }
-
-        if( !empty( $_POST['select_package'][$i] ) ) {
-            update_post_meta( $variation_id, 'select_package', esc_attr( $_POST['select_package'][$i] ) );
-        }
-
-    }
 
     /**
      * Handle a custom 'is_license_order' query var to get orders with the 'customvar' meta.
