@@ -20,7 +20,27 @@ class Admin_Handler{
 
         // Save Custom Fields: Variable Product
         add_action('woocommerce_save_product_variation', [$this, 'save_fields_variable_product'], 10, 2);
+
+        // Admin Scripts
+        add_action('admin_enqueue_scripts', [$this, 'admin_scripts']);
     }
+
+    /**
+     * Admin Scripts
+     *
+     * @param string $hook
+     * @return void
+     */
+	function admin_scripts( $hook ) {
+	    if ( 'options-permalink.php' != $hook ) {
+	        //return;
+	    }
+
+	    $ver = current_time( 'timestamp' );
+
+	    wp_enqueue_style( 'lmfwpptwcext-admin-styles', LICENSER_WCLITE_PLUGIN_URL . 'admin/assets/css/admin.css', null, $ver );
+	    wp_enqueue_script( 'lmfwpptwcext-admin-scripts', LICENSER_WCLITE_PLUGIN_URL . 'admin/assets/js/admin.js', array('jquery'), $ver );
+	}
 
     /**
      * Add Product Data Tab
@@ -97,6 +117,20 @@ class Admin_Handler{
 
         // Product instance
         $product_model = \Licenser\Models\Product::instance();
+
+        // Products
+        $products = $product_model->get_all([
+            'status' => 'active',
+            'number' => -1,
+            'inc_packages' => true,
+            'columns' => 'id, name, product_type',
+        ]);
+
+        // Product List Array
+        $product_list = [];
+        foreach ($products as $product) {
+            $product_list[$product->id] = $product->name;
+        }
         
         // Loop Index
         $loop_index = $is_variation ? '_' . $loop : '';
@@ -123,10 +157,10 @@ class Admin_Handler{
 
                 woocommerce_wp_select( array(
                     'id'          => 'licenser_product_id' . $loop_index,
-                    'class'          => 'select_product_list licenser_product_id',
+                    'class'          => 'select_product_list licenser_product_id licenser_load_package',
                     'value'       => get_post_meta( $post_id, 'licenser_product_id', true ),
                     'label'       => __('Select Product', 'licenser'),
-                    'options'     => []
+                    'options'     => array( '' => 'Please select') + $product_list
                 ) );
 
                 woocommerce_wp_select( array(
