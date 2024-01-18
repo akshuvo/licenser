@@ -11,6 +11,8 @@ class Wc_Lite {
         // Admin Handler
         if ( is_admin() ) {
             $this->admin_handler();
+        } else {
+            new \Licenser\Addons\Wc_Lite\Order_Handler();
         }
         
     }

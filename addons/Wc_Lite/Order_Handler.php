@@ -3,11 +3,13 @@ namespace Licenser\Addons\Wc_Lite;
 /**
  * WooCommerce Handler
  */
-class Admin_Handler{
+class Order_Handler{
 
 	function __construct(){
 
 
+        // Add Licensing data to cart item
+        add_filter( 'woocommerce_add_cart_item_data', [$this, 'licenser_cart_item_data'], 10, 3 );
 
         
 
@@ -27,8 +29,7 @@ class Admin_Handler{
             add_action( 'woocommerce_account_dashboard', [$this, 'licenses_endpoint_content'], 30 );
         }
         
-        //Add text to cart item.
-        add_filter( 'woocommerce_add_cart_item_data', [$this, 'lmfwpptwcext_add_engraving_text_to_cart_item'], 10, 3 );
+
 
         //Display custom data on cart and checkout page
         add_filter( 'woocommerce_get_item_data', [$this, 'lmfwpptwcext_get_item_data'], 25, 2 );
@@ -45,19 +46,39 @@ class Admin_Handler{
 
 	}
 
+    /**
+     * Add Licensing data to cart item
+     *
+     * @param array $cart_item_data
+     * @param int   $product_id
+     * @param int   $variation_id
+     *
+     * @return array
+     */
+    function licenser_cart_item_data( $cart_item_data, $product_id, $variation_id ) {
+        
+        $product_id = isset( $variation_id ) && $variation_id != "0" ? sanitize_text_field( $variation_id ) : sanitize_text_field( $product_id );
 
-
-    /*
-    *
-    * product list select option pass
-    */
-    public static function lmfwpptwcext_generate( $data_arr ){
-        $return = array();
-        $return[''] = __('Select Product','lmfwpptwcext');
-        foreach ( $data_arr as $data ) {
-            $return[$data->id] = $data->name;
+        // Check if active licensing
+        $licenser_active_licensing = get_post_meta( $product_id, 'licenser_active_licensing', true );
+        if( $licenser_active_licensing != "yes" ) {
+            return $cart_item_data;
+        } else {
+            $cart_item_data['licenser_active_licensing'] = true;
         }
-        return $return;
+
+        // Meta Data
+        $product_type = get_post_meta( $product_id, 'licenser_product_type', true );
+        $licenser_product_id = get_post_meta( $product_id, 'licenser_product_id', true );
+        $package_id = get_post_meta( $product_id, 'licenser_package_id', true );
+
+        // Set Cart Item Data
+        $cart_item_data['licenser_product_id'] = $licenser_product_id;
+        $cart_item_data['product_type'] = $product_type;
+        $cart_item_data['package_id'] = $package_id;
+        
+
+        return $cart_item_data;
     }
 
 
@@ -277,48 +298,6 @@ class Admin_Handler{
         <?php  endif;
     }
 
-    /**
-     * Add text to cart item.
-     *
-     * @param array $cart_item_data
-     * @param int   $product_id
-     * @param int   $variation_id
-     *
-     * @return array
-     */
-    function lmfwpptwcext_add_engraving_text_to_cart_item( $cart_item_data, $product_id, $variation_id ) {
-        
-        $product_id = isset( $variation_id ) && $variation_id != "0" ? sanitize_text_field( $variation_id ) : sanitize_text_field( $product_id );
-
-        $is_active = get_post_meta( $product_id, 'licenser_active_license_management', true );
-        if( !$is_active ) {
-            return $cart_item_data;
-        }else{
-            $cart_item_data['is_active'] = $is_active;
-        }
-
-        $product_type = get_post_meta( $product_id, 'licenser_product_type', true );
-        if( isset( $product_type ) ) {
-            $cart_item_data['product_type'] = $product_type;
-        }
-
-        $theme_id = get_post_meta( $product_id, 'theme_product_list', true );
-        if( isset( $theme_id ) ) {
-            $cart_item_data['theme_id'] = $theme_id;
-        }
-
-        $plugin_id = get_post_meta( $product_id, 'plugin_product_list', true );
-        if( isset( $plugin_id ) ) {
-            $cart_item_data['plugin_id'] = $plugin_id;
-        }
-
-        $package_id = get_post_meta( $product_id, 'select_package', true );
-        if( isset( $package_id ) ) {
-            $cart_item_data['package_id'] = $package_id;
-        }
-
-        return $cart_item_data;
-    }
 
     /*
     * Display custom data on cart and checkout page.
@@ -332,9 +311,9 @@ class Admin_Handler{
          
         $product_id = isset( $cart_item['variation_id'] ) && $cart_item['variation_id'] != "0" ? sanitize_text_field( $cart_item['variation_id'] ) : sanitize_text_field( $cart_item['product_id'] );
 
-        $is_active = isset($cart_item['is_active']) ? sanitize_text_field($cart_item['is_active']) : null;
+        $licenser_active_licensing = isset($cart_item['licenser_active_licensing']) ? sanitize_text_field($cart_item['licenser_active_licensing']) : null;
 
-        if( !$is_active ) {
+        if( !$licenser_active_licensing ) {
             return $item_data;
         }
 
@@ -358,8 +337,8 @@ class Admin_Handler{
         }
         
          
-        if ( $product_type == "plugin" && isset( $cart_item['plugin_id'] ) && $cart_item['plugin_id'] ) {
-            $plugin_name = LMFWPPT_ProductsHandler::get_product($cart_item['plugin_id'])['name'];
+        if ( $product_type == "plugin" && isset( $cart_item['licenser_product_id'] ) && $cart_item['licenser_product_id'] ) {
+            $plugin_name = LMFWPPT_ProductsHandler::get_product($cart_item['licenser_product_id'])['name'];
                 $item_data[] = array(
                 'key'     => __( 'Plugin Name', 'lmfwpptwcext' ),
                 'value'   => $plugin_name,
@@ -397,9 +376,9 @@ class Admin_Handler{
 
         $order_id = $order->get_id(); // Get the order ID
 
-        $is_active = isset($values['is_active']) ? sanitize_text_field($values['is_active']) : null;
+        $licenser_active_licensing = isset($values['licenser_active_licensing']) ? sanitize_text_field($values['licenser_active_licensing']) : null;
 
-        if( !$is_active ) {
+        if( !$licenser_active_licensing ) {
             return;
         }
 
@@ -413,8 +392,8 @@ class Admin_Handler{
             $item->add_meta_data( __( 'Theme Name', 'lmfwpptwcext' ), $theme_name );
         }
 
-        if ( $product_type == "plugin" && isset( $values['plugin_id'] ) && $values['plugin_id'] ){
-            $plugin_name = LMFWPPT_ProductsHandler::get_product($values['plugin_id'])['name'];
+        if ( $product_type == "plugin" && isset( $values['licenser_product_id'] ) && $values['licenser_product_id'] ){
+            $plugin_name = LMFWPPT_ProductsHandler::get_product($values['licenser_product_id'])['name'];
             $item->add_meta_data( __( 'Plugin Name', 'lmfwpptwcext' ), $plugin_name );
         }
 
