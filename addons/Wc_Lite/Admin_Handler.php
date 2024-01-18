@@ -113,7 +113,6 @@ class Admin_Handler{
      * @return void
      */
     public function license_management_fields( $post_id, $is_variation = false, $loop = '' ){
-        $post_id = get_the_ID();
 
         // Product instance
         $product_model = \Licenser\Models\Product::instance();
@@ -165,11 +164,11 @@ class Admin_Handler{
 
                 woocommerce_wp_select( array(
                     'id'          => 'licenser_package_id' . $loop_index,
-                    'class'          => 'select_package',
+                    'class'          => 'licenser_select_package',
                     'value'       => get_post_meta( $post_id, 'licenser_package_id', true ),
                     'label'       => __('Select Package', 'licenser'),
                     'options'     => array( '' => 'Please select'),
-                    'custom_attributes' => ['data-pack_value' => get_post_meta( $post_id, 'select_package', true )]
+                    'custom_attributes' => ['data-selected-val' => get_post_meta( $post_id, 'licenser_package_id', true )]
                 ) );
          
             echo '</div>';
