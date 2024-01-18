@@ -48,13 +48,16 @@ class Product {
             'inc_stable_release' => true,
             'inc_releases' => false,
             'inc_packages' => true,
+            'columns' => '*',
         ] );
         global $lwpdb;
+        $columns =  $args['columns'];
 
         $product = $lwpdb->wpdb->get_row(
             $lwpdb->wpdb->prepare(
-                "SELECT * FROM {$lwpdb->products} WHERE id = %d",
-                $id
+                "SELECT {$columns} FROM {$lwpdb->products} WHERE id = %d AND status = %s LIMIT 1",
+                $id,
+                $args['status']
             )
         );
 

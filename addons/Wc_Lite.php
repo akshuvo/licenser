@@ -15,6 +15,8 @@ class Wc_Lite {
             new \Licenser\Addons\Wc_Lite\Order_Handler();
         }
         
+        // Generate License
+        add_action( 'woocommerce_order_status_changed', [$this, 'generate_license_key'], 150 );
     }
 
     // Defines
@@ -26,5 +28,11 @@ class Wc_Lite {
     // Admin_Handler
     public function admin_handler() {
         new \Licenser\Addons\Wc_Lite\Admin_Handler();
+    }
+
+    // Generate License
+    public function generate_license_key( $order_id ) {
+        $order_handler = new \Licenser\Addons\Wc_Lite\Order_Handler();
+        $order_handler->generate_license( $order_id );
     }
 }
