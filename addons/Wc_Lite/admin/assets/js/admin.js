@@ -64,48 +64,14 @@ jQuery(document).on( 'change', '.licenser_load_package', function(e, is_edit){
         },
     });
 
-
-    // let selected = $this.closest('.lmfwpptwcext_product_data').find('.select_package').attr('data-pack_value'); 
-
-    // jQuery(this).closest('.lmfwpptwcext_product_data').find('p[class*="select_package"]').show();
-    // var id = jQuery(this).val();
-    // if( id == ''){
-    //     return;
-    // }
-
-    // console.log(selected);
-    
-    // jQuery.ajax({
-    //     type: 'POST',
-    //     url: ajaxurl,
-    //     data: {
-    //         action:"get_product_package_wc",
-    //         id:id
-    //     },
-    //     cache: false,
-    //     success:function( data ){
-    //         if( data ){
-    //             $this.closest('.lmfwpptwcext_product_data').find('select[class*="select_package"]').html(data);
-                
-    //             // handle edit
-    //             if ( is_edit ) {
-    //                 $this.closest('.lmfwpptwcext_product_data').find('select[class*="select_package"]').find( 'option[value="'+selected+'"]' ).prop('selected', 1);
-    //             }
-    //         }
-
-    //     },
-    //     error:function( data ){
-    //         console.log("error");
-    //     }
-
-    // });
-
 });
 
 function licenser_trigger_fields_change(){
-    jQuery('select.licenser_load_package').trigger('change', [true]);
-
-    console.log('data loaded');
+    // Hide Panel
+    jQuery('.licenser_wcaddon_checkbox').trigger('change');
+    
+    // Trigger Product Change
+    jQuery('.licenser_load_package').trigger('change', [true]);
 }
 
 // Document ready
@@ -114,6 +80,15 @@ jQuery(document).ready(function(){
     jQuery( '#woocommerce-product-data' ).on( 'woocommerce_variations_loaded', function(){
         licenser_trigger_fields_change();
     } );
+
+    jQuery(document).on('change', '.licenser_wcaddon_checkbox', function( e ) {
+        let $this = jQuery(this);
+        if( $this.is(":checked") ) {
+            $this.closest('.licenser_product_data').find('.licenser_wcaddon_product_fields').fadeIn('fast');
+        } else{
+            $this.closest('.licenser_product_data').find('.licenser_wcaddon_product_fields').hide();
+        }
+    });
 
     // Simple Product
     licenser_trigger_fields_change();
@@ -125,13 +100,7 @@ jQuery(document).ready(function(){
     jQuery(document).ready(function(){
 
        // jQuery('div[class*="lmfwpptwcext_product_fields"]').hide();
-        jQuery(document).on('change', 'input[class*="lmfwpptwcext_checkbox"]', function(e){
-            if(jQuery(this).is(":checked")) {
-                jQuery(this).closest('.lmfwpptwcext_product_data').find('div[class*="lmfwpptwcext_product_fields"]').show();
-            } else {
-                jQuery(this).closest('.lmfwpptwcext_product_data').find('div[class*="lmfwpptwcext_product_fields"]').hide();
-            }
-        });
+
 
         jQuery(document).on( 'change', 'select[class*="licenser_product_type"]', function(e) {
             var product_type = jQuery(this).val();
