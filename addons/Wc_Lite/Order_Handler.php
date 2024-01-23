@@ -7,7 +7,6 @@ class Order_Handler{
 
 	function __construct(){
 
-
         // Add Licensing data to cart item
         add_filter( 'woocommerce_add_cart_item_data', [$this, 'add_cart_item_data'], 10, 3 );
 
@@ -38,16 +37,9 @@ class Order_Handler{
 
 
   
-
-        
-
-        //wp_ajax product package load ajax
-		add_action( 'wp_ajax_get_product_package_wc', [ $this, 'get_product_package' ] );
-
         add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_license_query_var' ], 20, 2 );
 
-        // Add License key in the order email
-        add_action( 'woocommerce_order_item_meta_end', [$this, 'license_key_order_email'], 1000, 4 );
+     
 
 	}
 
@@ -220,23 +212,29 @@ class Order_Handler{
         // Create License for Each Order Items
         foreach ( $order->get_items() as $item_id => $item ) {
             // Stop creating license key fro same order
-            if ( !get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true ) ) {
+            // if ( !get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true ) ) {
     
                 $product_id = $item->get_product_id();
                 $variation_id = $item->get_variation_id();
                 $product_id = $variation_id != "0" ? intval( $variation_id ) : intval( $product_id );
     
                 // Check if product has license management activated
-                $is_active = get_post_meta( $product_id, 'licenser_active_license_management', true );
-                if( !isset( $is_active ) && $is_active != "yes" ) {
+                $is_active = get_post_meta( $product_id, 'licenser_active_licensing', true );
+                if( $is_active != "yes" ) {
                     return;
                 }
     
                 // Get Package ID
-                $package_id = get_post_meta( $product_id, 'select_package', true );
+                $package_id = get_post_meta( $product_id, 'licenser_package_id', true );
+
     
                 // Get the package date
-                $get_package = LMFWPPT_ProductsHandler::get_package_by_package_id( $package_id );
+                $get_package = \Licenser\Models\LicensePackage::instance()->get( $package_id );
+
+
+                // error_log( print_r( $get_package, true ) );
+
+                // exit;
     
                 // Return if $get_package is empty
                 if( empty( $get_package ) ) {
@@ -244,44 +242,41 @@ class Order_Handler{
                 }
     
                 // Package Period
-                $update_period = isset( $get_package['update_period'] ) ? sanitize_text_field( $get_package['update_period'] ) : 0;
-                $domain_limit = isset( $get_package['domain_limit'] ) ? sanitize_text_field( $get_package['domain_limit'] ) : 0;
+                $update_period = isset( $get_package->update_period ) ? intval( $get_package->update_period ) : 0;
+                $domain_limit = isset( $get_package->domain_limit ) ? intval( $get_package->domain_limit ) : 0;
     
-                // Generate end date
+                // Calculate End Date
                 $end_date = date( "Y-m-d H:i:s", strtotime( "+{$update_period} day", current_time('timestamp') ) );
-    
-                // License Object Class
-                $licenseobj = new LMFWPPT_LicenseHandler();
-    
-                // License Key
-                $license_key = LMFWPPT_LicenseHandler::generate_license_key();
-                
-                // Insert Data
-                $post_data = array(
-                    'order_id'     => $order_id,
-                    'license_key'  => $license_key,
-                    'package_id'   => $package_id,
-                    'end_date'     => $end_date,
-                    'domain_limit' => $domain_limit,
-                );
+
+                // Generate License Key
+                $license_key = \Licenser\Models\License::instance()->generate_key();
     
                 // Insert License
-                 $insert_id = $licenseobj->create_license($post_data);
+                $license_id = \Licenser\Models\License::instance()->create( [
+                    'status' => 1,
+                    'package_id' => $package_id,
+                    'source' => 'wc',
+                    'source_id' => $order_id,
+                    'end_date' => $update_period == "0" ? null : $end_date,
+                    'is_lifetime' => $update_period == "0" ? 1 : 0,
+                    'domain_limit' => $domain_limit,
+                    'license_key' => $license_key,
+                ] );
     
                 // Product Slug
-                $get_product = LMFWPPT_ProductsHandler::get_product_details_by_package_id( $package_id );
-                $product_slug = isset( $get_product['slug'] ) ? sanitize_text_field( $get_product['slug'] ) : '';
+                // $get_product = LMFWPPT_ProductsHandler::get_product_details_by_package_id( $package_id );
+                $licenser_product_id = get_post_meta( $product_id, 'licenser_product_id', true );
     
     
-                 if ( !empty( $insert_id ) ) {
-                     update_post_meta( $order_id, "license_generated_item_id_{$item_id}", $insert_id );
-                     update_post_meta( $order_id, "license_generated_item_key_{$item_id}", $license_key );
-                     update_post_meta( $order_id, "license_generated_product_slug_{$item_id}", $product_slug );
+                if ( !empty( $license_id ) ) {
+                    update_post_meta( $order_id, "license_generated_item_id_{$item_id}", $license_id );
+                    update_post_meta( $order_id, "license_generated_item_key_{$item_id}", $license_key );
+                    update_post_meta( $order_id, "license_generated_product_slug_{$item_id}", $licenser_product_id );
     
-                     // Save custom meta for future usages
-                     update_post_meta( $order_id, "is_license_order", 'yes' );
-                 }
-             }
+                    // Save custom meta for future usages
+                    update_post_meta( $order_id, "is_license_order", 'yes' );
+                }
+            // }
         }
     
         // Send order invoice if not already sent
@@ -316,7 +311,7 @@ class Order_Handler{
         WC()->mailer()->customer_invoice( $order );
     
         // Note the event.
-        $order->add_order_note( __( 'Order details sent to customer via License Manager.', 'lmfwpptwcext' ), false, true );
+        $order->add_order_note( __( 'Order details sent to customer via License Manager.', 'licenser' ), false, true );
     
         do_action( 'woocommerce_after_resend_order_email', $order, 'customer_invoice' );
     }
@@ -449,14 +444,14 @@ class Order_Handler{
                     <tr class="woocommerce-orders-table__row woocommerce-orders-table__row--status-processing order">
                         
                         <td class="woocommerce-orders-table__cell" data-title="<?php esc_attr_e('Item', 'licenser'); ?>">
-                            <div class="license_product_name"><strong><?php echo esc_html( $product_name, "lmfwpptwcext" ); ?></strong></div>
+                            <div class="license_product_name"><strong><?php echo esc_html( $product_name, "licenser" ); ?></strong></div>
                             <div class="license_key">
-                                <input type="text" value="<?php echo esc_attr($license_key, "lmfwpptwcext"); ?>" readonly="readonly" style=" width: 100%; ">
+                                <input type="text" value="<?php echo esc_attr($license_key, "licenser"); ?>" readonly="readonly" style=" width: 100%; ">
                             </div>
 
                             <!-- activations button -->
                             <div class="show_manage_activations_details">
-                                <a><?php echo esc_html__( "Manage Activations", "lmfwpptwcext" ); ?></a>
+                                <a><?php echo esc_html__( "Manage Activations", "licenser" ); ?></a>
                             </div>
 
                             <!-- activations value show -->
@@ -465,11 +460,11 @@ class Order_Handler{
 
                                 <a class="activations-close-modal" title="Close">&times;</a>
 
-                                <h5 style="margin:0px;"><?php echo esc_html__( "Manage License:", "lmfwpptwcext" ); ?></h5>
+                                <h5 style="margin:0px;"><?php echo esc_html__( "Manage License:", "licenser" ); ?></h5>
 
                                 <ul class="am-list-ul">
-                                    <li><strong><?php echo esc_html__( "License Key", "lmfwpptwcext" ); ?></strong>: <code><?php echo esc_html( $license_key ); ?></code></li>
-                                    <li><strong><?php echo esc_html__( "Product", "lmfwpptwcext" ); ?></strong>: <?php echo esc_html( $product_name ); ?></li>
+                                    <li><strong><?php echo esc_html__( "License Key", "licenser" ); ?></strong>: <code><?php echo esc_html( $license_key ); ?></code></li>
+                                    <li><strong><?php echo esc_html__( "Product", "licenser" ); ?></strong>: <?php echo esc_html( $product_name ); ?></li>
                                 </ul>
                               
                                 
@@ -477,8 +472,8 @@ class Order_Handler{
                                 <table style="border-width: 1px 1px 1px 1px;">
                                     <thead>
                                         <tr>
-                                            <th><?php echo esc_html__( "Site URL", "lmfwpptwcext" ); ?></th>
-                                            <th><?php echo esc_html__( "Status", "lmfwpptwcext" ); ?></th>
+                                            <th><?php echo esc_html__( "Site URL", "licenser" ); ?></th>
+                                            <th><?php echo esc_html__( "Status", "licenser" ); ?></th>
                                         </tr>
                                     </thead>
                                    <tbody>
@@ -493,12 +488,12 @@ class Order_Handler{
                                                     <?php echo esc_html( $url ); ?> 
                                                     <a target="_blank" href="<?php echo esc_url( $url ); ?>">↗</a>
                                                 </td>
-                                                <td><?php echo $status == "1" ? esc_html__( "Active", "lmfwpptwcext" ) : esc_html__( "Inactive", "lmfwpptwcext" ); ?></td>
+                                                <td><?php echo $status == "1" ? esc_html__( "Active", "licenser" ) : esc_html__( "Inactive", "licenser" ); ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                     <tr>
-                                        <td colspan="2"><?php echo esc_html__( "No Domains", "lmfwpptwcext" ); ?></td> 
+                                        <td colspan="2"><?php echo esc_html__( "No Domains", "licenser" ); ?></td> 
                                     </tr>
                                     <?php endif; ?>  
                                        
@@ -540,18 +535,68 @@ class Order_Handler{
     }
 
 
-  
+    // add_license_key_in_order_email
+    public function add_license_key_in_order_email( $order, $sent_to_admin, $plain_text, $email ){
+
+        // if( licenser_get_option('hide_wclm_info_from_ordermeta') == "on"){
+        //     return;
+        // }
+
+        // // Check If order status = completed, processing
+        // if ( !in_array( $order->get_status(), [ 'processing', 'completed' ] ) ) {
+        //     return;
+        // }
+
+        // Get the order ID
+        $order_id = $order->get_id(); 
+
+        // Create License for Each Order Items
+        foreach ( $order->get_items() as $item_id => $item ) {
+
+            // Get license key by id
+            $license_key_id = get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true );
+            $license_key = get_post_meta( $order_id, "license_generated_item_key_{$item_id}", true );
+            $product_slug = get_post_meta( $order_id, "license_generated_product_slug_{$item_id}", true );
+
+            if ( empty( $license_key_id ) ) {
+                // return;
+            }
+
+            // Download Link
+            $download_link = add_query_arg( array(
+                'product_slug' => $product_slug,
+                'license_key' => $license_key,
+                'action' => 'download',
+            ), lmfwppt_api_url() );
+
+            // Show License key
+            echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <code>%s</code></li></ul>',
+                __( 'License Key', 'licenser' ),
+                $license_key
+            );
+
+            if ( $download_link ) {
+                echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <a href="%s" target="_blank">%s</a></li></ul>',
+                    __( 'Download Link', 'licenser' ),
+                    $download_link,
+                    __( 'Download', 'licenser' )
+                );
+            }
+
+        }
+
+    }
 
     // Attach License key in order item
-    function license_key_order_email( $item_id, $item, $order, $plain_text ){
+    public function license_key_order_email( $item_id, $item, $order, $plain_text ){
 
         if( licenser_get_option('hide_wclm_info_from_ordermeta') == "on"){
-            return;
+            // return;
         }
 
         // Check If order status = completed, processing
         if ( !in_array( $order->get_status(), [ 'processing', 'completed' ] ) ) {
-            return;
+            // return;
         }
 
         // Get the order ID
@@ -563,7 +608,7 @@ class Order_Handler{
         $product_slug = get_post_meta( $order_id, "license_generated_product_slug_{$item_id}", true );
 
         if ( empty( $license_key_id ) ) {
-            return;
+            // return;
         }
 
         // Show License key
@@ -590,32 +635,4 @@ class Order_Handler{
     }
 
 
-    /**
-     * Get product package
-     */
-	function get_product_package(){
-
-        ?>
-        <option value="" class="blank"><?php esc_html_e( 'Select Package', 'lmfwppt' ); ?></option>
-        <?php 
-
-		if( isset( $_POST['id'] ) ) {
-
-            $package_list = LMFWPPT_ProductsHandler::get_packages($_POST['id']);
-
-            if( $package_list ) {
-
-                foreach( $package_list as $result ):
-                    $package_id = $result['package_id'];
-                    $label = $result['label'];
-                    ?>
-                    <option value="<?php echo $package_id; ?>"><?php echo $label; ?></option> 
-                    <?php 
-                endforeach;
-            }
-         
-        }
-        die();
-	}
-	
 }

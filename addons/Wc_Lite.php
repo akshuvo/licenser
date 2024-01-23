@@ -14,9 +14,14 @@ class Wc_Lite {
         } else {
             new \Licenser\Addons\Wc_Lite\Order_Handler();
         }
+
+        // $order_handler = new \Licenser\Addons\Wc_Lite\Order_Handler();
         
         // Generate License
         add_action( 'woocommerce_order_status_changed', [$this, 'generate_license_key'], 150 );
+        
+        // Add License key in the order email of each item
+        add_action( 'woocommerce_email_after_order_table', [$this, 'add_license_key_in_order_email'], 10, 4 );
     }
 
     // Defines
@@ -34,5 +39,11 @@ class Wc_Lite {
     public function generate_license_key( $order_id ) {
         $order_handler = new \Licenser\Addons\Wc_Lite\Order_Handler();
         $order_handler->generate_license( $order_id );
+    }
+
+    // Add License key in the order email of each item
+    public function add_license_key_in_order_email( $order, $sent_to_admin, $plain_text, $email ) {
+        $order_handler = new \Licenser\Addons\Wc_Lite\Order_Handler();
+        $order_handler->add_license_key_in_order_email( $order, $sent_to_admin, $plain_text, $email );
     }
 }

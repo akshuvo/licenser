@@ -64,7 +64,6 @@ class License {
 
         global $lwpdb;
 
-
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
             $lwpdb->wpdb->update(
@@ -86,6 +85,13 @@ class License {
 
             $insert_id = $data['id'];
         } else {
+
+            // If license_key is empty then generate a new one
+            if( empty( $data['license_key'] ) ){
+                $data['license_key'] = $this->generate_key();
+            }
+
+            // Insert
             $lwpdb->wpdb->insert(
                 $lwpdb->licenses,
                 [
