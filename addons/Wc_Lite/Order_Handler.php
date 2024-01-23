@@ -17,13 +17,11 @@ class Order_Handler{
         // Display Licensing data on checkout
         add_action( 'woocommerce_checkout_create_order_line_item', [$this, 'display_item_data_checkout'], 10, 4 );
 
-        
+        // Add License Manager Menu on My Account
+        add_filter ( 'woocommerce_account_menu_items', [$this, 'acc_menu_item'] );
 
-        //Add A Menu on My Account menu tab 
-        add_filter ( 'woocommerce_account_menu_items', [$this, 'licenses_link_my_account'] );
-
-        // hook the external URL
-        add_filter( 'woocommerce_get_endpoint_url', [$this, 'hook_endpoint_link'], 10, 4 );
+        // Set License Manager Menu URL
+        add_filter( 'woocommerce_get_endpoint_url', [$this, 'licenser_menu_url'], 10, 4 );
 
         // Add Shortcode
         add_shortcode( 'licenser_wc_manager', [$this, 'licenses_endpoint_content'], 30 );
@@ -32,13 +30,6 @@ class Order_Handler{
         if ( isset( $_GET['wc_tab'] ) && $_GET['wc_tab'] == 'license_manager' ) {
             add_action( 'woocommerce_account_dashboard', [$this, 'licenses_endpoint_content'], 30 );
         }
-        
-
-
-  
-        // add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_license_query_var' ], 20, 2 );
-
-
 
 	}
 
@@ -357,29 +348,13 @@ class Order_Handler{
 
     }
 
-
     /**
-     * Handle a custom 'is_license_order' query var to get orders with the 'customvar' meta.
-     * @param array $query - Args for WP_Query.
-     * @param array $query_vars - Query vars from WC_Order_Query.
-     * @return array modified $query
+     * Add License Manager Menu on My Account
+     *
+     * @param array $menu_links
+     * @return array
      */
-    function handle_license_query_var( $query, $query_vars ) {
-        if ( ! empty( $query_vars['is_license_order'] ) ) {
-            $query['meta_query'][] = array(
-                'key' => 'is_license_order',
-                'value' => esc_attr( $query_vars['is_license_order'] ),
-            );
-        }
-
-        return $query;
-    }
-
-    /*
-    *
-    * Add A Menu on My Account menu tab
-    */
-    public function licenses_link_my_account( $menu_links ){
+    public function acc_menu_item( $menu_links ){
         
         $menu_links = array_slice( $menu_links, 0, 3, true ) 
         + array( 'licenses' => 'License Manager' )
@@ -389,18 +364,16 @@ class Order_Handler{
     }
 
     // License Menu Link
-    function hook_endpoint_link( $url, $endpoint, $value, $permalink ){
+    function licenser_menu_url( $url, $endpoint, $value, $permalink ){
  
         if( 'licenses' === $endpoint ) {
-     
-            // ok, here is the place for your custom URL, it could be external
             $url = add_query_arg([
                 'wc_tab' => 'license_manager',
             ], wc_get_account_endpoint_url('dashboard') );
      
         }
+        
         return $url;
-     
     }
 
     // License Endpoint Content
@@ -408,7 +381,4 @@ class Order_Handler{
         $shortcode = new Shortcode();
         return $shortcode->output();
     }
-
-
-
 }
