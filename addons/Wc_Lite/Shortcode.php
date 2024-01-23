@@ -53,7 +53,7 @@ class Shortcode{
             <tbody>
                 <?php foreach ( $get_licenses as $key => $license ) : 
 
-                $license = (array) $license;
+                    $license = (array) $license;
 
                     $license_id = isset( $license['id'] ) ? sanitize_text_field( $license['id'] ) : 0;
                     $package_id = isset( $license['package_id'] ) ? sanitize_text_field( $license['package_id'] ) : null;
@@ -78,7 +78,7 @@ class Shortcode{
                     }
 
                     global $wpdb;
-                    $get_product = $wpdb->get_row( $wpdb->prepare("SELECT * FROM {$wpdb->prefix}lmfwppt_license_packages as lp INNER JOIN {$wpdb->prefix}lmfwppt_products as p ON p.id = lp.product_id WHERE lp.package_id = %s", $package_id), ARRAY_A );
+                    $get_product = $wpdb->get_row( $wpdb->prepare("SELECT * FROM {$wpdb->prefix}licenser_license_packages as lp INNER JOIN {$wpdb->prefix}licenser_products as p ON p.id = lp.product_id WHERE lp.id = %s", $package_id), ARRAY_A );
 
                     $product_name = isset( $get_product['name'] ) ? sanitize_text_field( $get_product['name'] ) : '';
                     $pack_label = isset( $get_product['label'] ) ? sanitize_text_field( $get_product['label'] ) : '';
@@ -108,7 +108,7 @@ class Shortcode{
                         <td class="woocommerce-orders-table__cell" data-title="<?php esc_attr_e('Item', 'licenser'); ?>">
                             <div class="license_product_name"><strong><?php echo esc_html( $product_name, "licenser" ); ?></strong></div>
                             <div class="license_key">
-                                <input type="text" value="<?php echo esc_attr($license_key, "licenser"); ?>" readonly="readonly" style=" width: 100%; ">
+                                <code><?php echo esc_html( $license_key ); ?></code>
                             </div>
 
                             <!-- activations button -->
@@ -186,7 +186,7 @@ class Shortcode{
 
         <?php else: 
             $shop_page_url = get_permalink( wc_get_page_id( 'shop' ) );
-            $product_page_url = apply_filters( 'license_manager_products_page_url', $shop_page_url );
+            $product_page_url = apply_filters( 'licenser_wclite_products_page_url', $shop_page_url );
 
             ?>
             <div class="woocommerce-Message woocommerce-Message--info woocommerce-info">
