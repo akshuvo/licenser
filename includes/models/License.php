@@ -8,15 +8,15 @@ class License {
 
     // Default Fields
     public $default_fields = [
-        'status' => '',
+        'status' => 1,
         'license_key' => '',
         'package_id' => '',
-        'order_id' => '',
-        'end_date' => '',
-        'is_lifetime' => '',
-        'domain_limit' => '',
         'source' => '',
         'source_id' => '',
+        'end_date' => '',
+        'is_lifetime' => 0,
+        'domain_limit' => '',
+        'dated' => '',
     ];
 
     /**
@@ -40,6 +40,96 @@ class License {
         }
 
         return $license;
+    }
+
+    /**
+     * Get Product Licenses
+     *
+     * @var int
+     */
+    public function get_all( $args = [] ) {
+        global $lwpdb;
+
+        $defaults = [
+            'number' => 20,
+            'offset' => 0,
+            'orderby' => 'id',
+            'order' => 'DESC',
+            'count_total' => true,
+            'product_id' => '',
+            'package_id' => '',
+            'source' => '',
+            'source_id' => '',
+            'status' => '',
+            'license_key' => '',
+            'end_date' => '',
+            'is_lifetime' => '',
+            'domain_limit' => '',
+            'dated' => '',
+        ];
+
+        $args = wp_parse_args( $args, $defaults );
+
+        $where = ' 1=1 ';
+
+        if( !empty( $args['product_id'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $args['product_id'] );
+        }
+
+        if( !empty( $args['package_id'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND package_id = %s", $args['package_id'] );
+        }
+
+        if( !empty( $args['source'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND source = %s", $args['source'] );
+        }
+
+        if( !empty( $args['source_id'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND source_id = %d", $args['source_id'] );
+        }
+
+        if( !empty( $args['status'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND status = %d", $args['status'] );
+        }
+
+        if( !empty( $args['license_key'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND license_key = %s", $args['license_key'] );
+        }
+
+        if( !empty( $args['end_date'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND end_date = %s", $args['end_date'] );
+        }
+
+        if( !empty( $args['is_lifetime'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND is_lifetime = %d", $args['is_lifetime'] );
+        }
+
+        if( !empty( $args['domain_limit'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND domain_limit = %d", $args['domain_limit'] );
+        }
+
+        if( !empty( $args['dated'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND dated = %s", $args['dated'] );
+        }
+
+        // Order
+        $where .= " ORDER BY {$args['orderby']} {$args['order']}";
+
+        $limit = '';
+        if( $args['number'] != -1 ){
+            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+        }
+
+        $licenses = $lwpdb->wpdb->get_results(
+            "SELECT * FROM {$lwpdb->licenses} WHERE {$where} {$limit}"
+        );
+
+        // Return if no license found
+        if( empty( $licenses ) ){
+            return false;
+        }
+
+        return $licenses;
     }
 
     /**
