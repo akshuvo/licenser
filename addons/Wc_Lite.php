@@ -12,16 +12,14 @@ class Wc_Lite {
         if ( is_admin() ) {
             $this->admin_handler();
         } else {
-            new \Licenser\Addons\Wc_Lite\Order_Handler();
+            new Wc_Lite\Order_Handler();
         }
-
-        // $order_handler = new \Licenser\Addons\Wc_Lite\Order_Handler();
         
         // Generate License
         add_action( 'woocommerce_order_status_changed', [$this, 'generate_license_key'], 150 );
-        
+
         // Add License key in the order email of each item
-        add_action( 'woocommerce_email_after_order_table', [$this, 'add_license_key_in_order_email'], 10, 4 );
+        add_action( 'woocommerce_order_item_meta_end', [$this, 'add_license_key_in_order_email'], 20, 4 );
     }
 
     // Defines
@@ -32,18 +30,18 @@ class Wc_Lite {
 
     // Admin_Handler
     public function admin_handler() {
-        new \Licenser\Addons\Wc_Lite\Admin_Handler();
+        return new Wc_Lite\Admin_Handler();
     }
 
     // Generate License
     public function generate_license_key( $order_id ) {
-        $order_handler = new \Licenser\Addons\Wc_Lite\Order_Handler();
+        $order_handler = new Wc_Lite\Order_Handler();
         $order_handler->generate_license( $order_id );
     }
 
     // Add License key in the order email of each item
     public function add_license_key_in_order_email( $order, $sent_to_admin, $plain_text, $email ) {
-        $order_handler = new \Licenser\Addons\Wc_Lite\Order_Handler();
-        $order_handler->add_license_key_in_order_email( $order, $sent_to_admin, $plain_text, $email );
+        $order_handler = new Wc_Lite\Order_Handler();
+        $order_handler->license_key_order_email( $order, $sent_to_admin, $plain_text, $email );
     }
 }

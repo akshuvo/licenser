@@ -39,7 +39,7 @@ class Order_Handler{
   
         add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', [ $this, 'handle_license_query_var' ], 20, 2 );
 
-     
+
 
 	}
 
@@ -315,7 +315,54 @@ class Order_Handler{
     
         do_action( 'woocommerce_after_resend_order_email', $order, 'customer_invoice' );
     }
-    
+
+
+    // Attach License key in order item
+    public function license_key_order_email( $item_id, $item, $order, $plain_text ){
+
+        if( licenser_get_option('hide_wclm_info_from_ordermeta') == "on"){
+            // return;
+        }
+
+        // Check If order status = completed, processing
+        if ( !in_array( $order->get_status(), [ 'processing', 'completed' ] ) ) {
+            // return;
+        }
+
+        // Get the order ID
+        $order_id = $order->get_id(); 
+
+        // Get license key by id
+        $license_key_id = get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true );
+        $license_key = get_post_meta( $order_id, "license_generated_item_key_{$item_id}", true );
+        $product_slug = get_post_meta( $order_id, "license_generated_product_slug_{$item_id}", true );
+
+        if ( empty( $license_key_id ) ) {
+            // return;
+        }
+
+        // Show License key
+        echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <code>%s</code></li></ul>',
+            __( 'License Key', 'licenser' ),
+            $license_key
+        );
+
+        // Download Link
+        $download_link = add_query_arg( array(
+            'product_slug' => $product_slug,
+            'license_key' => $license_key,
+            'action' => 'download',
+        ), lmfwppt_api_url() );
+
+        if ( $download_link ) {
+            echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <a href="%s" target="_blank">%s</a></li></ul>',
+                __( 'Download Link', 'licenser' ),
+                $download_link,
+                __( 'Download', 'licenser' )
+            );
+        }
+
+    }
 
 
     /**
@@ -534,105 +581,6 @@ class Order_Handler{
         <?php  endif;
     }
 
-
-    // add_license_key_in_order_email
-    public function add_license_key_in_order_email( $order, $sent_to_admin, $plain_text, $email ){
-
-        // if( licenser_get_option('hide_wclm_info_from_ordermeta') == "on"){
-        //     return;
-        // }
-
-        // // Check If order status = completed, processing
-        // if ( !in_array( $order->get_status(), [ 'processing', 'completed' ] ) ) {
-        //     return;
-        // }
-
-        // Get the order ID
-        $order_id = $order->get_id(); 
-
-        // Create License for Each Order Items
-        foreach ( $order->get_items() as $item_id => $item ) {
-
-            // Get license key by id
-            $license_key_id = get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true );
-            $license_key = get_post_meta( $order_id, "license_generated_item_key_{$item_id}", true );
-            $product_slug = get_post_meta( $order_id, "license_generated_product_slug_{$item_id}", true );
-
-            if ( empty( $license_key_id ) ) {
-                // return;
-            }
-
-            // Download Link
-            $download_link = add_query_arg( array(
-                'product_slug' => $product_slug,
-                'license_key' => $license_key,
-                'action' => 'download',
-            ), lmfwppt_api_url() );
-
-            // Show License key
-            echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <code>%s</code></li></ul>',
-                __( 'License Key', 'licenser' ),
-                $license_key
-            );
-
-            if ( $download_link ) {
-                echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <a href="%s" target="_blank">%s</a></li></ul>',
-                    __( 'Download Link', 'licenser' ),
-                    $download_link,
-                    __( 'Download', 'licenser' )
-                );
-            }
-
-        }
-
-    }
-
-    // Attach License key in order item
-    public function license_key_order_email( $item_id, $item, $order, $plain_text ){
-
-        if( licenser_get_option('hide_wclm_info_from_ordermeta') == "on"){
-            // return;
-        }
-
-        // Check If order status = completed, processing
-        if ( !in_array( $order->get_status(), [ 'processing', 'completed' ] ) ) {
-            // return;
-        }
-
-        // Get the order ID
-        $order_id = $order->get_id(); 
-
-        // Get license key by id
-        $license_key_id = get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true );
-        $license_key = get_post_meta( $order_id, "license_generated_item_key_{$item_id}", true );
-        $product_slug = get_post_meta( $order_id, "license_generated_product_slug_{$item_id}", true );
-
-        if ( empty( $license_key_id ) ) {
-            // return;
-        }
-
-        // Show License key
-        echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <code>%s</code></li></ul>',
-            __( 'License Key', 'licenser' ),
-            $license_key
-        );
-
-        // Download Link
-        $download_link = add_query_arg( array(
-            'product_slug' => $product_slug,
-            'license_key' => $license_key,
-            'action' => 'download',
-        ), lmfwppt_api_url() );
-
-        if ( $download_link ) {
-            echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <a href="%s" target="_blank">%s</a></li></ul>',
-                __( 'Download Link', 'licenser' ),
-                $download_link,
-                __( 'Download', 'licenser' )
-            );
-        }
-
-    }
 
 
 }
