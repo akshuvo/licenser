@@ -38,8 +38,8 @@ class Admin_Handler{
 
 	    $ver = current_time( 'timestamp' );
 
-	    wp_enqueue_style( 'lmfwpptwcext-admin-styles', LICENSER_WCLITE_PLUGIN_URL . 'admin/assets/css/admin.css', null, $ver );
-	    wp_enqueue_script( 'lmfwpptwcext-admin-scripts', LICENSER_WCLITE_PLUGIN_URL . 'admin/assets/js/admin.js', array('jquery'), $ver );
+	    wp_enqueue_style( 'lmfwpptwcext-admin-styles', LICENSER_WCLITE_PLUGIN_URL . 'assets/css/admin.css', null, $ver );
+	    wp_enqueue_script( 'lmfwpptwcext-admin-scripts', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), $ver );
 	}
 
     /**

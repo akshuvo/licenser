@@ -96,15 +96,14 @@ class LicensesListTable extends \WP_List_Table{
 	}
 
 	public function column_license_details( $item ){	
-		$productObj = new Products();
-		
-		$package_id = $productObj->get_product_details_by_package_id($item->package_id);
-	
-		$package_details = '<a href="admin.php?page=licenser-licenses&action=edit&id='.$package_id['product_id'].'">'.$package_id['name'].' ('.$package_id['label'].')'.'</a>';
+
+
+
+		$package_details = '<a href="admin.php?page=licenser-licenses&action=edit&id=">'.$item->package_id.'</a>';
 		 
 		$package_details .= '<ul class="package_details">
-					<li>Domain Limit: '.$package_id['domain_limit'].'</li>
-					<li>Product Type: '.$package_id['product_type'].'</li>
+					<li>Domain Limit: '.$item->domain_limit.'</li>
+					<li>Product Type: '.$item->source.'</li>
 				</ul>';
 		return $package_details; 
 	}

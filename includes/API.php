@@ -24,6 +24,7 @@ class Api {
             'products' => 'Products',
             'licenses'  => 'Licenses',
             'settings'  => 'Settings',
+            'public'    => 'Public_Apis',
         ];
 
         // // Load controller routes based on url
