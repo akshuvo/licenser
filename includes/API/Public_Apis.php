@@ -1,6 +1,7 @@
 <?php
 namespace Licenser\API;
 use Licenser\Controllers\RestController;
+use Licenser\Controllers\Product as Product_Controller;
 use Licenser\Models\Product;
 use Licenser\Models\LicensePackage;
 use WP_REST_Request;
@@ -124,32 +125,7 @@ class Public_Apis extends RestController {
      */
     public function prepare_response_for_plugin( $product, $request ) {
 
-        // {
-        //     "id": "xxx",
-        //     "name": "Load More Anything",
-        //     "slug": "sadf",
-        //     "plugin": "asdf",
-        //     "url": null,
-        //     "icons": {
-        //         "1x": null,
-        //         "2x": null
-        //     },
-        //     "banners": {
-        //         "low": null,
-        //         "high": null
-        //     },
-        //     "tested": "5.6",
-        //     "requires_php": "7.4",
-        //     "requires": "5.6",
-        //     "sections": {
-        //         "description": "",
-        //         "changelog": "<h3>1.2.3</h3> <p><em>Release Date – Jan 8, 2024</em></p> <p>Test</p>"
-        //     },
-        //     "new_version": "1.2.3",
-        //     "last_updated": "2024-01-08 21:51:03",
-        //     "package": "public/update/25c070e9-6da7-4d88-b07b-bfeda943e559/download",
-        //     "download_link": "public/update/25c070e9-6da7-4d88-b07b-bfeda943e559/download"
-        // }
+        $download_url = licenser_product_download_url( $product->uuid, $request->get_param( 'license_key' ) );
 
         $response = [
             'id' => $product->uuid,
@@ -170,12 +146,12 @@ class Public_Apis extends RestController {
             'requires' => $product->requires,
             'sections' => [
                 'description' => $product->description,
-                'changelog' => $product->stable_release->changelog,
+                'changelog' => '<h3>1.2.3</h3> <p><em>Release Date - Jan 8, 2024</em></p> <p>Test</p>',
             ],
             'new_version' => $product->stable_release->version,
             'last_updated' => $product->stable_release->release_date,
-            'package' => $product->stable_release->download_link,
-            'download_link' => $product->stable_release->download_link,
+            'package' => $download_url,
+            'download_link' => $download_url,
         ];
 
         return $response;
@@ -190,32 +166,7 @@ class Public_Apis extends RestController {
      */
     public function prepare_response_for_theme( $product, $request ) {
 
-        // {
-        //     "id": "xxx",
-        //     "name": "Load More Anything",
-        //     "slug": "sadf",
-        //     "theme": "asdf",
-        //     "url": null,
-        //     "icons": {
-        //         "1x": null,
-        //         "2x": null
-        //     },
-        //     "banners": {
-        //         "low": null,
-        //         "high": null
-        //     },
-        //     "tested": "5.6",
-        //     "requires_php": "7.4",
-        //     "requires": "5.6",
-        //     "sections": {
-        //         "description": "",
-        //         "changelog": "<h3>1.2.3</h3> <p><em>Release Date – Jan 8, 2024</em></p> <p>Test</p>"
-        //     },
-        //     "new_version": "1.2.3",
-        //     "last_updated": "2024-01-08 21:51:03",
-        //     "package": "public/update/25c070e9-6da7-4d88-b07b-bfeda943e559/download",
-        //     "download_link": "public/update/25c070e9-6da7-4d88-b07b-bfeda943e559/download"
-        // }
+        $download_url = licenser_product_download_url( $product->uuid, $request->get_param( 'license_key' ) );
 
         $response = [
             'id' => $product->uuid,
@@ -240,8 +191,8 @@ class Public_Apis extends RestController {
             ],
             'new_version' => $product->stable_release->version,
             'last_updated' => $product->stable_release->release_date,
-            'package' => $product->stable_release->download_link,
-            'download_link' => $product->stable_release->download_link,
+            'package' => $download_url,
+            'download_link' => $download_url,
         ];
 
         return $response;
@@ -274,32 +225,43 @@ class Public_Apis extends RestController {
             );
         }
 
-        // Check product type
-        if( $product->product_type == 'plugin' ){
-            $response = $this->prepare_response_for_plugin( $product, $request );
-        } elseif( $product->product_type == 'theme' ){
-            $response = $this->prepare_response_for_theme( $product, $request );
-        }
+        // Download
+        return Product_Controller::instance()->download( [
+            'product_id' => $product->id,
+            'license_key' => $license_key,
+            'version' => $product->stable_release->version,
+            'product' => $product,
+        ] );
 
-        // Check if license key is valid
-        if( !empty( $license_key ) ){
-            $license = License::instance()->get( $license_key, [
-                'inc_product' => true,
-                'inc_package' => true,
-                'get_by' => 'key',
-            ]);
-        }
 
-        // Check if license is valid
-        if( !empty( $license ) && $license->status == 'active' ){
-            $response['package'] = $product->stable_release->download_link;
-            $response['download_link'] = $product->stable_release->download_link;
-        } else {
-            $response['package'] = null;
-            $response['download_link'] = null;
-        }
+        // // Check product type
+        // if( $product->product_type == 'plugin' ){
+        //     $response = $this->prepare_response_for_plugin( $product, $request );
+        // } elseif( $product->product_type == 'theme' ){
+        //     $response = $this->prepare_response_for_theme( $product, $request );
+        // }
 
-        return rest_ensure_response( $response );
+        // // Check if license key is valid
+        // if( !empty( $license_key ) ){
+        //     $license = License::instance()->get( $license_key, [
+        //         'inc_product' => true,
+        //         'inc_package' => true,
+        //         'get_by' => 'key',
+        //     ]);
+        // }
+
+        // // Check if license is valid
+        // if( !empty( $license ) && $license->status == 'active' ){
+        //     $response['package'] = $download_url;
+        //     $response['download_link'] = $download_url;
+        // } else {
+        //     $response['package'] = null;
+        //     $response['download_link'] = null;
+        // }
+
+        error_log( print_r( $license_key, true ) );
+
+        return rest_ensure_response( $product );
     }
 
 }

@@ -24,15 +24,26 @@ class License {
      *
      * @var int
      */
-    public function get( $id ) {
-        global $lwpdb;
+    public function get( $id, $args = []) {
+        $args = wp_parse_args( $args, [
+            'columns' => '*',
+            'get_by' => '',
+        ] );
 
-        $license = $lwpdb->wpdb->get_row(
-            $lwpdb->wpdb->prepare(
-                "SELECT * FROM {$lwpdb->licenses} WHERE id = %d",
-                $id
-            )
-        );
+        global $lwpdb;
+        $columns =  $args['columns'];
+
+        // Where
+        $where = ' 1=1 ';
+
+        // Get By
+        if( $args['get_by'] == 'key' ){
+            $where .= $lwpdb->wpdb->prepare( " AND license_key = %s", $id );
+        } else {
+            $where .= $lwpdb->wpdb->prepare( " AND id = %d", $id );
+        }
+
+        $license = $lwpdb->wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->licenses} WHERE {$where} LIMIT 1" );
 
         // Return if no license found
         if( empty( $license ) ){

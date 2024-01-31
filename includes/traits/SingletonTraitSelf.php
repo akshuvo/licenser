@@ -29,7 +29,7 @@ trait SingletonTraitSelf {
 	 * @return object Instance.
 	 */
     final public static function instance() {
-        if (null === static::$instance) {
+        if ( null === static::$instance ) {
             static::$instance = new self();
         }
         return static::$instance;

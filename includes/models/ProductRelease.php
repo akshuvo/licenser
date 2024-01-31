@@ -7,6 +7,39 @@ class ProductRelease {
     use \Licenser\Traits\SingletonTraitSelf;
 
     /**
+     * Get Var
+     *
+     * @var int
+     */
+    public function get( $id, $args = [] ) {
+        $args = wp_parse_args( $args, [
+            'columns' => [],
+            'get_by' => '',
+            'version' => '',
+        ] );
+
+        global $lwpdb;
+        $columns = !empty( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
+
+        // Where
+        $where = ' 1=1 ';
+
+        // Get By
+        if( $args['get_by'] == 'product_id' ){
+            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $id );
+        } else {
+            $where .= $lwpdb->wpdb->prepare( " AND id = %d", $id );
+        }
+
+        // Version
+        if( !empty( $args['version'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND version = %s", $args['version'] );
+        }
+
+        return $lwpdb->wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->product_releases} WHERE {$where} LIMIT 1" );
+    }
+
+    /**
      * Get Stable Release
      */
     public function get_stable( $product_id ) {
@@ -14,7 +47,7 @@ class ProductRelease {
 
         $release = $lwpdb->wpdb->get_row(
             $lwpdb->wpdb->prepare(
-                "SELECT * FROM {$lwpdb->product_releases} WHERE product_id = %d ORDER BY id DESC LIMIT 1",
+                "SELECT * FROM {$lwpdb->product_releases} WHERE product_id = %d ORDER BY id DESC, release_date DESC LIMIT 1",
                 $product_id
             )
         );

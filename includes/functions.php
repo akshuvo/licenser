@@ -25,6 +25,14 @@ function lmfwppt_api_url(){
     return apply_filters( 'lmfwppt_api_url', home_url('/') );
 }
 
+// Download URL
+function licenser_product_download_url( $product_id, $license_key = '' ) {
+    // http://licenser.local/wp-json/licenser/v1/public/products/download/ce78f257-1254-4680-993d-24c199a21a30?license_key=xxx
+    return add_query_arg( [
+        'license_key' => $license_key,
+    ], lmfwppt_api_url() . 'wp-json/licenser/v1/public/products/download/' . $product_id );
+}
+
 // Get Product list
 function lmfwppt_get_product_list( $product_type ){
 
