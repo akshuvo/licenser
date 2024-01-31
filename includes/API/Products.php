@@ -138,26 +138,6 @@ class Products extends RestController {
                 ],
             ]
         );
-
-        // Single Product Route
-        register_rest_route(
-            $this->namespace,
-            '/' . $this->rest_base . '/products/(?P<uuid>[\S]+)',
-            [
-                [
-                    'methods'             => WP_REST_Server::CREATABLE,
-                    'callback'            => [ $this, 'get_item_by_uuid' ],
-                    'permission_callback' => [ $this, 'get_item_permissions_check' ],
-                    'args'                => [
-                        'uuid' => [
-                            'description' => __( 'Product UUID.' ),
-                            'type'        => 'string',
-                            'required'    => true,
-                        ],
-                    ],
-                ],
-            ]
-        );
         
     }
 
@@ -285,31 +265,5 @@ class Products extends RestController {
         }
 
         return rest_ensure_response( $packages );
-    }
-
-    /**
-     * Get a single item by uuid
-     *
-     * @param WP_REST_Request $request Full data about the request.
-     *
-     * @return WP_Error|WP_REST_Response
-     */
-    public function get_item_by_uuid( $request ) {
-
-        error_log( print_r( $request->get_params(), true ) );
-
-        $uuid = $request->get_param( 'uuid' );
-
-        $product = Product::instance()->get_by_uuid( $uuid );
-
-        if ( ! $product ) {
-            return new WP_Error(
-                'not_found',
-                __( 'Invalid Product UUID.' ),
-                [ 'status' => 404 ]
-            );
-        }
-
-        return rest_ensure_response( $product );
     }
 }

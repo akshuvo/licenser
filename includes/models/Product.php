@@ -44,22 +44,26 @@ class Product {
      */
     public function get( $id, $args = [] ) {
         $args = wp_parse_args( $args, [
-            'status' => 'active',
             'inc_stable_release' => true,
             'inc_releases' => false,
             'inc_packages' => true,
             'columns' => '*',
+            'get_by' => '',
         ] );
         global $lwpdb;
         $columns =  $args['columns'];
 
-        $product = $lwpdb->wpdb->get_row(
-            $lwpdb->wpdb->prepare(
-                "SELECT {$columns} FROM {$lwpdb->products} WHERE id = %d AND status = %s LIMIT 1",
-                $id,
-                $args['status']
-            )
-        );
+        // Where
+        $where = ' 1=1 ';
+
+        // Get By
+        if( $args['get_by'] == 'uuid' ){
+            $where .= $lwpdb->wpdb->prepare( " AND uuid = %s", $id );
+        } else {
+            $where .= $lwpdb->wpdb->prepare( " AND id = %d", $id );
+        }
+
+        $product = $lwpdb->wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->products} WHERE {$where} LIMIT 1" );
 
         // Return if no product found
         if( empty( $product ) ){
