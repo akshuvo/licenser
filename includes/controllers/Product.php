@@ -38,9 +38,49 @@ class Product {
             'get_by' => 'product_id',
         ] );
 
-        error_log( print_r( $product, true ) );
+        // Return if no product found
+        if( empty( $product ) ){
+            wp_die( __( 'No product found.', 'licenser' ) );
+        }
 
+        // Download link
+        $download_link = $product->download_link;
 
-        return $product;
+        // Parse file path from download link
+        $parsed_file_path = lmfwppt_parse_file_path( $download_link );
+
+        /**
+         * Fallback on force download method for remote files.
+         */
+        if ( $parsed_file_path['remote_file'] ) {
+            header("Location: $download_link");
+            exit;
+        }
+
+        // Download file name
+        //$download_file_name = sanitize_text_field( $args['product_slug'].'.zip' );
+        $download_file_name = basename($download_link);
+
+        // File path
+        $file_path = isset( $parsed_file_path['file_path'] ) ? sanitize_text_field( $parsed_file_path['file_path'] ) : '';
+       
+        // Download from own server
+        if( !empty( $download_link ) && !empty( $file_path ) ) {
+            //readfile($download_link);
+            header("Pragma: public");
+            header("Expires: 0");
+            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+            header("Cache-Control: public");
+            header("Content-Description: File Transfer");
+            header("Content-type: application/octet-stream");
+            header("Content-Disposition: attachment; filename=\"".$download_file_name."\"");
+            header("Content-Transfer-Encoding: binary");
+            header("Content-Length: ".filesize($file_path));
+            ob_end_flush();
+            @readfile($file_path);
+            exit;
+        }
+
+        wp_die( __( 'No file found.', 'licenser' ) );
     }
 }

@@ -36,6 +36,9 @@ class ProductRelease {
             $where .= $lwpdb->wpdb->prepare( " AND version = %s", $args['version'] );
         }
 
+        // Order
+        $where .= " ORDER BY id DESC, release_date DESC";
+
         return $lwpdb->wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->product_releases} WHERE {$where} LIMIT 1" );
     }
 

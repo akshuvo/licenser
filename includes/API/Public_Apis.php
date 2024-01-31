@@ -229,39 +229,8 @@ class Public_Apis extends RestController {
         return Product_Controller::instance()->download( [
             'product_id' => $product->id,
             'license_key' => $license_key,
-            'version' => $product->stable_release->version,
-            'product' => $product,
+            // 'version' => $product->stable_release->version,
         ] );
-
-
-        // // Check product type
-        // if( $product->product_type == 'plugin' ){
-        //     $response = $this->prepare_response_for_plugin( $product, $request );
-        // } elseif( $product->product_type == 'theme' ){
-        //     $response = $this->prepare_response_for_theme( $product, $request );
-        // }
-
-        // // Check if license key is valid
-        // if( !empty( $license_key ) ){
-        //     $license = License::instance()->get( $license_key, [
-        //         'inc_product' => true,
-        //         'inc_package' => true,
-        //         'get_by' => 'key',
-        //     ]);
-        // }
-
-        // // Check if license is valid
-        // if( !empty( $license ) && $license->status == 'active' ){
-        //     $response['package'] = $download_url;
-        //     $response['download_link'] = $download_url;
-        // } else {
-        //     $response['package'] = null;
-        //     $response['download_link'] = null;
-        // }
-
-        error_log( print_r( $license_key, true ) );
-
-        return rest_ensure_response( $product );
     }
 
 }
