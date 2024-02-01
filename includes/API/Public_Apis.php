@@ -2,8 +2,9 @@
 namespace Licenser\API;
 use Licenser\Controllers\RestController;
 use Licenser\Controllers\Product as Product_Controller;
+use Licenser\Controllers\License as License_Controller;
 use Licenser\Models\Product;
-use Licenser\Models\LicensePackage;
+
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -28,7 +29,7 @@ class Public_Apis extends RestController {
      */
     public function register_routes() {
 
-        // Product Single Route for Public
+        // Get Product by UUID
         register_rest_route(
             $this->namespace,
             '/' . $this->rest_base . '/products/(?P<uuid>[\S]+)',
@@ -42,6 +43,95 @@ class Public_Apis extends RestController {
                             'description' => __( 'Product UUID.' ),
                             'type'        => 'string',
                             'required'    => true,
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        // Check, Activate, Deactivate license
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/license/(?P<uuid>[\S]+)/(?P<action>[\S]+)',
+            [
+                [
+                    'methods'             => WP_REST_Server::CREATABLE,
+                    'callback'            => function( $request ) {
+                        $uuid = $request->get_param( 'uuid' );
+                        $action = $request->get_param( 'action' );
+                        $license_key = $request->get_param( 'license_key' );
+
+                        error_log( print_r( $request->get_params(), true ) ); 
+
+                        // Get Product
+                        $product = Product::instance()->get( $uuid, [
+                            'inc_stable_release' => false,
+                            'inc_releases' => false,
+                            'inc_packages' => false,
+                            'get_by' => 'uuid',
+                            'columns' => [ 'status' ]
+                        ]);
+                        
+                        // Check if product exists
+                        if ( ! $product ) {
+                            return new WP_Error(
+                                'not_found',
+                                __( 'Invalid Product UUID.', 'licenser'),
+                                [ 'status' => 404 ]
+                            );
+                        }
+
+                        // Check if product is active
+                        if ( $product->status != 'active' ) {
+                            return new WP_Error(
+                                'not_found',
+                                __( 'Product is not active.', 'licenser'),
+                                [ 'status' => 404 ]
+                            );
+                        }
+                        
+                        // License Controller
+                        $license_controller = License_Controller::instance();
+
+                        // Check action
+                        if ( $action == 'check' ) {
+                            $response = $license_controller->check( $license_key );
+                        } elseif ( $action == 'activate' ) {
+                            $response = $license_controller->activate( [
+                                'license_key' => $license_key,
+                                'url' => $request->get_param( 'url' ),
+                                'is_local' => $request->get_param( 'is_local' ),
+                                'client' => $request->get_param( 'client' ),
+                            ] );
+                        } elseif ( $action == 'deactivate' ) {
+                            $response = $license_controller->deactivate( $request );
+                        }
+
+                        error_log( print_r( $response, true ) ); 
+
+                        return rest_ensure_response( $response );
+                    },
+                    'permission_callback' => '__return_true',
+                    'args'                => [
+                        'uuid' => [
+                            'description' => __( 'Product UUID.' ),
+                            'type'        => 'string',
+                            'required'    => true,
+                        ],
+                        'action' => [
+                            'description' => __( 'Action.' ),
+                            'type'        => 'string',
+                            'required'    => true,
+                            'enum'        => [
+                                'check',
+                                'activate',
+                                'deactivate',
+                            ],
+                        ],
+                        'license_key' => [
+                            'description' => __( 'License Key.' ),
+                            'type'        => 'string',
+                            'required'    => false,
                         ],
                     ],
                 ],
@@ -152,6 +242,7 @@ class Public_Apis extends RestController {
             'last_updated' => $product->stable_release->release_date,
             'package' => $download_url,
             'download_link' => $download_url,
+            'author' => $product->author_name,
         ];
 
         return $response;

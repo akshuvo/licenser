@@ -47,11 +47,11 @@ class Product {
             'inc_stable_release' => true,
             'inc_releases' => false,
             'inc_packages' => true,
-            'columns' => '*',
+            'columns' => [],
             'get_by' => '',
         ] );
         global $lwpdb;
-        $columns =  $args['columns'];
+        $columns = !empty( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
 
         // Where
         $where = ' 1=1 ';

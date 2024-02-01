@@ -11,6 +11,18 @@ class License {
      * Check License is valid
      */
     public function check( $license_key ) {
+
+        return [
+            'success' => true,
+            'status' => 'deactivate',
+            'remaining' => 1,
+            'activation_limit' => 3,
+            'expiry_days' => false,
+            'title' => 'Test License',
+            'source_id' => 'wc-123',
+            'recurring' => 0,
+        ];
+
         $license = License_Model::instance()->get( $license_key, [ 'get_by' => 'key' ] );
 
         // Return if no license found
@@ -37,5 +49,68 @@ class License {
         return $license;
     }
 
+    /**
+     * Activate License
+     */
+    public function activate( $args ) {
+        // Check license
+        $license = $this->check( $args['license_key'] );
 
+        // Check error
+        if( is_wp_error( $license ) ){
+            return $license;
+        }
+
+        // $license['status']           = 'activate';
+        // $license['remaining']        = $response['remaining'];
+        // $license['activation_limit'] = $response['activation_limit'];
+        // $license['expiry_days']      = $response['expiry_days'];
+        // $license['title']            = $response['title'];
+        // $license['source_id']        = $response['source_identifier'];
+        // $license['recurring']        = $response['recurring'];
+
+        return [
+            'success' => true,
+            'status' => 'activate',
+            'remaining' => 2,
+            'activation_limit' => 3,
+            'expiry_days' => false,
+            'title' => 'Test License',
+            'source_id' => 'wc-123',
+            'recurring' => 0,
+        ];
+        
+    }
+
+    /**
+     * Deactivate License
+     */
+    public function deactivate( $args ) {
+        // Check license
+        $license = $this->check( $args['license_key'] );
+
+        // Check error
+        if( is_wp_error( $license ) ){
+            return $license;
+        }
+
+        // $license['status']           = 'deactivate';
+        // $license['remaining']        = $response['remaining'];
+        // $license['activation_limit'] = $response['activation_limit'];
+        // $license['expiry_days']      = $response['expiry_days'];
+        // $license['title']            = $response['title'];
+        // $license['source_id']        = $response['source_identifier'];
+        // $license['recurring']        = $response['recurring'];
+
+        return [
+            'success' => true,
+            'status' => 'deactivate',
+            'remaining' => 2,
+            'activation_limit' => 3,
+            'expiry_days' => false,
+            'title' => 'Test License',
+            'source_id' => 'wc-123',
+            'recurring' => 0,
+        ];
+    }
 }
