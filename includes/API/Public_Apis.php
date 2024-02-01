@@ -95,7 +95,7 @@ class Public_Apis extends RestController {
 
                         // Check action
                         if ( $action == 'check' ) {
-                            $response = $license_controller->check( $license_key );
+                            $response = $license_controller->refresh( $license_key );
                         } elseif ( $action == 'activate' ) {
                             $response = $license_controller->activate( [
                                 'license_key' => $license_key,

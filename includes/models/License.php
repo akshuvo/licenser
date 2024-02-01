@@ -255,4 +255,163 @@ class License {
 
         return true;
     }
+
+    /**
+     * Get License Domains
+     * 
+     * @param int $license_id
+     * @return array
+     */
+    public function get_domains( $args = [] ) {
+        $args = wp_parse_args( $args, [
+            'license_id' => '',
+            'columns' => [],
+            'count_total' => false,
+            'number' => 20,
+            'offset' => 0,
+            'orderby' => 'id',
+            'order' => 'DESC',
+        ] );
+        
+        global $lwpdb;
+
+        // Columns
+        $columns = !empty( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
+
+        $where = ' 1=1 ';
+
+        // License ID
+        if( !empty( $args['license_id'] ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND license_id = %d", $args['license_id'] );
+        }
+
+        // Order
+        $where .= " ORDER BY {$args['orderby']} {$args['order']}";
+
+        $limit = '';
+        if( $args['number'] != -1 ){
+            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+        }
+
+        // Count Total
+        if( $args['count_total'] ) {
+            return $lwpdb->wpdb->get_var( "SELECT COUNT(*) FROM {$lwpdb->license_domains} WHERE {$where}" );
+        } 
+        
+        return $lwpdb->wpdb->get_results(
+            "SELECT {$columns} FROM {$lwpdb->license_domains} WHERE {$where} {$limit}"
+        );
+    }
+    /**
+     * Delete License Domains
+     * 
+     * @param int $license_id
+     * @return int
+     */
+    public function delete_domains( $license_id ) {
+        global $lwpdb;
+
+        $lwpdb->wpdb->delete(
+            $lwpdb->license_domains,
+            [
+                'license_id' => $license_id
+            ]
+        );
+
+        return true;
+    }
+
+    /**
+     * Delete License Domain
+     * 
+     * @param int $id
+     * @return int
+     */
+    public function delete_domain( $id ) {
+        global $lwpdb;
+
+        $lwpdb->wpdb->delete(
+            $lwpdb->license_domains,
+            [
+                'id' => $id
+            ]
+        );
+
+        return true;
+    }
+
+    /**
+     * Domain Exists
+     * 
+     * @param int $license_id
+     * @param string $domain
+     * @return bool
+     */
+    public function domain_exists( $domain, $license_id = '' ) {
+        global $lwpdb;
+
+        $domain = lmfwppt_get_clean_url( $domain );
+
+        $where = $lwpdb->wpdb->prepare( "domain = %s", $domain );
+
+        if( !empty( $license_id ) ){
+            $where .= $lwpdb->wpdb->prepare( " AND license_id = %d", $license_id );
+        }
+
+        return $lwpdb->wpdb->get_var( "SELECT id FROM {$lwpdb->license_domains} WHERE {$where} LIMIT 1" );
+    }
+
+
+    /**
+     * Add Domain
+     * 
+     * @param array $args
+     * @return int
+     */
+    public function add_domain( $args ) {
+        $args = wp_parse_args( $args, [
+            'id' => '',
+            'license_id' => '',
+            'domain' => '',
+            'status' => ''
+        ] );
+
+        global $lwpdb;
+
+        // Update
+        if( !empty( $args['id'] ) ){
+            $lwpdb->wpdb->update(
+                $lwpdb->license_domains,
+                [
+                    'license_id' => intval( $args['license_id'] ),
+                    'domain' => lmfwppt_get_clean_url( $args['domain'] ),
+                    'status' => intval( $args['status'] ),
+                ],
+                [
+                    'id' => $args['id']
+                ]
+            );
+
+            return $args['id'];
+        }
+
+        // Insert
+        $lwpdb->wpdb->insert(
+            $lwpdb->license_domains,
+            [
+                'license_id' => intval( $args['license_id'] ),
+                'domain' => lmfwppt_get_clean_url( $args['domain'] ),
+                'status' => intval( $args['status'] ),
+            ],
+            [
+                '%d',
+                '%s',
+                '%d',
+            ]
+        );
+
+        return $lwpdb->wpdb->insert_id;
+    }
+
+
 }
