@@ -122,6 +122,7 @@ class License {
             'remaining' => $license->domain_limit - $domain_count,
             'activation_limit' => $license->domain_limit,
             'expiry_days' => $license->is_lifetime ? false : number_format( ( strtotime( $license->end_date ) - time() ) / DAY_IN_SECONDS ),
+            'expiry_date' => $license->is_lifetime ? false : $license->end_date,
             'title' => '',
         ], $license );
     }
