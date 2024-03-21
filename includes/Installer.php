@@ -30,7 +30,7 @@ class Installer {
             $table_prefix = $wpdb->prefix . 'licenser_';
 			
 			// Drop Below Table
-	        $wpdb->query("DROP TABLE $table_prefix}products");
+	        // $wpdb->query("DROP TABLE $table_prefix}products");
 
 	        // Products Table
 	        $schema[] = "CREATE TABLE `{$table_prefix}products` (
@@ -55,7 +55,7 @@ class Installer {
 	        ) $charset_collate";
 
 			// Drop Below Table
-	        $wpdb->query("DROP TABLE $table_prefix}product_releases");
+	        // $wpdb->query("DROP TABLE $table_prefix}product_releases");
 
             // Product Releases Table
             $schema[] = "CREATE TABLE `{$table_prefix}product_releases` (
@@ -91,7 +91,8 @@ class Installer {
 	          `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	          `status` tinyint(1) NOT NULL DEFAULT 1,
 	          `license_key` varchar(255) NOT NULL DEFAULT '',
-	          `package_id` INT(128) NOT NULL,
+	          `product_id` INT(128) NOT NULL,
+	          `package_id` INT(128) NULL,
 			  `source` varchar(100) NULL,
 	          `source_id` bigint(20) unsigned NOT NULL DEFAULT 0,
 	          `end_date` datetime DEFAULT NULL,

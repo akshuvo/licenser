@@ -46,6 +46,11 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
                     </div>
 
                     <div class="lmfwppt-form-field">
+                        <label for="id"><?php esc_html_e( 'Product ID', 'licenser' ); ?></label>
+                        <input type="text" id="id" class="regular-text "  value="<?php echo esc_attr( $product->uuid ); ?>" readonly>
+                    </div>
+
+                    <div class="lmfwppt-form-field">
                         <label for="slug"><?php esc_html_e( 'Product Slug', 'licenser' ); ?></label>
                         <input type="text" name="slug" id="slug" class="regular-text product_slug_input" placeholder="your-theme-or-plugin-name" value="<?php echo esc_attr( $product->slug ); ?>" required>
                     </div>
@@ -187,7 +192,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
                         <div class="lwp-col-half">
                             <label for="banner_low"><?php esc_html_e( 'Banner Low', 'licenser' ); ?></label>
                             <div class="lmfwppt-file-field">
-                                <input type="url" name="banners[low]" id="banner_low" class="regular-text" placeholder="<?php esc_attr_e( 'banner-772x250.png', 'licenser' ); ?>" value="<?php echo esc_attr( $product->banners['low'] ); ?>" required>
+                                <input type="url" name="banners[low]" id="banner_low" class="regular-text" placeholder="<?php esc_attr_e( 'banner-772x250.png', 'licenser' ); ?>" value="<?php echo esc_attr( $product->banners['low'] ); ?>" >
                                 <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#banner_low" type="button" id="banners_low_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
                             </div>
                         </div> 

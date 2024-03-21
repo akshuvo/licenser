@@ -10,6 +10,7 @@ class License {
     public $default_fields = [
         'status' => 1,
         'license_key' => '',
+        'product_id' => '',
         'package_id' => '',
         'source' => '',
         'source_id' => '',
@@ -154,6 +155,7 @@ class License {
         $data = wp_parse_args( $data, [
             'status' => 1,
             'license_key' => '',
+            'product_id' => '',
             'package_id' => '',
             'source' => '',
             'source_id' => '',
@@ -172,6 +174,7 @@ class License {
                 [
                     'status' => intval( $data['status'] ),
                     'license_key' => sanitize_text_field( $data['license_key'] ),
+                    'product_id' => sanitize_text_field( $data['product_id'] ),
                     'package_id' => sanitize_text_field( $data['package_id'] ),
                     'source' => sanitize_text_field( $data['source'] ),
                     'source_id' => intval( $data['source_id'] ),
@@ -198,6 +201,7 @@ class License {
                 [
                     'status' => intval( $data['status'] ),
                     'license_key' => sanitize_text_field( $data['license_key'] ),
+                    'product_id' => sanitize_text_field( $data['product_id'] ),
                     'package_id' => sanitize_text_field( $data['package_id'] ),
                     'source' => sanitize_text_field( $data['source'] ),
                     'source_id' => intval( $data['source_id'] ),

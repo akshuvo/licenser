@@ -59,9 +59,19 @@ class License {
      * Activate License
      */
     public function activate( $args ) {
-        // license key
-        $license_key = $args['license_key'];
-        $url = $args['url'];
+        $args = wp_parse_args( $args, [
+            'license_key' => '',
+            'url' => '',
+            'product_id' => '',
+        ] );
+
+        // Product ID Check
+        if( empty( $args['product_id'] ) ){
+            return [
+                'success' => false,
+                'error' => __( 'Invalid product ID.', 'licenser' ),
+            ];
+        }
 
         // Check license
         $license = $this->check( $args['license_key'], $args );
@@ -74,10 +84,17 @@ class License {
             ];
         }
 
+        // Match product ID
+        if( $license->product_id != $args['product_id'] ){
+            return [
+                'success' => false,
+                'error' => __( 'Invalid product ID.', 'licenser' ),
+            ];
+        }
+
         // License ID
         $license_id = $license->id;
 
-       
 
         // TODO: If domain exists and, dont add again and return success. no need to update status
 
@@ -85,7 +102,7 @@ class License {
         $add_domain = License_Model::instance()->add_domain( [
             'id' => $license->exists_domain_id,
             'license_id' => $license_id,
-            'domain' => $url,
+            'domain' => $args['url'],
             'status' => '1'
         ] );
 
@@ -131,19 +148,8 @@ class License {
      * Deactivate License
      */
     public function deactivate( $args ) {
-       
-
-        // $license['status']           = 'deactivate';
-        // $license['remaining']        = $response['remaining'];
-        // $license['activation_limit'] = $response['activation_limit'];
-        // $license['expiry_days']      = $response['expiry_days'];
-        // $license['title']            = $response['title'];
-        // $license['source_id']        = $response['source_identifier'];
-        // $license['recurring']        = $response['recurring'];
-
         return [
             'success' => true,
-            
         ];
     }
 }

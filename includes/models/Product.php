@@ -9,6 +9,7 @@ class Product {
     // Product Default Fields
     public $default_fields = [
         'name' => '',
+        'uuid' => '',
         'slug' => '',
         'product_type' => '',
         'tested' => '',

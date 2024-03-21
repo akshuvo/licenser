@@ -61,6 +61,7 @@ class Public_Apis extends RestController {
                         $action = $request->get_param( 'action' );
                         $license_key = $request->get_param( 'license_key' );
 
+                        error_log('Public_Apis');
                         error_log( print_r( $request->get_params(), true ) ); 
 
                         // Get Product
@@ -69,25 +70,23 @@ class Public_Apis extends RestController {
                             'inc_releases' => false,
                             'inc_packages' => false,
                             'get_by' => 'uuid',
-                            'columns' => [ 'status' ]
+                            'columns' => [ 'status', 'id' ]
                         ]);
                         
                         // Check if product exists
                         if ( ! $product ) {
-                            return new WP_Error(
-                                'not_found',
-                                __( 'Invalid Product UUID.', 'licenser'),
-                                [ 'status' => 404 ]
-                            );
+                            return rest_ensure_response( [
+                                'success' => false,
+                                'error' => __( 'Invalid Product ID.', 'licenser'),
+                            ] );
                         }
 
                         // Check if product is active
                         if ( $product->status != 'active' ) {
-                            return new WP_Error(
-                                'not_found',
-                                __( 'Product is not active.', 'licenser'),
-                                [ 'status' => 404 ]
-                            );
+                            return [
+                                'success' => false,
+                                'error' => __( 'Product is not active.', 'licenser'),
+                            ];
                         }
                         
                         // License Controller
@@ -102,12 +101,19 @@ class Public_Apis extends RestController {
                                 'url' => $request->get_param( 'url' ),
                                 'is_local' => $request->get_param( 'is_local' ),
                                 'client' => $request->get_param( 'client' ),
+                                'product_id' => $product->id,
                             ] );
                         } elseif ( $action == 'deactivate' ) {
                             $response = $license_controller->deactivate( $request );
                         }
 
-                        error_log( print_r( $response, true ) ); 
+                        // Check if response is error
+                        if( is_wp_error( $response ) ){
+                            $response = [
+                                'success' => false,
+                                'error' => $response->get_error_message(),
+                            ];
+                        }
 
                         return rest_ensure_response( $response );
                     },

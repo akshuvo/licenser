@@ -84,10 +84,10 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                     <!-- Select Product -->
                     <div class="lmfwppt-form-field lmfwppt_theme_products">
                         <label for="product_list"><?php esc_html_e( 'Select Product', 'licenser' ); ?></label>
-                        <select name="product_list" class="products_list" id="product_list" >
+                        <select name="product_id" class="products_list" id="product_list" >
                             <option value="" class="blank">Select Product</option>
                             <?php foreach ( $products as $product ): ?>   
-                                <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>" <?php selected( $product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
+                                <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>" <?php selected( $license->product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -95,8 +95,8 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                     <!--  License Package -->
                     <div class="lmfwppt-form-field lmfwppt_license_package" id="lmfwppt_license_package">
                         <label for="lmfwppt_package_list"><?php esc_html_e( 'Select Package', 'licenser' ); ?></label>
-                        <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php echo esc_attr_e( $license->package_id ); ?>" >
-                             <option value="" class="blank"><?php esc_html_e( 'Select Package', 'licenser' ); ?></option>
+                        <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php echo esc_attr( $license->package_id ); ?>" >
+                            <option value="<?php echo esc_attr( $license->package_id ); ?>" class="blank"><?php esc_html_e( 'Select Package', 'licenser' ); ?></option>
                              
                         </select>
                     </div>
@@ -144,7 +144,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
             <span id="poststuff">
                 <h2 class="hndle">
                      
-                    <input id="<?php echo esc_attr( $field_name ); ?>-lmfwppt_domain" class="regular-text" type="text" name="<?php echo esc_attr( $field_name ); ?>[url]" value="<?php echo esc_attr( $url ); ?>" placeholder="<?php echo esc_attr__( 'Enter Domain/URL', 'lmfwppt' ); ?>" required />
+                    <input id="<?php echo esc_attr( $field_name ); ?>-lmfwppt_domain" class="regular-text" type="text" name="<?php echo esc_attr( $field_name ); ?>[url]" value="<?php echo esc_attr( $url ); ?>" placeholder="<?php echo esc_attr__( 'Enter Domain/URL', 'lmfwppt' ); ?>"  />
                     <label class="lmfwppt_label_space">
                         <input name="<?php echo esc_attr( $field_name ); ?>[deactivate]" type="checkbox" id="<?php echo esc_attr( $field_name ); ?>-lmfwppt_deactivate" <?php checked($deactivate, "on"); ?>><?php esc_html_e( 'Deactivate', 'lmfwppt' ); ?>
                     </label>
