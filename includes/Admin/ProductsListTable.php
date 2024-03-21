@@ -111,11 +111,12 @@ class ProductsListTable extends \WP_List_Table{
 
         $this->items = $this->get_product_list($args);
 
-		$productObj = new Products();
+		// $productObj = new Products();
 
         // pagination and sortable
 		$this->set_pagination_args([
-			'total_items' => $productObj->product_count($product_type),
+			// 'total_items' => $productObj->product_count($product_type),
+			'total_items' => 0,
             'per_page'    => $per_page,
 		]);
 	}

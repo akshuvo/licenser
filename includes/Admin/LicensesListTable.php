@@ -133,11 +133,12 @@ class LicensesListTable extends \WP_List_Table{
 
         $this->items = $this->get_license_list($args);
 
-		$licenseObj = new Licenses();
+		// $licenseObj = new Licenses();
 
         // pagination and sortable
 		$this->set_pagination_args([
-			'total_items' => $licenseObj->license_count(),
+			// 'total_items' => $licenseObj->license_count(),
+			'total_items' => 0,
             'per_page'    => $per_page,
 		]);
 	}

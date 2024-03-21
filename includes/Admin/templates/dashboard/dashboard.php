@@ -1,10 +1,5 @@
 <?php
-use Licenser\Products;
-use Licenser\Licenses;
 
-
-$licenseObj = new Licenses();
-$productObj = new Products();
 ?>
 <div class="wrap">
    <h1 class="wp-heading-inline"><?php _e( 'Overview', 'lmfwppt' ); ?></h1>
@@ -25,7 +20,7 @@ $productObj = new Products();
 
       </div>
       <div class="lmwppt-counter">
-         <h1><?php echo $productObj->product_count('plugin'); ?></h1>
+         <h1><?php echo 0; ?></h1>
       </div>
    </div>
    </a>
@@ -42,7 +37,7 @@ $productObj = new Products();
 
       </div>
       <div class="lmwppt-counter">
-         <h1><?php echo $productObj->product_count('theme'); ?></h1>
+         <h1><?php echo 0; ?></h1>
       </div>
    </div>
    </a>
@@ -57,7 +52,7 @@ $productObj = new Products();
          </div>
       </div>
       <div class="lmwppt-counter">
-         <h1><?php echo $licenseObj->license_count(); ?></h1>
+         <h1><?php echo 0; ?></h1>
       </div>
    </div>
    </a>
