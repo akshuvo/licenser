@@ -182,8 +182,6 @@ class Public_Apis extends RestController {
      */
     public function get_product_by_uuid( $request ) {
 
-        error_log( print_r( $request->get_params(), true ) );
-
         $uuid = $request->get_param( 'uuid' );
 
         $product = Product::instance()->get( $uuid, [
@@ -223,6 +221,9 @@ class Public_Apis extends RestController {
 
         $download_url = licenser_product_download_url( $product->uuid, $request->get_param( 'license_key' ) );
 
+        // TODO: Show all changelog
+        $changelog = '<h4>' . $product->stable_release->version . ' - ' . date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) . '</h4>' . $product->stable_release->changelog;
+
         $response = [
             'id' => $product->uuid,
             'name' => $product->name,
@@ -242,7 +243,7 @@ class Public_Apis extends RestController {
             'requires' => $product->requires,
             'sections' => [
                 'description' => $product->description,
-                'changelog' => '<h3>1.2.3</h3> <p><em>Release Date - Jan 8, 2024</em></p> <p>Test</p>',
+                'changelog' => $changelog,
             ],
             'new_version' => $product->stable_release->version,
             'last_updated' => $product->stable_release->release_date,
