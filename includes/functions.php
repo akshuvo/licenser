@@ -22,6 +22,7 @@ function licenser_get_option( $name = null ){
 
 // API URL
 function lmfwppt_api_url(){
+    // return 'https://c0c7-103-106-239-17.ngrok-free.app/';
     return apply_filters( 'lmfwppt_api_url', home_url('/') );
 }
 

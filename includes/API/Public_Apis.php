@@ -308,6 +308,16 @@ class Public_Apis extends RestController {
         $uuid = $request->get_param( 'uuid' );
         $license_key = $request->get_param( 'license_key' );
 
+        // Check if license key is provided
+        if ( empty( $license_key ) ) {
+            return new WP_Error(
+                'missing_license_key',
+                __( 'License key is required.' ),
+                [ 'status' => 400 ]
+            );
+        }
+
+        // Get Product
         $product = Product::instance()->get( $uuid, [
             'inc_stable_release' => true,
             'inc_releases' => false,
@@ -318,7 +328,7 @@ class Public_Apis extends RestController {
         if ( ! $product ) {
             return new WP_Error(
                 'not_found',
-                __( 'Invalid Product UUID.' ),
+                __( 'Invalid Product ID.' ),
                 [ 'status' => 404 ]
             );
         }
