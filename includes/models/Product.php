@@ -52,7 +52,7 @@ class Product {
             'get_by' => '',
         ] );
         global $lwpdb;
-        $columns = !empty( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
+        $columns = !empty( $args['columns'] ) && is_array( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
 
         // Where
         $where = ' 1=1 ';

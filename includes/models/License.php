@@ -231,6 +231,8 @@ class License {
         if ($method == 'wp_generate') {
             $limit = licenser_get_option('license_code_character_limit');
             $key = wp_generate_password($limit, false, false);
+        } elseif ($method == 'uuid') {
+            $key = wp_generate_uuid4();
         } else {
             $key = md5(microtime() . rand());
         }

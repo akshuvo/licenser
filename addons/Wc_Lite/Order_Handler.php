@@ -44,6 +44,7 @@ class Order_Handler{
      */
     function add_cart_item_data( $cart_item_data, $product_id, $variation_id ) {
         
+        // WC Product ID
         $product_id = isset( $variation_id ) && $variation_id != "0" ? sanitize_text_field( $variation_id ) : sanitize_text_field( $product_id );
 
         // Check if active licensing
@@ -73,6 +74,7 @@ class Order_Handler{
 
         // Get Package
         $package = \Licenser\Models\LicensePackage::instance()->get( $package_id );
+
 
         // Package Label
         $package_label = isset( $package->label ) ? sanitize_text_field( $package->label ) : '';
@@ -235,9 +237,14 @@ class Order_Handler{
                 // Generate License Key
                 $license_key = \Licenser\Models\License::instance()->generate_key();
     
+                // Product Slug
+                // $get_product = LMFWPPT_ProductsHandler::get_product_details_by_package_id( $package_id );
+                $licenser_product_id = get_post_meta( $product_id, 'licenser_product_id', true );
+
                 // Insert License
                 $license_id = \Licenser\Models\License::instance()->create( [
                     'status' => 1,
+                    'product_id' => $licenser_product_id,
                     'package_id' => $package_id,
                     'source' => 'wc',
                     'source_id' => $order_id,
@@ -247,11 +254,7 @@ class Order_Handler{
                     'license_key' => $license_key,
                 ] );
     
-                // Product Slug
-                // $get_product = LMFWPPT_ProductsHandler::get_product_details_by_package_id( $package_id );
-                $licenser_product_id = get_post_meta( $product_id, 'licenser_product_id', true );
-    
-    
+                // Save License Key
                 if ( !empty( $license_id ) ) {
                     update_post_meta( $order_id, "license_generated_item_id_{$item_id}", $license_id );
                     update_post_meta( $order_id, "license_generated_item_key_{$item_id}", $license_key );
