@@ -203,7 +203,7 @@ class Order_Handler{
     
         // Create License for Each Order Items
         foreach ( $order->get_items() as $item_id => $item ) {
-            // Stop creating license key fro same order
+            // Stop creating license key for same order
             // if ( !get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true ) ) {
     
                 $product_id = $item->get_product_id();
@@ -226,6 +226,11 @@ class Order_Handler{
                 if( empty( $get_package ) ) {
                     return;
                 }
+
+                // TODO: How quantity will be handled?
+                // > $update_period x $quantity
+                // > $domain_limit x $quantity
+                // > $license_key x $quantity
     
                 // Package Period
                 $update_period = isset( $get_package->update_period ) ? intval( $get_package->update_period ) : 0;

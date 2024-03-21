@@ -228,7 +228,7 @@ class License {
         $method = licenser_get_option('license_generate_method');
         $key = '';
     
-        if ($method == 'wp_generate') {
+        if ( $method == 'wp_generate' ) {
             $limit = licenser_get_option('license_code_character_limit');
             $key = wp_generate_password($limit, false, false);
         } elseif ($method == 'uuid') {
