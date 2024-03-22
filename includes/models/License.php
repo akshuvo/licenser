@@ -78,6 +78,7 @@ class License {
             'is_lifetime' => '',
             'domain_limit' => '',
             'dated' => '',
+            'inc_domains' => false,
         ];
 
         $args = wp_parse_args( $args, $defaults );
@@ -145,6 +146,15 @@ class License {
         // Return if no license found
         if( empty( $licenses ) ){
             return false;
+        }
+
+        // Include Domains
+        if( $args['inc_domains'] ){
+            foreach( $licenses as $key => $license ){
+                $licenses[$key]->domains = isset( $license->id ) ? $this->get_domains([
+                    'license_id' => $license->id,
+                ]) : [];
+            }
         }
 
         return $licenses;

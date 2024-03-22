@@ -21,8 +21,6 @@ class Shortcode{
         );
         $orders = wc_get_orders( $args );
 
-        echo '<pre>'; print_r($orders); echo '</pre>';
-
         // Licenser Unique User ID
         // $licenser_user_id = get_user_meta( $user_id, 'licenser_user_id', true );
 
@@ -34,8 +32,9 @@ class Shortcode{
             'count_total' => true,
             // 'user_uuid' => $licenser_user_id,
             'source' => 'wc',
-            'source_id' => (array) $orders
+            'source_id' => (array) $orders,
         ] );
+
 
         echo sprintf("<h4>%s</h4>", __('License Manager', 'licenser'));
 
@@ -97,7 +96,12 @@ class Shortcode{
                     ), lmfwppt_api_url() );
 
                     // Get Domains 
-                    $get_domains = [];
+                    $get_domains = \Licenser\Models\License::instance()->get_domains([
+                        'license_id' => $license_id,
+                    ]);
+
+                    error_log( print_r( $get_domains, true ) );
+
 
                     //ppr($get_product);
                     ?>
@@ -111,7 +115,7 @@ class Shortcode{
 
                             <!-- activations button -->
                             <div class="show_manage_activations_details">
-                                <a><?php echo esc_html__( "Manage Activations", "licenser" ); ?></a>
+                                <a><?php esc_html_e( "Manage Activations", "licenser" ); ?></a>
                             </div>
 
                             <!-- activations value show -->
@@ -120,40 +124,36 @@ class Shortcode{
 
                                 <a class="activations-close-modal" title="Close">&times;</a>
 
-                                <h5 style="margin:0px;"><?php echo esc_html__( "Manage License:", "licenser" ); ?></h5>
-
-                                <ul class="am-list-ul">
-                                    <li><strong><?php echo esc_html__( "License Key", "licenser" ); ?></strong>: <code><?php echo esc_html( $license_key ); ?></code></li>
-                                    <li><strong><?php echo esc_html__( "Product", "licenser" ); ?></strong>: <?php echo esc_html( $product_name ); ?></li>
-                                </ul>
-                              
-                                
+                                <h5 ><?php esc_html_e( "Manage License:", "licenser" ); ?></h5>
 
                                 <table style="border-width: 1px 1px 1px 1px;">
                                     <thead>
                                         <tr>
-                                            <th><?php echo esc_html__( "Site URL", "licenser" ); ?></th>
-                                            <th><?php echo esc_html__( "Status", "licenser" ); ?></th>
+                                            <th><?php esc_html_e( "Site URL", "licenser" ); ?></th>
+                                            <th><?php esc_html_e( "Status", "licenser" ); ?></th>
                                         </tr>
                                     </thead>
                                    <tbody>
                                     <?php if( !empty( $get_domains ) ) :
                                         foreach( $get_domains as $domain ):
-                                            $key = isset( $domain['id'] ) ? sanitize_text_field( $domain['id'] ) : '';
-                                            $url = isset( $domain['domain'] ) ? sanitize_text_field( $domain['domain'] ) : '';
-                                            $status = isset( $domain['status'] ) ? sanitize_text_field( $domain['status'] ) : '1';
+                                            $key = isset( $domain->id ) ? sanitize_text_field( $domain->id ) : '';
+                                            $url = isset( $domain->domain ) ? sanitize_text_field( $domain->domain ) : '';
+                                            $status = isset( $domain->status ) && $domain->status == 1 ? __('Active', 'licenser') : __('Inactive', 'licenser');
+                                            // $dated = isset( $domain->dated ) ? gmdate('Y-m-d H:i:s', $domain->dated) : '';
                                             ?>
                                             <tr>
                                                 <td>
                                                     <?php echo esc_html( $url ); ?> 
                                                     <a target="_blank" href="<?php echo esc_url( $url ); ?>">↗</a>
                                                 </td>
-                                                <td><?php echo $status == "1" ? esc_html__( "Active", "licenser" ) : esc_html__( "Inactive", "licenser" ); ?></td>
+                                                <td>
+                                                    <?php echo esc_html( $status ); ?>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                     <tr>
-                                        <td colspan="2"><?php echo esc_html__( "No Domains", "licenser" ); ?></td> 
+                                        <td colspan="2"><?php esc_html_e( "No Domains", "licenser" ); ?></td> 
                                     </tr>
                                     <?php endif; ?>  
                                        
@@ -165,11 +165,11 @@ class Shortcode{
                         </td>
 
                         <td class="woocommerce-orders-table__cell" data-title="<?php esc_attr_e('License Details', 'licenser'); ?>">
-                            <div class="license_product_name"><strong><?php echo esc_html__( "Product Name",'licenser' ); ?>:</strong> <?php echo esc_html( $product_name ); ?> (<?php echo esc_html($pack_label); ?>) </div>
+                            <div class="license_product_name"><strong><?php esc_html_e( "Product Name",'licenser' ); ?>:</strong> <?php echo esc_html( $product_name ); ?> (<?php echo esc_html($pack_label); ?>) </div>
                             <div class="license_details">
-                                <strong><?php echo esc_html__( "Domain Limit", 'licenser' ); ?>:</strong> <?php echo esc_html($domain_limit)?><br>
-                                <strong><?php echo esc_html__( "Product Type", 'licenser' ); ?>:</strong> <?php echo esc_html(ucwords($product_type)); ?> <br>
-                                <strong><?php echo esc_html__( "Expires", 'licenser' ); ?>:</strong> <?php echo esc_html($expire_date); ?>
+                                <strong><?php esc_html_e( "Domain Limit", 'licenser' ); ?>:</strong> <?php echo esc_html($domain_limit)?><br>
+                                <strong><?php esc_html_e( "Product Type", 'licenser' ); ?>:</strong> <?php echo esc_html(ucwords($product_type)); ?> <br>
+                                <strong><?php esc_html_e( "Expires", 'licenser' ); ?>:</strong> <?php echo esc_html($expire_date); ?>
                             </div>
                         </td>
 
