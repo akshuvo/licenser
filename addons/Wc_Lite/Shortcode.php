@@ -75,32 +75,34 @@ class Shortcode{
                     }
 
                     global $wpdb;
-                    $get_product = $wpdb->get_row( $wpdb->prepare("SELECT * FROM {$wpdb->prefix}licenser_license_packages as lp INNER JOIN {$wpdb->prefix}licenser_products as p ON p.id = lp.product_id WHERE lp.id = %s", $package_id), ARRAY_A );
+                    $get_product = $wpdb->get_row( 
+                        $wpdb->prepare("SELECT product.uuid, product.name, package.label, product.product_type
+                            FROM {$wpdb->prefix}licenser_license_packages as package 
+                            INNER JOIN {$wpdb->prefix}licenser_products as product ON product.id = package.product_id 
+                            WHERE package.id = %s", 
+                            $package_id
+                        ), 
+                    );
 
-                    $product_name = isset( $get_product['name'] ) ? sanitize_text_field( $get_product['name'] ) : '';
-                    $pack_label = isset( $get_product['label'] ) ? sanitize_text_field( $get_product['label'] ) : '';
+                    $product_type = isset( $get_product->product_type ) ? $get_product->product_type : '';
+                    $product_name = isset( $get_product->name ) ? $get_product->name : '';
+                    $pack_label = isset( $get_product->label ) ? $get_product->label : '';
                     
-                    $product_type = isset($get_product['product_type']) ? sanitize_text_field($get_product['product_type']) : '';
-
-                    
-
+                    // Domain Limit
                     if ( $domain_limit == "0" ) {
-                       $domain_limit = esc_html('Unlimited', 'licenser');
+                       $domain_limit = __('Unlimited', 'licenser');
                     }
 
                     // Download Link
-                    $download_link = add_query_arg( array(
-                        'product_slug' => isset( $get_product['slug'] ) ? $get_product['slug'] : "",
-                        'license_key' => $license_key,
-                        'action' => 'download',
-                    ), lmfwppt_api_url() );
+                    $download_link = licenser_product_download_url( $get_product->uuid, $license_key);
+
 
                     // Get Domains 
                     $get_domains = \Licenser\Models\License::instance()->get_domains([
                         'license_id' => $license_id,
                     ]);
 
-                    error_log( print_r( $get_domains, true ) );
+                   
 
 
                     //ppr($get_product);
