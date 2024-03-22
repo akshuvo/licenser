@@ -29,6 +29,9 @@ class Order_Handler{
         // Content Show on my-account dashboard
         if ( isset( $_GET['wc_tab'] ) && $_GET['wc_tab'] == 'license_manager' ) {
             add_action( 'woocommerce_account_dashboard', [$this, 'licenses_endpoint_content'], 30 );
+
+            // Enqueue Scripts
+            add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         }
 
 	}
@@ -383,6 +386,16 @@ class Order_Handler{
         
         return $url;
     }
+
+    /**
+     * Enqueue Scripts
+     *
+     * @return void
+     */
+	function enqueue_scripts() {
+        wp_enqueue_style( 'licenser-wclite-styles', LICENSER_WCLITE_PLUGIN_URL . 'assets/css/styles.css', null, LMFWPPT_PLUGIN_VERSION );
+	    wp_enqueue_script( 'licenser-wclite-scripts', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/scripts.js', array('jquery'), LMFWPPT_PLUGIN_VERSION );
+	}
 
     // License Endpoint Content
     public function licenses_endpoint_content() {

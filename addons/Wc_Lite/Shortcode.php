@@ -5,25 +5,9 @@ namespace Licenser\Addons\Wc_Lite;
  */
 class Shortcode{
 
-	function __construct(){
-        // Enqueue Scripts
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
-    }
-
-    /**
-     * Enqueue Scripts
-     *
-     * @return void
-     */
-	function enqueue_scripts() {
-	    $ver = current_time( 'timestamp' );
-
-	    wp_enqueue_style( 'lmfwpptwcext-admin-styles', LICENSER_WCLITE_PLUGIN_URL . 'assets/css/styles.css', null, $ver );
-	    wp_enqueue_script( 'lmfwpptwcext-admin-scripts', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/scripts.js', array('jquery'), $ver );
-	}
-
     // License Endpoint Content
     public function output() {
+
         // User ID
         $user_id = get_current_user_id();
 
