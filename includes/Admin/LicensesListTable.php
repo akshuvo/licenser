@@ -25,13 +25,14 @@ class LicensesListTable extends \WP_List_Table{
 	public function get_columns(){
 		return [
 			'cb' => "<input type='checkbox'/>",
-			'license_key' => __('License Key','lmfwppt'),
-			'license_details' => __('License Info','lmfwppt'),
-			'order_id' => __('Order ID','lmfwppt'),
-			'end_date' => __('Expires','lmfwppt'),
-			'dated' => __('Date','lmfwppt'),
+			'license_key' => __('License Key', 'licenser'),
+			'license_details' => __('License Info', 'licenser'),
+			'domain_limit' => __('Domain Limit', 'licenser'),
+			'end_date' => __('Expires', 'licenser'),
+			'source' => __('Source', 'licenser'),
+			'source_id' => __('Source ID', 'licenser'),
+			'dated' => __('Date', 'licenser'),
 		];
-
 	}
 
 	/**
@@ -68,9 +69,9 @@ class LicensesListTable extends \WP_List_Table{
 
 		$actions['id']   = sprintf( '<span class="id">ID: %s </span>', $item->id );
 
-		$actions['edit']   = sprintf( '<a href="%s" title="%s">%s</a>', admin_url( 'admin.php?page=licenser-licenses&action=edit&id=' . $item->id ), $item->id, __( 'Edit', 'lmfwppt' ), __( 'Edit', 'lmfwppt' ) );
+		$actions['edit']   = sprintf( '<a href="%s" title="%s">%s</a>', admin_url( 'admin.php?page=licenser-licenses&action=edit&id=' . $item->id ), $item->id, __( 'Edit', 'licenser' ), __( 'Edit', 'licenser' ) );
 
-        $actions['delete'] = sprintf( '<a href="%s" class="submitdelete" onclick="return confirm(\'Are you sure?\');" title="%s">%s</a>', wp_nonce_url( admin_url( 'admin-post.php?action=lmfwppt-delete-license&id=' . $item->id ), 'lmfwppt-delete-license' ), $item->id, __( 'Delete', 'lmfwppt' ), __( 'Delete', 'lmfwppt' ) );
+        $actions['delete'] = sprintf( '<a href="%s" class="submitdelete" onclick="return confirm(\'Are you sure?\');" title="%s">%s</a>', wp_nonce_url( admin_url( 'admin-post.php?action=lmfwppt-delete-license&id=' . $item->id ), 'lmfwppt-delete-license' ), $item->id, __( 'Delete', 'licenser' ), __( 'Delete', 'licenser' ) );
 
 		return sprintf(
 			'<input class="w-100" type="text" value="%1$s" readonly/> %2$s', $item->license_key, $this->row_actions($actions)
@@ -90,20 +91,16 @@ class LicensesListTable extends \WP_List_Table{
 
 	protected function column_end_date($item){
 		if( $item->is_lifetime == "1" ){
-			return __( 'Lifetime', 'lmfwppt' );
+			return __( 'Lifetime', 'licenser' );
 		}
 		return date('j F Y',strtotime($item->end_date));
 	}
 
 	public function column_license_details( $item ){	
-
-
-
-		$package_details = '<a href="admin.php?page=licenser-licenses&action=edit&id=">'.$item->package_id.'</a>';
 		 
-		$package_details .= '<ul class="package_details">
-					<li>Domain Limit: '.$item->domain_limit.'</li>
-					<li>Product Type: '.$item->source.'</li>
+		$package_details = '<ul class="package_details">
+					<li>Product ID: '.$item->product_id.'</li>
+					<li>Package ID: '.$item->package_id.'</li>
 				</ul>';
 		return $package_details; 
 	}

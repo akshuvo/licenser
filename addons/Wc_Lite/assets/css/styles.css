@@ -67,3 +67,8 @@
     visibility: visible;
     opacity: 1;
 }
+
+.expired-label {
+    color: #c80000;
+    font-weight: 700;
+}

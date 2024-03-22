@@ -12,21 +12,22 @@ $license_model = License::instance();
 $license_id = isset( $_GET['id'] ) ? intval( $_GET['id'] ) : '';
 
 // Get License
-$license = $license_model->get( $license_id );
-
+$license = !empty( $license_id ) ? $license_model->get( $license_id ) : (object) $license_model->default_fields;
 
 // Products
 $products = $product_model->get_all([
     'status' => 'active',
     'number' => -1,
-    'inc_packages' => true,
+    'inc_packages' => false,
     'columns' => 'id, name, product_type',
 ]);
 
-
 echo "<pre>"; print_r($license); echo "</pre>";
 
-
+// Get Domains 
+$get_domains = $license_model->get_domains([
+    'license_id' => $license_id,
+]);
 
 // Submit button label for Add
 $submit_button_label = __( 'Add License', 'licenser' );
@@ -76,7 +77,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         <select name="product_type" id="product_type">
                             <option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
                             <?php foreach( $product_model->get_types() as $key => $value ) : ?>
-                                <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $product->product_type, $key ); ?> ><?php echo esc_html( $value ); ?></option>
+                                <option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $value ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -85,9 +86,9 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                     <div class="lmfwppt-form-field lmfwppt_theme_products">
                         <label for="product_list"><?php esc_html_e( 'Select Product', 'licenser' ); ?></label>
                         <select name="product_id" class="products_list" id="product_list" >
-                            <option value="" class="blank">Select Product</option>
+                            <option value="" class="blank"><?php esc_html_e( 'Select Product', 'licenser' ); ?></option>
                             <?php foreach ( $products as $product ): ?>   
-                                <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>" <?php selected( $license->product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
+                                <option data-product_type="<?php echo esc_attr( $product->product_type ); ?>" value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>" <?php selected( $license->product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -112,8 +113,6 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         </div>
                         <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $license->end_date ); ?>">
                     
-                            
-                        
                     </div>
 
                     <div class="lmfwppt-form-field">
@@ -140,20 +139,28 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                     <h2>Activated Domains</h2>
                     <div id="lmfwppt_domains_fields">
                         <?php //$license_handler::get_domains_html( $get_domains ); ?>
-                        <div id="postimagediv" class="postbox lmfwppt_license_field"> <!-- Wrapper Start -->
-            <span id="poststuff">
-                <h2 class="hndle">
-                     
-                    <input id="<?php echo esc_attr( $field_name ); ?>-lmfwppt_domain" class="regular-text" type="text" name="<?php echo esc_attr( $field_name ); ?>[url]" value="<?php echo esc_attr( $url ); ?>" placeholder="<?php echo esc_attr__( 'Enter Domain/URL', 'lmfwppt' ); ?>"  />
-                    <label class="lmfwppt_label_space">
-                        <input name="<?php echo esc_attr( $field_name ); ?>[deactivate]" type="checkbox" id="<?php echo esc_attr( $field_name ); ?>-lmfwppt_deactivate" <?php checked($deactivate, "on"); ?>><?php esc_html_e( 'Deactivate', 'lmfwppt' ); ?>
-                    </label>
-                    <span class="delete_field">&times;</span>
-                </h2>
-            </span>
-        </div>
+
+                        <?php if( !empty( $get_domains ) ) : ?>
+                            <?php foreach( $get_domains as $domain ):
+                                $key = isset( $domain->id ) ? sanitize_text_field( $domain->id ) : '';
+                                $url = isset( $domain->domain ) ? sanitize_text_field( $domain->domain ) : '';
+                                $status = isset( $domain->status ) && $domain->status == 1 ? __('Active', 'licenser') : __('Inactive', 'licenser');
+                                // $dated = isset( $domain->dated ) ? gmdate('Y-m-d H:i:s', $domain->dated) : '';
+                                ?>
+                                <div class="postbox">
+                                    <h4>
+                                        <?php echo esc_html( $url ); ?> 
+                                        <a target="_blank" href="<?php echo esc_url( $url ); ?>">↗</a>
+                                        <?php echo esc_html( $status ); ?>
+
+                                        <span class="delete_field">&times;</span>
+                                    </h4>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="licenser-not-found"><?php esc_html_e( "No Domains", "licenser" ); ?></div>
+                        <?php endif; ?> 
                     </div>
-                    <button class="button lmfwppt-domain-activate" type="button">Add Domain</button>
                 </div>
             </div>
           

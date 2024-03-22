@@ -62,10 +62,17 @@ class Shortcode{
                     // Domain Limit
                     $domain_limit = isset($license['domain_limit']) ? sanitize_text_field($license['domain_limit']) : 0;
 
+                    // Expired Text
+                    $expired_label = '';
+
                     // Check if lifetime
                     if ( $is_lifetime != "0" ) {
-                        $expire_date = esc_html('Lifetime', 'licenser');
+                        $expire_date = __('Lifetime', 'licenser');
                     } else {
+                        // check with $expire_date
+                        if ( $expire_date ) {
+                            $expired_label = strtotime($expire_date) < time() ? sprintf('<span class="expired-label">(%s)</span>', __('Expired. Want to renew?', 'licenser')) : '';
+                        }
                         $expire_date = date('j F Y',strtotime($expire_date));
                     }
 
@@ -102,10 +109,6 @@ class Shortcode{
                         'license_id' => $license_id,
                     ]);
 
-                   
-
-
-                    //ppr($get_product);
                     ?>
                     <tr class="woocommerce-orders-table__row woocommerce-orders-table__row--status-processing order">
                         
@@ -171,7 +174,7 @@ class Shortcode{
                             <div class="license_details">
                                 <strong><?php esc_html_e( "Domain Limit", 'licenser' ); ?>:</strong> <?php echo esc_html($domain_limit)?><br>
                                 <strong><?php esc_html_e( "Product Type", 'licenser' ); ?>:</strong> <?php echo esc_html(ucwords($product_type)); ?> <br>
-                                <strong><?php esc_html_e( "Expires", 'licenser' ); ?>:</strong> <?php echo esc_html($expire_date); ?>
+                                <strong><?php esc_html_e( "Expires", 'licenser' ); ?>:</strong> <?php echo esc_html($expire_date); ?> <?php echo $expired_label; // phpcs:ignore ?>
                             </div>
                         </td>
 
