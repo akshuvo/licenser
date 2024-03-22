@@ -201,13 +201,13 @@ class Order_Handler{
     
         // Check If order status = completed, processing
         if ( !in_array( $order->get_status(), [ 'processing', 'completed' ] ) ) {
-            // return false;
+            return false;
         }
     
         // Create License for Each Order Items
         foreach ( $order->get_items() as $item_id => $item ) {
             // Stop creating license key for same order
-            // if ( !get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true ) ) {
+            if ( !get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true ) ) {
     
                 $product_id = $item->get_product_id();
                 $variation_id = $item->get_variation_id();
@@ -271,7 +271,7 @@ class Order_Handler{
                     // Save custom meta for future usages
                     update_post_meta( $order_id, "is_license_order", 'yes' );
                 }
-            // }
+            }
         }
     
         // Send order invoice if not already sent

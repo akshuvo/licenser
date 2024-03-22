@@ -97,7 +97,13 @@ class License {
         }
 
         if( !empty( $args['source_id'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND source_id = %d", $args['source_id'] );
+            if( is_array( $args['source_id'] ) ) {
+                $source_ids = esc_sql( $args['source_id'] );
+                $source_ids = implode( ',', $source_ids );
+                $where .= " AND source_id IN ({$source_ids})";
+            } else {
+                $where .= $lwpdb->wpdb->prepare( " AND source_id = %d", $args['source_id'] );
+            }
         }
 
         if( !empty( $args['status'] ) ){

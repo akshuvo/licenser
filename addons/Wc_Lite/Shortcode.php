@@ -11,8 +11,20 @@ class Shortcode{
         // User ID
         $user_id = get_current_user_id();
 
+        // Get latest 3 orders.
+        $args = array(
+            'limit' => 100,
+            'customer_id' => $user_id,
+            'return' => 'ids',
+            'status' => ['wc-processing', 'wc-completed'],
+            'is_license_order' => 'yes'
+        );
+        $orders = wc_get_orders( $args );
+
+        echo '<pre>'; print_r($orders); echo '</pre>';
+
         // Licenser Unique User ID
-        $licenser_user_id = get_user_meta( $user_id, 'licenser_user_id', true );
+        // $licenser_user_id = get_user_meta( $user_id, 'licenser_user_id', true );
 
         $get_licenses = \Licenser\Models\License::instance()->get_all( [
             'number' => -1,
@@ -20,7 +32,9 @@ class Shortcode{
             'orderby' => 'id',
             'order' => 'DESC',
             'count_total' => true,
-            'user_uuid' => $licenser_user_id,
+            // 'user_uuid' => $licenser_user_id,
+            'source' => 'wc',
+            'source_id' => (array) $orders
         ] );
 
         echo sprintf("<h4>%s</h4>", __('License Manager', 'licenser'));
