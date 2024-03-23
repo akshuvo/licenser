@@ -27,20 +27,41 @@ class MigrateOldDb {
 
 		global $wpdb;
 		$table_prefix = $wpdb->prefix . 'licenser_';
-		$wpdb->query("DROP TABLE $table_prefix}products");
-		$messages[] = 'Products Table Dropped';
 
-		$wpdb->query("DROP TABLE $table_prefix}product_releases");
-		$messages[] = 'Product Releases Table Dropped';
+		$wpdb->query("DROP TABLE {$table_prefix}products");
+		if( $wpdb->last_error ){
+			$messages[] = 'Error: ' . $wpdb->last_error;
+		} else {
+			$messages[] = 'Products Table Dropped';
+		}
 
-		$wpdb->query("DROP TABLE $table_prefix}license_packages");
-		$messages[] = 'License Packages Table Dropped';
+		$wpdb->query("DROP TABLE {$table_prefix}product_releases");
+		if( $wpdb->last_error ){
+			$messages[] = 'Error: ' . $wpdb->last_error;
+		} else {
+			$messages[] = 'Product Releases Table Dropped';
+		}
+
+		$wpdb->query("DROP TABLE {$table_prefix}license_packages");
+		if( $wpdb->last_error ){
+			$messages[] = 'Error: ' . $wpdb->last_error;
+		} else {
+			$messages[] = 'License Packages Table Dropped';
+		}
 
 		$wpdb->query("DROP TABLE {$table_prefix}licenses");
-		$messages[] = 'Licenses Table Dropped';
+		if( $wpdb->last_error ){
+			$messages[] = 'Error: ' . $wpdb->last_error;
+		} else {
+			$messages[] = 'Licenses Table Dropped';
+		}
 
 		$wpdb->query("DROP TABLE {$table_prefix}license_domains");
-		$messages[] = 'License Domains Table Dropped';
+		if( $wpdb->last_error ){
+			$messages[] = 'Error: ' . $wpdb->last_error;
+		} else {
+			$messages[] = 'License Domains Table Dropped';
+		}
 
 		// Delete option
 		delete_option( 'licenser_db_version' );
