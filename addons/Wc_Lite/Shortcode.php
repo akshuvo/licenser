@@ -35,6 +35,7 @@ class Shortcode{
             'source_id' => (array) $orders,
         ] );
 
+        print_r($get_licenses);
 
         echo sprintf("<h4>%s</h4>", __('License Manager', 'licenser'));
 
@@ -76,7 +77,7 @@ class Shortcode{
                         $expire_date = date('j F Y',strtotime($expire_date));
                     }
 
-
+                    // If no package id
                     if ( !$package_id ) {
                         continue;
                     }
