@@ -42,6 +42,21 @@ class Ajax {
         // // Ajax Add data options table 
 		// add_action( 'wp_ajax_sdk_generator_add_form', [ $sdkGeneratorObj, 'sdkgenerator_add' ] );
 
+		add_action( 'wp_ajax_licenser_migrate_from_old_database', function(){
+            $table = $_POST['table'];
+            $migration = new MigrateOldDb();
+
+            $migrate = $migration->get_data( $table );
+
+            // error_log( print_r( $migrate, true ) );
+
+            echo '<pre>';
+            print_r( $migrate );
+            echo '</pre>';
+            die();
+        });
+
+
     }
 
 }

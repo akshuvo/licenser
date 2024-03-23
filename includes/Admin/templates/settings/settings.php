@@ -71,8 +71,40 @@ $settings = Settings::instance()->get_all();
 
 </div>
 
+<button class="button button-primary migrate-database" data-table="product">Migrate Product</button>
+
+<div class="migration-response"></div>
+
 <script>
-   jQuery(document).on('submit', '#setting-add-form', function(e) {
+    jQuery(document).on('click', '.migrate-database', function(e) {
+        e.preventDefault();
+        let $this = jQuery(this);
+
+        jQuery.ajax({
+            type: 'post',
+            url: ajaxurl,
+            data: {
+                action: 'licenser_migrate_from_old_database',
+                table: $this.data('table'),
+                nonce: '<?php echo wp_create_nonce('lmfwppt_migrate_database'); ?>'
+            },
+            beforeSend: function(xhr) {
+
+            },
+            complete: function(data) {
+               
+            }, 
+            success: function(res) {
+                jQuery(document).trigger("lmfwppt_notice", ['Database migrated successfully.', 'success']);
+                jQuery('.migration-response').html(res);
+            },
+            error: function(data) {
+                jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
+            },
+        });
+    });
+
+    jQuery(document).on('submit', '#setting-add-form', function(e) {
         e.preventDefault();
         let $this = jQuery(this);
 
