@@ -48,8 +48,6 @@ class Ajax {
 
             $migrate = $migration->migrate_data( $table );
 
-            // error_log( print_r( $migrate, true ) );
-
             echo '<pre>';
             print_r( $migrate );
             echo '</pre>';
