@@ -46,7 +46,7 @@ class Ajax {
             $table = $_POST['table'];
             $migration = new MigrateOldDb();
 
-            $migrate = $migration->get_data( $table );
+            $migrate = $migration->migrate_data( $table );
 
             // error_log( print_r( $migrate, true ) );
 

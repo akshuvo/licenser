@@ -71,7 +71,8 @@ $settings = Settings::instance()->get_all();
 
 </div>
 
-<button class="button button-primary migrate-database" data-table="product">Migrate Product</button>
+<button class="button button-primary migrate-database" data-table="product">Migrate Products</button>
+<button class="button button-primary migrate-database" data-table="license">Migrate Licenses</button>
 
 <div class="migration-response"></div>
 

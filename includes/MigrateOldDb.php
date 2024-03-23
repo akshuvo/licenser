@@ -8,25 +8,70 @@ use Licenser\Models\License;
  * Installer class
  */
 class MigrateOldDb {
-
-    /**
-     * Run the installer
-     *
-     * @return void
-     */
-    public function run() {
-        $this->add_version();
-        $this->run_migration();
-    }
-
+	
 	// Get Data
-	public function get_data( $table ){
+	public function migrate_data( $table ){
 		if( $table == 'product' ){
 			return $this->migrate_products();
 		} else if( $table == 'license' ){
 			return $this->migrate_licenses();
 		}
+	}
 
+	// Licenses
+	public function migrate_licenses(){
+		global $wpdb;
+		$licenses = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}lmfwppt_licenses");
+
+		// Set Packages for preventing duplicate query
+		$packages = [];
+
+		// Truncate the tables
+		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_licenses");
+		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_license_domains");
+
+		// Loop through the results and add to new table
+		foreach( $licenses as $key => $license ){
+			$get_domains = $wpdb->get_results( $wpdb->prepare("SELECT * FROM {$wpdb->prefix}lmfwppt_license_domains WHERE license_id = %d", $license->id) );
+
+			// Get the package
+			if( isset( $packages[$license->package_id] ) ) {
+				$package = $packages[$license->package_id];
+			} else {
+				$package = $wpdb->get_row( $wpdb->prepare("SELECT id, product_id  FROM {$wpdb->prefix}lmfwppt_license_packages WHERE package_id = %s", $license->package_id) );
+				$packages[$license->package_id] = $package;
+
+				
+			}
+
+			// Add License
+			$add_license = License::instance()->create([
+				'status' => $license->status,
+				'license_key' => $license->license_key,
+				'product_id' => isset( $package->product_id ) ? $package->product_id : 0,
+				'package_id' => $license->package_id,
+				'source' => 'wc',
+				'source_id' => $license->order_id,
+				'end_date' => $license->end_date,
+				'is_lifetime' => $license->is_lifetime,
+				'domain_limit' => $license->domain_limit,
+			]);
+
+			// Add Domains
+			if( !empty( $get_domains ) ){
+				foreach( $get_domains as $key => $domain ){
+					$add_domain = License::instance()->add_domain([
+						'license_id' => $add_license,
+						'domain' => $domain->domain,
+						'status' => $domain->status,
+						'dated' => $domain->dated,
+					]);
+				}
+			}
+
+		}
+
+		return $licenses;
 	}
 
 	// Products
@@ -41,7 +86,7 @@ class MigrateOldDb {
 
 		// Loop through the results and add to new table
 		foreach( $products as $key => $product ){
-			// error_log( print_r( $product, true ) );
+			
 			$packages = $wpdb->get_results( $wpdb->prepare("SELECT * FROM {$wpdb->prefix}lmfwppt_license_packages WHERE product_id = %d", $product->id) );
 			
 			$banners = !empty( $product->banners ) ? unserialize( $product->banners ) : [
