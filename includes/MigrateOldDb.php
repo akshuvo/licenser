@@ -5,7 +5,7 @@ use Licenser\Models\Product;
 use Licenser\Models\License;
 
 /**
- * Installer class
+ * Migrate Old Database
  */
 class MigrateOldDb {
 	
@@ -23,12 +23,17 @@ class MigrateOldDb {
 		global $wpdb;
 		$licenses = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}lmfwppt_licenses");
 
+		// Messages
+		$messages = [];
+
 		// Set Packages for preventing duplicate query
 		$packages = [];
 
 		// Truncate the tables
 		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_licenses");
 		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_license_domains");
+
+		$messages[] = 'Tables Truncated';
 
 		// Loop through the results and add to new table
 		foreach( $licenses as $key => $license ){
@@ -40,8 +45,6 @@ class MigrateOldDb {
 			} else {
 				$package = $wpdb->get_row( $wpdb->prepare("SELECT id, product_id  FROM {$wpdb->prefix}lmfwppt_license_packages WHERE package_id = %s", $license->package_id) );
 				$packages[$license->package_id] = $package;
-
-				
 			}
 
 			// Add License
@@ -69,9 +72,14 @@ class MigrateOldDb {
 				}
 			}
 
+			$messages[] = 'License Added: ' . $license->license_key . ' - (' . count( $get_domains ) . ' Domains)';
+
 		}
 
-		return $licenses;
+		$messages[] = 'Total Licenses: ' . count( $licenses );
+		$messages[] = 'Migration Completed';
+
+		return implode( '<br>', $messages );
 	}
 
 	// Products
@@ -79,23 +87,30 @@ class MigrateOldDb {
 		global $wpdb;
 		$products = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}lmfwppt_products");
 
+		// Messages
+		$messages = [];
+
 		// Truncate the tables
 		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_license_packages");
 		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_product_releases");
 		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_products");
 
+		$messages[] = 'Tables Truncated';
+
 		// Loop through the results and add to new table
 		foreach( $products as $key => $product ){
-			
-			$packages = $wpdb->get_results( $wpdb->prepare("SELECT * FROM {$wpdb->prefix}lmfwppt_license_packages WHERE product_id = %d", $product->id) );
-			
+			// Banners
 			$banners = !empty( $product->banners ) ? unserialize( $product->banners ) : [
 				'low' => '',
 				'high' => '',
 			];
 
+			// Sections
 			$sections = !empty( $product->sections ) ? unserialize( $product->sections ) : [];
 
+			// Get the packages
+			$packages = $wpdb->get_results( $wpdb->prepare("SELECT * FROM {$wpdb->prefix}lmfwppt_license_packages WHERE product_id = %d", $product->id) );
+			
 			$new_packages = [];
 			if( !empty( $packages ) ){
 				foreach( $packages as $key => $package ){
@@ -133,17 +148,15 @@ class MigrateOldDb {
 	
 				'license_packages' => $new_packages,
 			]);
+
+			$messages[] = 'Product Added: ' . $product->name . ' - (' . count( $new_packages ) . ' Packages)';
 		}
 
-		return $products;
+
+		$messages[] = 'Total Products: ' . count( $products );
+		$messages[] = 'Migration Completed';
+
+		return implode( '<br>', $messages );
 	}
-
-
-	function run_migration(){
-			
-		global $wpdb;
-
-	}
-
 
 }
