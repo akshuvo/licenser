@@ -63,7 +63,7 @@ class Installer {
               `product_id` int(11) NOT NULL,
               `version` varchar(30) DEFAULT NULL,
               `changelog` text DEFAULT NULL,
-              `file_name` varchar(30) DEFAULT NULL,
+              `file_name` varchar(255) DEFAULT NULL,
               `download_link` varchar(255) DEFAULT NULL,
               `release_date` datetime NOT NULL DEFAULT NOW(),
               PRIMARY KEY (`id`)
