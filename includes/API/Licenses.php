@@ -61,6 +61,26 @@ class Licenses extends RestController {
                 ],
             ]
         );
+
+        // Single Route
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/(?P<id>[\d]+)',
+            [
+                [
+                    'methods'             => WP_REST_Server::DELETABLE,
+                    'callback'            => [ $this, 'delete_item' ],
+                    'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+                    'args'                => [
+                        'id' => [
+                            'description' => __( 'License ID.' ),
+                            'type'        => 'integer',
+                            'required'    => true,
+                        ],
+                    ],
+                ],
+            ]
+        );
   
         register_rest_route(
             $this->namespace,
@@ -226,5 +246,20 @@ class Licenses extends RestController {
     }
 
 
+    /**
+     * Delete a single item
+     *
+     * @param WP_REST_Request $request Full data about the request.
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    public function delete_item( $request ) {
+
+        $id = $request->get_param( 'id' );
+
+        $product = License::instance()->delete( $id );
+
+        return rest_ensure_response( $product );
+    }
 
 }

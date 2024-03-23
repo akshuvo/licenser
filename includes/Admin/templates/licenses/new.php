@@ -378,7 +378,6 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
         //     }
         // });
     });
-  
 
     // Document Ready
     jQuery(document).ready(function() {
@@ -388,5 +387,11 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
             jQuery('#generate_key').trigger('click');
         }
 
+    });
+</script>
+
+<script type="text/javascript">
+    jQuery(document).ready(function($){
+  
     });
 </script>

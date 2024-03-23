@@ -71,7 +71,8 @@ class LicensesListTable extends \WP_List_Table{
 
 		$actions['edit']   = sprintf( '<a href="%s" title="%s">%s</a>', admin_url( 'admin.php?page=licenser-licenses&action=edit&id=' . $item->id ), $item->id, __( 'Edit', 'licenser' ), __( 'Edit', 'licenser' ) );
 
-        $actions['delete'] = sprintf( '<a href="%s" class="submitdelete" onclick="return confirm(\'Are you sure?\');" title="%s">%s</a>', wp_nonce_url( admin_url( 'admin-post.php?action=lmfwppt-delete-license&id=' . $item->id ), 'lmfwppt-delete-license' ), $item->id, __( 'Delete', 'licenser' ), __( 'Delete', 'licenser' ) );
+		$actions['delete'] = sprintf( '<a href="#" class="licenser-delete-license" data-id="'.esc_attr( $item->id ).'">%s</a>', __( 'Delete', 'licenser' ) );
+
 
 		return sprintf(
 			'<input class="w-100" type="text" value="%1$s" readonly/> %2$s', $item->license_key, $this->row_actions($actions)

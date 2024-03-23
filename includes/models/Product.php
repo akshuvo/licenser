@@ -296,4 +296,50 @@ class Product {
 
         return $insert_id;
     }
+
+    /**
+     * Delete Product
+     * 
+     * @param int $id
+     * @return bool
+     */
+    public function delete( $id ) {
+        global $lwpdb;
+
+        $lwpdb->wpdb->delete(
+            $lwpdb->products,
+            [
+                'id' => $id
+            ]
+        );
+
+        return true;
+    }
+
+    /**
+     * Update Status
+     * 
+     * @param int $id
+     * @param string $status
+     * @return bool
+     */
+    public function update_status( $id, $status ) {
+        if( !in_array( $status, [ 'active', 'trash', 'draft' ] ) ){
+            return false;
+        }
+
+        global $lwpdb;
+
+        $lwpdb->wpdb->update(
+            $lwpdb->products,
+            [
+                'status' => $status
+            ],
+            [
+                'id' => $id
+            ]
+        );
+
+        return true;
+    }
 }

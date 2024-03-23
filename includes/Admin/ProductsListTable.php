@@ -67,7 +67,7 @@ class ProductsListTable extends \WP_List_Table{
 		$actions = [];
 		$actions['edit']   = sprintf( '<a href="%s" title="%s">%s</a>', admin_url( 'admin.php?page='.$page.'&action=edit&id=' . $item->id ), $item->id, __( 'Edit', 'lmfwppt' ), __( 'Edit', 'lmfwppt' ) );
 
-        $actions['delete'] = sprintf( '<a href="%s" class="submitdelete" onclick="return confirm(\'Are you sure?\');" title="%s">%s</a>', wp_nonce_url( admin_url( 'admin-post.php?action=lmfwppt-delete-product&redirect_url='.$page.'&id=' . $item->id ), 'lmfwppt-delete-product' ), $item->id, __( 'Delete', 'lmfwppt' ), __( 'Delete', 'lmfwppt' ) );
+        $actions['delete'] = sprintf( '<a href="#" class="licenser-delete-product" data-id="'.esc_attr( $item->id ).'">%s</a>', __( 'Delete', 'licenser' ) );
 
 		return sprintf(
 			'<a href="%1$s"><strong>%2$s</strong></a> %3$s', admin_url('admin.php?page='.$page.'&action=edit&id=' . $item->id ), $item->name, $this->row_actions($actions)
