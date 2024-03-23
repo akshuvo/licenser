@@ -62,17 +62,21 @@ $settings = Settings::instance()->get_all();
             </tbody>
          </table>
 
-         <div class="submit_btn_area"> 
+        <div class="submit_btn_area"> 
             <?php submit_button( __( 'Save', 'lmfwppt' ), 'primary' ); ?> 
             <span class="spinner"></span>
-         </div>
+        </div>
+         
+        <div class="migration-btns" style="margin-top: 20px;">
+            <button class="button button-primary migrate-database" data-table="reset">Delete Tables</button>
+            <button class="button button-primary migrate-database" data-table="product">Migrate Products</button>
+            <button class="button button-primary migrate-database" data-table="license">Migrate Licenses</button>
+        </div>
+
          <div class="lmfwppt-notices"></div>
       </form>
 
 </div>
-
-<button class="button button-primary migrate-database" data-table="product">Migrate Products</button>
-<button class="button button-primary migrate-database" data-table="license">Migrate Licenses</button>
 
 <div class="migration-response"></div>
 

@@ -13,9 +13,43 @@ class MigrateOldDb {
 	public function migrate_data( $table ){
 		if( $table == 'product' ){
 			return $this->migrate_products();
-		} else if( $table == 'license' ){
+		} elseif( $table == 'license' ){
 			return $this->migrate_licenses();
+		} elseif( $table == 'reset' ){
+			return $this->reset_tables();
 		}
+	}
+
+	// Reset Tables
+	public function reset_tables(){
+		// Messages
+		$messages = [];
+
+		global $wpdb;
+		$table_prefix = $wpdb->prefix . 'licenser_';
+		$wpdb->query("DROP TABLE $table_prefix}products");
+		$messages[] = 'Products Table Dropped';
+
+		$wpdb->query("DROP TABLE $table_prefix}product_releases");
+		$messages[] = 'Product Releases Table Dropped';
+
+		$wpdb->query("DROP TABLE $table_prefix}license_packages");
+		$messages[] = 'License Packages Table Dropped';
+
+		$wpdb->query("DROP TABLE {$table_prefix}licenses");
+		$messages[] = 'Licenses Table Dropped';
+
+		$wpdb->query("DROP TABLE {$table_prefix}license_domains");
+		$messages[] = 'License Domains Table Dropped';
+
+		// Delete option
+		delete_option( 'licenser_db_version' );
+		$messages[] = 'DB_Version Option Deleted';
+
+		$messages[] = 'Completed!';
+		$messages[] = 'Please deactivate and reactivate the plugin to recreate the tables';
+
+		return implode( '<br>', $messages );
 	}
 
 	// Licenses
