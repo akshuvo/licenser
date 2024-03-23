@@ -22,7 +22,7 @@ class Installer {
 
 
 	function run_migration(){
-		// if ( version_compare( get_option( 'licenser_db_version', "1" ), $this->db_version, '<' ) ) {
+		if ( version_compare( get_option( 'licenser_db_version', "1" ), $this->db_version, '<' ) ) {
 			
 			global $wpdb;
 
@@ -125,7 +125,7 @@ class Installer {
 			
 			// Update databse version
 			update_option( 'licenser_db_version', $this->db_version );
-		// }
+		}
 	}
 
     /**
