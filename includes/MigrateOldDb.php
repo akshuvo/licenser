@@ -23,6 +23,8 @@ class MigrateOldDb {
 	public function get_data( $table ){
 		if( $table == 'product' ){
 			return $this->migrate_products();
+		} else if( $table == 'license' ){
+			return $this->migrate_licenses();
 		}
 
 	}
@@ -31,6 +33,11 @@ class MigrateOldDb {
 	public function migrate_products(){
 		global $wpdb;
 		$products = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}lmfwppt_products");
+
+		// Truncate the tables
+		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_license_packages");
+		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_product_releases");
+		$wpdb->query("TRUNCATE TABLE {$wpdb->prefix}licenser_products");
 
 		// Loop through the results and add to new table
 		foreach( $products as $key => $product ){
@@ -74,12 +81,12 @@ class MigrateOldDb {
 				'status' => 'active',
 	
 				'version' => $product->version,
-				'changelog' => 'testtest',
+				'changelog' => isset( $sections['changelog']['content'] ) ? $sections['changelog']['content'] : '',
 				'file_name' => basename( $product->download_link ),
 				'download_link' => $product->download_link,
 				'release_date' => $product->dated,
 	
-				// 'license_packages' => $new_packages,
+				'license_packages' => $new_packages,
 			]);
 		}
 
