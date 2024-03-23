@@ -98,7 +98,7 @@ class MigrateOldDb {
 			if( isset( $packages[$license->package_id] ) ) {
 				$package = $packages[$license->package_id];
 			} else {
-				$package = $wpdb->get_row( $wpdb->prepare("SELECT id, product_id  FROM {$wpdb->prefix}lmfwppt_license_packages WHERE package_id = %s", $license->package_id) );
+				$package = $wpdb->get_row( $wpdb->prepare("SELECT id, product_id  FROM {$wpdb->prefix}licenser_license_packages WHERE package_id = %s", $license->package_id) );
 				$packages[$license->package_id] = $package;
 			}
 
