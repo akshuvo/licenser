@@ -71,7 +71,6 @@ $settings = Settings::instance()->get_all();
 
 </div>
 
-
 <script>
    jQuery(document).on('submit', '#setting-add-form', function(e) {
         e.preventDefault();
