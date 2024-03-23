@@ -395,7 +395,8 @@ class License {
             'id' => '',
             'license_id' => '',
             'domain' => '',
-            'status' => ''
+            'status' => '',
+            'dated' => date('Y-m-d H:i:s'),
         ] );
 
         global $lwpdb;
@@ -424,6 +425,7 @@ class License {
                 'license_id' => intval( $args['license_id'] ),
                 'domain' => licenser_get_clean_url( $args['domain'] ),
                 'status' => intval( $args['status'] ),
+                'dated' => sanitize_text_field( $args['dated'] ),
             ],
             [
                 '%d',
