@@ -107,7 +107,7 @@ class MigrateOldDb {
 				'status' => $license->status,
 				'license_key' => $license->license_key,
 				'product_id' => isset( $package->product_id ) ? $package->product_id : 0,
-				'package_id' => $license->package_id,
+				'package_id' => isset( $package->id ) ? $package->id : 0,
 				'source' => 'wc',
 				'source_id' => $license->order_id,
 				'end_date' => $license->end_date,
