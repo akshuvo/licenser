@@ -47,7 +47,7 @@ class Product {
         $download_link = $product->download_link;
 
         // Parse file path from download link
-        $parsed_file_path = lmfwppt_parse_file_path( $download_link );
+        $parsed_file_path = licenser_parse_file_path( $download_link );
 
         /**
          * Fallback on force download method for remote files.

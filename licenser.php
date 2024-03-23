@@ -67,11 +67,9 @@ final class Licenser {
      * @return void
      */
     public function define_constants() {
-        define( 'LMFWPPT_PLUGIN_VERSION', self::version );
         define( 'LICENSER_VERSION', self::version );
         define( 'LICENSER_FILE', __FILE__ );
         define( 'LICENSER_PATH', __DIR__ );
-        define( 'LMFWPPT_PLUGIN_URL', plugins_url( '', LICENSER_FILE ) );
         define( 'LICENSER_URL', plugins_url( '', LICENSER_FILE ) );
         define( 'LICENSER_ASSETS', LICENSER_URL . '/assets' );
     }

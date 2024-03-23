@@ -347,7 +347,7 @@ class Order_Handler{
             'product_slug' => $product_slug,
             'license_key' => $license_key,
             'action' => 'download',
-        ), lmfwppt_api_url() );
+        ), licenser_api_url() );
 
         if ( $download_link ) {
             echo sprintf('<li><strong class="wc-item-meta-label">%s</strong>: <a href="%s" target="_blank">%s</a></li></ul>',
@@ -393,8 +393,8 @@ class Order_Handler{
      * @return void
      */
 	function enqueue_scripts() {
-        wp_enqueue_style( 'licenser-wclite-styles', LICENSER_WCLITE_PLUGIN_URL . 'assets/css/styles.css', null, LMFWPPT_PLUGIN_VERSION );
-	    wp_enqueue_script( 'licenser-wclite-scripts', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/scripts.js', array('jquery'), LMFWPPT_PLUGIN_VERSION );
+        wp_enqueue_style( 'licenser-wclite-styles', LICENSER_WCLITE_PLUGIN_URL . 'assets/css/styles.css', null, LICENSER_VERSION );
+	    wp_enqueue_script( 'licenser-wclite-scripts', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/scripts.js', array('jquery'), LICENSER_VERSION );
 	}
 
     // License Endpoint Content

@@ -372,7 +372,7 @@ class License {
     public function domain_exists( $domain, $license_id = '' ) {
         global $lwpdb;
 
-        $domain = lmfwppt_get_clean_url( $domain );
+        $domain = licenser_get_clean_url( $domain );
 
         $where = $lwpdb->wpdb->prepare( "domain = %s", $domain );
 
@@ -406,7 +406,7 @@ class License {
                 $lwpdb->license_domains,
                 [
                     'license_id' => intval( $args['license_id'] ),
-                    'domain' => lmfwppt_get_clean_url( $args['domain'] ),
+                    'domain' => licenser_get_clean_url( $args['domain'] ),
                     'status' => intval( $args['status'] ),
                 ],
                 [
@@ -422,7 +422,7 @@ class License {
             $lwpdb->license_domains,
             [
                 'license_id' => intval( $args['license_id'] ),
-                'domain' => lmfwppt_get_clean_url( $args['domain'] ),
+                'domain' => licenser_get_clean_url( $args['domain'] ),
                 'status' => intval( $args['status'] ),
             ],
             [
