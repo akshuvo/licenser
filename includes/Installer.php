@@ -7,7 +7,7 @@ namespace Licenser;
  */
 class Installer {
 
-    var $db_version = 25; // initial db version, don't use floats
+    var $db_version = 26; // initial db version, don't use floats
     var $db_version_key = "licenser_db_version";
 
     /**
