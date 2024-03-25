@@ -56,6 +56,13 @@ class MigrateOldDb {
 			$messages[] = 'Licenses Table Dropped';
 		}
 
+		$wpdb->query("DROP TABLE {$table_prefix}license_meta");
+		if( $wpdb->last_error ){
+			$messages[] = 'Error: ' . $wpdb->last_error;
+		} else {
+			$messages[] = 'License Meta Table Dropped';
+		}
+
 		$wpdb->query("DROP TABLE {$table_prefix}license_domains");
 		if( $wpdb->last_error ){
 			$messages[] = 'Error: ' . $wpdb->last_error;
