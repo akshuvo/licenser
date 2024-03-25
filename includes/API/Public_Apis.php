@@ -61,9 +61,6 @@ class Public_Apis extends RestController {
                         $action = $request->get_param( 'action' );
                         $license_key = $request->get_param( 'license_key' );
 
-                        error_log('Public_Apis');
-                        error_log( print_r( $request->get_params(), true ) ); 
-
                         // Get Product
                         $product = Product::instance()->get( $uuid, [
                             'inc_stable_release' => false,
@@ -218,7 +215,11 @@ class Public_Apis extends RestController {
      */
     public function prepare_response_for_plugin( $product, $request ) {
 
-        $download_url = licenser_product_download_url( $product->uuid, $request->get_param( 'license_key' ) );
+        $license_key = $request->get_param( 'license_key' );
+        $download_url = licenser_product_download_url( $product->uuid, $license_key );
+        if ( !empty( $license_key ) ) {
+            $download_url = add_query_arg( 'refurl', $request->get_param('url'), $download_url );
+        }
 
         // TODO: Show all changelog
         $changelog = '<h4>' . $product->stable_release->version . ' - ' . date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) . '</h4>' . $product->stable_release->changelog;
@@ -251,6 +252,8 @@ class Public_Apis extends RestController {
             'author' => $product->author_name,
         ];
 
+
+
         return $response;
     }
 
@@ -263,7 +266,11 @@ class Public_Apis extends RestController {
      */
     public function prepare_response_for_theme( $product, $request ) {
 
-        $download_url = licenser_product_download_url( $product->uuid, $request->get_param( 'license_key' ) );
+        $license_key = $request->get_param( 'license_key' );
+        $download_url = licenser_product_download_url( $product->uuid, $license_key );
+        if ( !empty( $license_key ) ) {
+            $download_url = add_query_arg( 'refurl', $request->get_param('url'), $download_url );
+        }
 
         $response = [
             'id' => $product->uuid,
@@ -306,6 +313,7 @@ class Public_Apis extends RestController {
 
         $uuid = $request->get_param( 'uuid' );
         $license_key = $request->get_param( 'license_key' );
+        $refurl = $request->get_param( 'refurl' );
 
         // Check if license key is provided
         if ( empty( $license_key ) ) {
@@ -336,6 +344,7 @@ class Public_Apis extends RestController {
         return Product_Controller::instance()->download( [
             'product_id' => $product->id,
             'license_key' => $license_key,
+            'ref_domain' => $refurl,
             // 'version' => $product->stable_release->version,
         ] );
     }

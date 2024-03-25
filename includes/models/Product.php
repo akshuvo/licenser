@@ -282,7 +282,6 @@ class Product {
         // License Package
         if( !empty( $data['license_packages'] ) && is_array( $data['license_packages'] ) ){
             foreach( $data['license_packages'] as $package ){
-                error_log( print_r( $package, true ) );
                 $license_package = LicensePackage::instance()->create([
                     'id' => isset( $package['id'] ) ? $package['id'] : '',
                     'product_id' => $insert_id,
