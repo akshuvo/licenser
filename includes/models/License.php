@@ -293,6 +293,7 @@ class License {
             'offset' => 0,
             'orderby' => 'id',
             'order' => 'DESC',
+            'license_id_check' => true,
         ] );
         
         global $lwpdb;
@@ -305,6 +306,8 @@ class License {
         // License ID
         if( !empty( $args['license_id'] ) ){
             $where .= $lwpdb->wpdb->prepare( " AND license_id = %d", $args['license_id'] );
+        } elseif( $args['license_id_check'] ){
+            return false;
         }
 
         // Order
@@ -437,6 +440,5 @@ class License {
 
         return $lwpdb->wpdb->insert_id;
     }
-
 
 }

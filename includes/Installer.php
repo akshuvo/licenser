@@ -102,6 +102,15 @@ class Installer {
 	          PRIMARY KEY (`id`)
 	        ) $charset_collate";
 
+			// License Meta Table
+			$schema[] = "CREATE TABLE `{$table_prefix}license_meta` (
+	          `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	          `license_id` bigint(20) unsigned NOT NULL,
+	          `meta_key` varchar(255) NOT NULL,
+	          `meta_value` longtext NOT NULL,
+	          PRIMARY KEY (`id`)
+	        ) $charset_collate";
+
 	        // Drop Below Table
 	        // $wpdb->query("DROP TABLE {$table_prefix}license_domains");
 

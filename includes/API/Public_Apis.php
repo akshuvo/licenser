@@ -206,7 +206,6 @@ class Public_Apis extends RestController {
             $response = $this->prepare_response_for_theme( $product, $request );
         }
   
-        error_log( print_r( $response, true ) );
         return rest_ensure_response( $response );
     }
 

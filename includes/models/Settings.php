@@ -37,5 +37,4 @@ class Settings {
         return get_option('lmfwppt_settings');
     }
 
-
 }
