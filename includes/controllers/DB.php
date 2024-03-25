@@ -45,6 +45,11 @@ class DB {
     public $licenses;
 
     /**
+     * License meta table name
+     */
+    public $license_meta;
+
+    /**
      * License domains table name
      */
     public $license_domains;
@@ -59,6 +64,7 @@ class DB {
         'product_releases',
         'license_packages',
         'licenses',
+        'license_meta',
         'license_domains',
     ];
     

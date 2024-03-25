@@ -7,7 +7,7 @@ namespace Licenser;
  */
 class Installer {
 
-    var $db_version = 25; // initial db version, don't use floats
+    var $db_version = 26; // initial db version, don't use floats
     var $db_version_key = "licenser_db_version";
 
     /**
@@ -99,6 +99,15 @@ class Installer {
 	          `is_lifetime` tinyint(1) NOT NULL DEFAULT 0,
 	          `domain_limit` INT(128) NULL,
 	          `dated` datetime NOT NULL DEFAULT NOW(),
+	          PRIMARY KEY (`id`)
+	        ) $charset_collate";
+
+			// License Meta Table
+			$schema[] = "CREATE TABLE `{$table_prefix}license_meta` (
+	          `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+	          `license_id` bigint(20) unsigned NOT NULL,
+	          `meta_key` varchar(255) NOT NULL,
+	          `meta_value` longtext NOT NULL,
 	          PRIMARY KEY (`id`)
 	        ) $charset_collate";
 

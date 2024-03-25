@@ -2,6 +2,8 @@
 namespace Licenser\Controllers;
 use Licenser\Controllers\License as License_Controller;
 use Licenser\Models\Product as Product_Model;
+use Licenser\Models\License as License_Model;
+use Licenser\Models\License_Meta;
 use Licenser\Models\ProductRelease;
 // use Licenser\Models\License;
 
@@ -17,6 +19,7 @@ class Product {
             'product_id' => '',
             'license_key' => '',
             'version' => '',
+            'ref_domain' => '',
         ] );
         
         // Check license key
@@ -27,13 +30,9 @@ class Product {
             }
         }
 
-        // 'columns' => [],
-        //     'get_by' => '',
-        //     'version' => '',
-
         // Get product download url
         $product = ProductRelease::instance()->get( $args['product_id'], [
-            'columns' => [ 'download_link' ],
+            'columns' => [ 'download_link', 'version' ],
             'version' => $args['version'],
             'get_by' => 'product_id',
         ] );
@@ -41,6 +40,17 @@ class Product {
         // Return if no product found
         if( empty( $product ) ){
             wp_die( __( 'No product found.', 'licenser' ) );
+        }
+
+        // TODO: Check if the license can download the latest version
+        // > if not, get the latest version that the license can download
+
+        // Domain ID
+        $domain_id = isset( $license->id ) && $license->id ? License_Model::instance()->domain_exists( $args['ref_domain'], $license->id ) : '';
+
+        // Add version to meta
+        if( !empty( $domain_id ) ){
+            $add_meta = License_Meta::instance()->update( $license->id, 'installed_version_' . $domain_id, $product->version );
         }
 
         // Download link
