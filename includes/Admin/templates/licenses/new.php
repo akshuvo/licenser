@@ -22,7 +22,7 @@ $products = $product_model->get_all([
     'columns' => 'id, name, product_type',
 ]);
 
-echo "<pre>"; print_r($license); echo "</pre>";
+// echo "<pre>"; print_r($license); echo "</pre>";
 
 // Get Domains 
 $get_domains = $license_model->get_domains([

@@ -13,7 +13,7 @@ $product = !empty( $product_id ) ? $product_model->get( $product_id ) : (object)
 // Product Packages
 $product_packages = isset( $product->packages ) ? $product->packages : [];
 
-echo '<pre>'; print_r($product); echo '</pre>';
+// echo '<pre>'; print_r($product); echo '</pre>';
 
 
 $submit_button_label = __( 'Add Product', 'licenser' );
@@ -473,7 +473,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
             <div class="lwp-col-half">
                 <label for="release_date"><?php esc_html_e( 'Release Date', 'licenser' ); ?></label>
-                <input type="text" name="release_date" id="release_date" class="regular-text" placeholder="<?php esc_attr_e( '01-23-2023', 'licenser' ); ?>">
+                <input type="date" name="release_date" id="release_date" class="regular-text" placeholder="<?php esc_attr_e( '01-23-2023', 'licenser' ); ?>">
             </div>
         </div>
 
