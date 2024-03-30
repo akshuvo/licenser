@@ -5,8 +5,12 @@ namespace Licenser;
  * Api class
  */
 class Api {
-    // Singleton trait
-    use Traits\SingletonTrait;
+    /**
+     * Initialize the class
+     */
+    function __construct() {
+        $this->init();
+    }
 
     /**
      * Initialize the class

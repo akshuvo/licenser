@@ -94,7 +94,7 @@ final class Licenser {
         }
 
         // API
-        \Licenser\Api::instance()->init();
+        new Licenser\Api();
 
         // Addons
         $addons = Licenser\Controllers\Addons::instance();
