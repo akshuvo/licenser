@@ -105,7 +105,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                 
                     <div class="lmfwppt-form-field">
                         <div class="d-flex">
-                            <label for="end_date" class="mr-15"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
+                            <label for="end_date" class="me-1"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
                             <label>
                                 <input type="checkbox" name="is_lifetime"  <?php checked( $license->is_lifetime, '1' ); ?>>
                                 <?php esc_html_e( 'Lifetime', 'licenser' ); ?>
@@ -142,18 +142,25 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
 
                         <?php if( !empty( $get_domains ) ) : ?>
                             <?php foreach( $get_domains as $domain ):
-                                $key = isset( $domain->id ) ? sanitize_text_field( $domain->id ) : '';
+                                $domain_id = isset( $domain->id ) ? sanitize_text_field( $domain->id ) : '';
                                 $url = isset( $domain->domain ) ? sanitize_text_field( $domain->domain ) : '';
                                 $status = isset( $domain->status ) && $domain->status == 1 ? __('Active', 'licenser') : __('Inactive', 'licenser');
+                                $status_tag_class = isset( $domain->status ) && $domain->status == 1 ? 'lwp-tag-success' : '';
                                 // $dated = isset( $domain->dated ) ? gmdate('Y-m-d H:i:s', $domain->dated) : '';
                                 ?>
                                 <div class="postbox">
                                     <h4>
-                                        <?php echo esc_html( $url ); ?> 
-                                        <a target="_blank" href="<?php echo esc_url( $url ); ?>">↗</a>
-                                        <?php echo esc_html( $status ); ?>
+                                        <span class="lwp-tag ms-1 me-1 <?php echo esc_attr( $status_tag_class ); ?>"><?php echo esc_html( $status ); ?></span>
+                                        <?php echo esc_html( $url . ' - (id:'.$domain_id.')' ); ?> 
+                                        <div class="lwp-postbox-actions">
+                                            <a class="lwp-action-item lwp-tooltip" target="_blank" href="<?php echo esc_url( $url ); ?>" data-title="<?php esc_html_e( 'Visit Domain', 'licenser' ); ?>">
+                                                <span class="dashicons dashicons-external"></span>
+                                            </a>
+                                            <a href="javascript:void(0);" class="lwp-action-item lwp-tooltip" data-title="<?php esc_html_e( 'Delete Domain', 'licenser' ); ?>" data-id="<?php echo esc_attr( $domain_id ); ?>" data-action="delete_domain" data-nonce="<?php echo esc_attr( wp_create_nonce( 'delete_domain' ) ); ?>">
+                                                <span class="dashicons dashicons-trash"></span>
+                                            </a>
+                                        </div>
 
-                                        <span class="delete_field">&times;</span>
                                     </h4>
                                 </div>
                             <?php endforeach; ?>

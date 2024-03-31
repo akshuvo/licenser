@@ -123,7 +123,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
                                     <h2 class="hndle">
                                         <span class="release-head">
                                             
-                                            <span class="lwp-tag lwp-tag-success"><?php esc_html_e( 'Stable', 'licenser' ); ?></span>
+                                            <span class="lwp-tag lwp-tag-success me-1"><?php esc_html_e( 'Stable', 'licenser' ); ?></span>
                                             
                                             <span class="release-version"><?php esc_html_e( 'Version:', 'licenser' ); ?> <span><?php echo esc_html( $product->stable_release->version ); ?></span></span>
                                             
