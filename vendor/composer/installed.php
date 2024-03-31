@@ -3,7 +3,7 @@
         'name' => 'akshuvo/licenser',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '1d83ad75d1e6f98876b64a400191cd9004e3e729',
+        'reference' => 'f0c43b45ea9c2aaeebc912dc5b5e9dc3279582e7',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'akshuvo/licenser' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '1d83ad75d1e6f98876b64a400191cd9004e3e729',
+            'reference' => 'f0c43b45ea9c2aaeebc912dc5b5e9dc3279582e7',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
