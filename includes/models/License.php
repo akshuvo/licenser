@@ -250,7 +250,7 @@ class License {
         } elseif ($method == 'uuid') {
             $key = wp_generate_uuid4();
         } else {
-            $key = md5(microtime() . rand());
+            $key = md5(microtime() . wp_rand());
         }
     
         $prefix = licenser_get_option('license_code_prefix');

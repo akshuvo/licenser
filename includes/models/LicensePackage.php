@@ -62,14 +62,12 @@ class LicensePackage {
         // Order
         $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
-        $limit = '';
+        // Limit
         if( $args['number'] != -1 ){
-            $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $where .= $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
-        $query = "SELECT * FROM {$wpdb->licenser_license_packages} WHERE {$where} {$limit}";
-
-        $packages = $wpdb->get_results( $query );
+        $packages = $wpdb->get_results( "SELECT * FROM {$wpdb->licenser_license_packages} WHERE {$where}" );
 
         // Return if no package found
         if( empty( $packages ) ){

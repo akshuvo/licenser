@@ -86,14 +86,12 @@ class ProductRelease {
         // Order
         $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
-        $limit = '';
+        // Limit
         if( !empty( $args['number'] ) ){
-            $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $where .= $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
-        $query = "SELECT * FROM {$wpdb->licenser_product_releases} WHERE {$where} {$limit}";
-
-        $items = $wpdb->get_results( $query );
+        $items = $wpdb->get_results( "SELECT * FROM {$wpdb->licenser_product_releases} WHERE {$where}" );
 
         return $items;
     }

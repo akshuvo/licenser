@@ -8,6 +8,19 @@ function licenser_table( $table ) {
 }
 
 /**
+ * gmdate
+ *
+ * @return Array
+ */
+function licenser_date( $format, $timestamp = null ) {
+    if ( is_null( $timestamp ) ) {
+        $timestamp = current_time( 'timestamp' );
+    }
+
+    return gmdate( $format, $timestamp );
+}
+
+/**
  * Get Settings
  */
 function licenser_get_option( $name = null ){

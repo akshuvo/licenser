@@ -24,7 +24,7 @@ class Admin {
 	 */
 	function action_links( $links ) {
 		$plugin_links = array(
-			'<a href="' . admin_url( 'admin.php?page=licenser' ) . '">' . esc_html__( 'License Manager', 'lmfwppt' ) . '</a>',
+			'<a href="' . admin_url( 'admin.php?page=licenser' ) . '">' . esc_html__( 'License Manager', 'licenser' ) . '</a>',
 		);
 		return array_merge( $plugin_links, $links );
 	}
@@ -50,7 +50,7 @@ class Admin {
 	    wp_enqueue_script( 'jquery-ui-datepicker' );
 
 	    // jQuery UI CSS on a CDN.
-	    wp_register_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css' );
+	    wp_register_style( 'jquery-ui', 'https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css', false, '1.12.1' );
 	    wp_enqueue_style( 'jquery-ui' );  
 
         wp_enqueue_style( 'lmfwppt-admin-style', LICENSER_ASSETS . '/css/admin.css', array(), LICENSER_VERSION );

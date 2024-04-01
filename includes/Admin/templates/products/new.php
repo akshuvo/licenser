@@ -328,7 +328,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
     // Load Product Packages
     jQuery(document).on('load_product_packages', function(){
-        let productPackages = <?php echo json_encode( $product_packages ); ?>;
+        let productPackages = <?php echo wp_json_encode( $product_packages ); ?>;
         let template = wp.template('license-package-field');
 
         // Data push

@@ -148,17 +148,15 @@ class Product {
         // Order
         $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
-        $limit = '';
+        // Limit
         if( $args['number'] != -1 ){
-            $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $where .= $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
         // Columns
         $columns = sanitize_text_field( $args['columns'] );
 
-        $query = "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} {$limit}";
-
-        $items = $wpdb->get_results( $query );
+        $items = $wpdb->get_results( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where}" );
 
         // Return if no product found
         if( empty( $items ) ){
@@ -211,7 +209,7 @@ class Product {
 
         // Banner
         if( !empty( $data['banners'] ) && is_array( $data['banners'] ) ){
-            $data['banners'] = json_encode( $data['banners'] );
+            $data['banners'] = wp_json_encode( $data['banners'] );
         }        
 
         global $wpdb;
