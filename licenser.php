@@ -17,12 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 // Autoload
 require_once( dirname( __FILE__ ) . '/vendor/autoload.php' );
 
-// Access the global $lwpdb instance
-// global $wpdb;
-
-// Create an instance of the lwpdb class
-// $lwpdb = Licenser\Controllers\DB::instance();
-
 /**
  * The main plugin class
  */
@@ -113,6 +107,26 @@ final class Licenser {
 
 // Initialize the plugin
 function licenser() {
+    // Access the global $wpdb instance
+    global $wpdb;
+
+    /**
+     * Set the table names
+     * 
+     * @uses $wpdb->licenser_products
+     */
+    foreach ( [
+        'products',
+        'product_releases',
+        'license_packages',
+        'licenses',
+        'license_meta',
+        'license_domains',
+    ] as $table ) {
+        $wpdb->__set( 'licenser_' . $table, $wpdb->prefix . 'licenser_' . $table );
+    }
+
+    // Initialize the plugin
     return Licenser::init();
 }
 

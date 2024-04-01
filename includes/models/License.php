@@ -44,7 +44,7 @@ class License {
             $where .= $wpdb->prepare( " AND id = %d", $id );
         }
 
-        $license = $wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->licenses} WHERE {$where} LIMIT 1" );
+        $license = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_licenses} WHERE {$where} LIMIT 1" );
 
         // Return if no license found
         if( empty( $license ) ){
@@ -140,7 +140,7 @@ class License {
         }
 
         $licenses = $wpdb->get_results(
-            "SELECT * FROM {$lwpdb->licenses} WHERE {$where} {$limit}"
+            "SELECT * FROM {$wpdb->licenser_licenses} WHERE {$where} {$limit}"
         );
 
         // Return if no license found
@@ -186,7 +186,7 @@ class License {
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
             $wpdb->update(
-                $lwpdb->licenses,
+                $wpdb->licenser_licenses,
                 [
                     'status' => intval( $data['status'] ),
                     'license_key' => sanitize_text_field( $data['license_key'] ),
@@ -213,7 +213,7 @@ class License {
 
             // Insert
             $wpdb->insert(
-                $lwpdb->licenses,
+                $wpdb->licenser_licenses,
                 [
                     'status' => intval( $data['status'] ),
                     'license_key' => sanitize_text_field( $data['license_key'] ),
@@ -269,7 +269,7 @@ class License {
         global $wpdb;
 
         $wpdb->delete(
-            $lwpdb->licenses,
+            $wpdb->licenser_licenses,
             [
                 'id' => $id
             ]
@@ -320,11 +320,11 @@ class License {
 
         // Count Total
         if( $args['count_total'] ) {
-            return $wpdb->get_var( "SELECT COUNT(*) FROM {$lwpdb->license_domains} WHERE {$where}" );
+            return $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->licenser_license_domains} WHERE {$where}" );
         } 
         
         return $wpdb->get_results(
-            "SELECT {$columns} FROM {$lwpdb->license_domains} WHERE {$where} {$limit}"
+            "SELECT {$columns} FROM {$wpdb->licenser_license_domains} WHERE {$where} {$limit}"
         );
     }
     /**
@@ -337,7 +337,7 @@ class License {
         global $wpdb;
 
         $wpdb->delete(
-            $lwpdb->license_domains,
+            $wpdb->licenser_license_domains,
             [
                 'license_id' => $license_id
             ]
@@ -356,7 +356,7 @@ class License {
         global $wpdb;
 
         $wpdb->delete(
-            $lwpdb->license_domains,
+            $wpdb->licenser_license_domains,
             [
                 'id' => $id
             ]
@@ -383,7 +383,7 @@ class License {
             $where .= $wpdb->prepare( " AND license_id = %d", $license_id );
         }
 
-        return $wpdb->get_var( "SELECT id FROM {$lwpdb->license_domains} WHERE {$where} LIMIT 1" );
+        return $wpdb->get_var( "SELECT id FROM {$wpdb->licenser_license_domains} WHERE {$where} LIMIT 1" );
     }
 
 
@@ -407,7 +407,7 @@ class License {
         // Update
         if( !empty( $args['id'] ) ){
             $wpdb->update(
-                $lwpdb->license_domains,
+                $wpdb->licenser_license_domains,
                 [
                     'license_id' => intval( $args['license_id'] ),
                     'domain' => licenser_get_clean_url( $args['domain'] ),
@@ -423,7 +423,7 @@ class License {
 
         // Insert
         $wpdb->insert(
-            $lwpdb->license_domains,
+            $wpdb->licenser_license_domains,
             [
                 'license_id' => intval( $args['license_id'] ),
                 'domain' => licenser_get_clean_url( $args['domain'] ),

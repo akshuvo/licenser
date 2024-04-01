@@ -39,7 +39,7 @@ class ProductRelease {
         // Order
         $where .= " ORDER BY id DESC, release_date DESC";
 
-        return $wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->product_releases} WHERE {$where} LIMIT 1" );
+        return $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_product_releases} WHERE {$where} LIMIT 1" );
     }
 
     /**
@@ -50,7 +50,7 @@ class ProductRelease {
 
         $release = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT * FROM {$lwpdb->product_releases} WHERE product_id = %d ORDER BY id DESC, release_date DESC LIMIT 1",
+                "SELECT * FROM {$wpdb->licenser_product_releases} WHERE product_id = %d ORDER BY id DESC, release_date DESC LIMIT 1",
                 $product_id
             )
         );
@@ -91,7 +91,7 @@ class ProductRelease {
             $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
-        $query = "SELECT * FROM {$lwpdb->product_releases} WHERE {$where} {$limit}";
+        $query = "SELECT * FROM {$wpdb->licenser_product_releases} WHERE {$where} {$limit}";
 
         $items = $wpdb->get_results( $query );
 
@@ -120,7 +120,7 @@ class ProductRelease {
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
             $wpdb->update(
-                $lwpdb->product_releases,
+                $wpdb->licenser_product_releases,
                 [
                     'product_id' => intval( $data['product_id'] ),
                     'version' => sanitize_text_field( $data['version'] ),
@@ -137,7 +137,7 @@ class ProductRelease {
             $insert_id = $data['id'];
         } else {
             $wpdb->insert(
-                $lwpdb->product_releases,
+                $wpdb->licenser_product_releases,
                 [
                     'product_id' => intval( $data['product_id'] ),
                     'version' => sanitize_text_field( $data['version'] ),

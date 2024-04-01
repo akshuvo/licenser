@@ -64,7 +64,7 @@ class Product {
             $where .= $wpdb->prepare( " AND id = %d", $id );
         }
 
-        $product = $wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->products} WHERE {$where} LIMIT 1" );
+        $product = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} LIMIT 1" );
 
         // Return if no product found
         if( empty( $product ) ){
@@ -156,7 +156,7 @@ class Product {
         // Columns
         $columns = sanitize_text_field( $args['columns'] );
 
-        $query = "SELECT {$columns} FROM {$lwpdb->products} WHERE {$where} {$limit}";
+        $query = "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} {$limit}";
 
         $items = $wpdb->get_results( $query );
 
@@ -219,7 +219,7 @@ class Product {
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
             $wpdb->update(
-                $lwpdb->products,
+                $wpdb->licenser_products,
                 [
                     'name' => sanitize_text_field( $data['name'] ),
                     'slug' => sanitize_text_field( $data['slug'] ),
@@ -244,7 +244,7 @@ class Product {
             $insert_id = $data['id'];
         } else {
             $wpdb->insert(
-                $lwpdb->products,
+                $wpdb->licenser_products,
                 [
                     'name' => sanitize_text_field( $data['name'] ),
                     'slug' => sanitize_text_field( $data['slug'] ),
@@ -306,7 +306,7 @@ class Product {
         global $wpdb;
 
         $wpdb->delete(
-            $lwpdb->products,
+            $wpdb->licenser_products,
             [
                 'id' => $id
             ]
@@ -330,7 +330,7 @@ class Product {
         global $wpdb;
 
         $wpdb->update(
-            $lwpdb->products,
+            $wpdb->licenser_products,
             [
                 'status' => $status
             ],

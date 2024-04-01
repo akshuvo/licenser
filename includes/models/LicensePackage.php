@@ -17,7 +17,7 @@ class LicensePackage {
 
         $package = $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT * FROM {$lwpdb->license_packages} WHERE id = %d",
+                "SELECT * FROM {$wpdb->licenser_license_packages} WHERE id = %d",
                 $id
             )
         );
@@ -67,7 +67,7 @@ class LicensePackage {
             $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
-        $query = "SELECT * FROM {$lwpdb->license_packages} WHERE {$where} {$limit}";
+        $query = "SELECT * FROM {$wpdb->licenser_license_packages} WHERE {$where} {$limit}";
 
         $packages = $wpdb->get_results( $query );
 
@@ -100,7 +100,7 @@ class LicensePackage {
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
             $wpdb->update(
-                $lwpdb->license_packages,
+                $wpdb->licenser_license_packages,
                 [
                     'product_id' => intval( $data['product_id'] ),
                     'package_id' => sanitize_text_field( $data['package_id'] ),
@@ -116,7 +116,7 @@ class LicensePackage {
             $insert_id = $data['id'];
         } else {
             $wpdb->insert(
-                $lwpdb->license_packages,
+                $wpdb->licenser_license_packages,
                 [
                     'product_id' => intval( $data['product_id'] ),
                     'package_id' => sanitize_text_field( $data['package_id'] ),
@@ -143,7 +143,7 @@ class LicensePackage {
         global $wpdb;
 
         $wpdb->delete(
-            $lwpdb->license_packages,
+            $wpdb->licenser_license_packages,
             [
                 'id' => $id
             ]
