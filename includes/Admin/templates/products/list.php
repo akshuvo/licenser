@@ -13,13 +13,13 @@ $product_type = $page == 'licenser-themes' ? 'theme' : 'plugin';
 <?php endif; ?>
 
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php _e( 'License Manager: '.$product_type.'s', 'lmfwppt' ); ?></h1>
+    <h1 class="wp-heading-inline"><?php esc_html_e( 'License Manager: '.$product_type.'s', 'licenser' ); ?></h1>
 
-    <a href="<?php echo admin_url( 'admin.php?page=licenser-'.$product_type.'s&action=new' ); ?>" class="page-title-action"><?php _e( 'Add New Product', 'lmfwppt' ); ?></a>
+    <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-'.$product_type.'s&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New Product', 'licenser' ); ?></a>
 
     <?php if ( isset( $_GET['updated'] ) ) { ?>
         <div class="notice notice-success">
-            <p><?php _e( 'Product License has been updated successfully!', 'lmfwppt' ); ?></p>
+            <p><?php esc_html_e( 'Product License has been updated successfully!', 'licenser' ); ?></p>
         </div>
     <?php } ?>
 

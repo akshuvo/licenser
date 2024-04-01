@@ -93,12 +93,11 @@ function licenser_parse_file_path( $file_path ) {
 }
 
 // Media Frame State Saving Ajax
-add_action('wp_ajax_lmfwppt_media_frame_state', 'licenser_media_frame_state_action');
+add_action('wp_ajax_licenser_media_frame_state', 'licenser_media_frame_state_action');
 function licenser_media_frame_state_action(){
     $state = isset( $_POST['state'] ) ? sanitize_text_field( $_POST['state'] ) : '';
-    update_option( 'lmfwppt_media_frame_state', $state );
-    echo $state;
-    wp_die();
+    update_option( 'licenser_media_frame_state', $state );
+    wp_send_json_success($state);
 }
 
 // Change Upload Directory for License Manager
@@ -110,7 +109,7 @@ function licenser_license_manager_pre_upload( $file ) {
 
 function licenser_license_manager_uploads_dir( $param ){
 
-    if ( get_option('lmfwppt_media_frame_state') == 'open' ) {
+    if ( get_option('licenser_media_frame_state') == 'open' ) {
         $mydir = '/license-manager';
 
         $param['path'] = $param['basedir'] . $mydir;

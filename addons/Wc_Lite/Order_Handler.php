@@ -339,8 +339,8 @@ class Order_Handler{
 
         // Show License key
         echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <code>%s</code></li>',
-            __( 'License Key', 'licenser' ),
-            $license_key
+            esc_html__( 'License Key', 'licenser' ),
+            esc_html($license_key)
         );
 
         // Download Link
@@ -352,9 +352,9 @@ class Order_Handler{
 
         if ( $download_link ) {
             echo sprintf('<li><strong class="wc-item-meta-label">%s</strong>: <a href="%s" target="_blank">%s</a></li></ul>',
-                __( 'Download Link', 'licenser' ),
-                $download_link,
-                __( 'Download', 'licenser' )
+                esc_html__( 'Download Link', 'licenser' ),
+                esc_url( $download_link ),
+                esc_html__( 'Download', 'licenser' )
             );
         }
 

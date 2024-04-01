@@ -130,7 +130,7 @@ jQuery(document).ready(function($){
         }
 
         file_frame = wp.media.frames.file_frame = wp.media({
-            title: 'Select The Appropriate File',
+            title: 'Select File',
             //frame:    'post',
             //state:    'insert',
             multiple: false,
@@ -161,15 +161,13 @@ jQuery(document).ready(function($){
 
     // Track Media State
     function wp_media_state( state = 'close' ){
-        jQuery(document).ready(function($) {
-            var data = {
-                'action': 'lmfwppt_media_frame_state',
-                'state': state
-            };
+        var data = {
+            'action': 'licenser_media_frame_state',
+            'state': state
+        };
 
-            jQuery.post(ajaxurl, data, function(response) {
-                console.log('Media State is now: ' + response);
-            });
+        jQuery.post(ajaxurl, data, function(response) {
+            console.log('Media State is now: ' + response);
         });
     }
 

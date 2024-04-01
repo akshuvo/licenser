@@ -35,7 +35,7 @@ class Shortcode{
             'source_id' => (array) $orders,
         ] );
 
-        echo sprintf("<h4>%s</h4>", __('License Manager', 'licenser'));
+        echo sprintf("<h4>%s</h4>", esc_html__('License Manager', 'licenser'));
 
         if ( !empty( $get_licenses ) ) : ?>
         <table class="woocommerce-orders-table woocommerce-MyAccount-orders shop_table shop_table_responsive my_account_orders account-orders-table">
