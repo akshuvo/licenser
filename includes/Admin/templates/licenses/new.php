@@ -22,7 +22,7 @@ $products = $product_model->get_all([
     'columns' => 'id, name, product_type',
 ]);
 
-// echo "<pre>"; print_r($license); echo "</pre>";
+// echo "<pre>"; print_r($products); echo "</pre>";
 
 // Get Domains 
 $get_domains = $license_model->get_domains([
@@ -88,7 +88,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         <select name="product_id" class="products_list" id="product_list" >
                             <option value="" class="blank"><?php esc_html_e( 'Select Product', 'licenser' ); ?></option>
                             <?php foreach ( $products as $product ): ?>   
-                                <option data-product_type="<?php echo esc_attr( $product->product_type ); ?>" value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>" <?php selected( $license->product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
+                                <option data-product_type="<?php echo esc_attr( $product->product_type ); ?>" value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt' ); ?>" <?php selected( $license->product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -112,11 +112,10 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                             </label>
                         </div>
                         <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $license->end_date ); ?>">
-                    
                     </div>
 
                     <div class="lmfwppt-form-field">
-                        <label for="end_date"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
+                        <label for="domain_limit"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
                         <input type="number" name="domain_limit" id="domain_limit" class="regular-text product_name_input" placeholder="Enter Domain Limit" value="<?php echo esc_attr( $license->domain_limit ); ?>">
                         <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
                     </div>
@@ -156,7 +155,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                                             <a class="lwp-action-item lwp-tooltip" target="_blank" href="<?php echo esc_url( $url ); ?>" data-title="<?php esc_html_e( 'Visit Domain', 'licenser' ); ?>">
                                                 <span class="dashicons dashicons-external"></span>
                                             </a>
-                                            <a href="javascript:void(0);" class="lwp-action-item lwp-tooltip" data-title="<?php esc_html_e( 'Delete Domain', 'licenser' ); ?>" data-id="<?php echo esc_attr( $domain_id ); ?>" data-action="delete_domain" data-nonce="<?php echo esc_attr( wp_create_nonce( 'delete_domain' ) ); ?>">
+                                            <a href="javascript:void(0);" class="lwp-action-item lwp-tooltip lwp-delete-domain" data-title="<?php esc_html_e( 'Delete Domain', 'licenser' ); ?>" data-id="<?php echo esc_attr( $domain_id ); ?>">
                                                 <span class="dashicons dashicons-trash"></span>
                                             </a>
                                         </div>
@@ -238,13 +237,13 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                 $this.find('.spinner').removeClass('is-active');
                 $this.find('[type="submit"]').prop('disabled', false);
             },
-            success: function(data) {
+            success: function(res) {
                 // Success Message and Redirection
                 if (jQuery('.lmfwppt_edit_id').val()) {
                     jQuery(document).trigger("lmfwppt_notice", ['License updated successfully.', 'success']);
                 } else {
                     jQuery(document).trigger("lmfwppt_notice", ['License added successfully. Redirecting...', 'success']);
-                    // window.location = '/wp-admin/admin.php?page=licenser-'+productType+'s&action=edit&id='+data+'&message=1';
+                    window.location = '/wp-admin/admin.php?page=licenser-licenses&action=edit&id='+res.id+'&message=1';
                 }
             },
             error: function(data) {
@@ -299,6 +298,37 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
            
     });
 
+    // Delete Domain
+    jQuery(document).on('click', '.lwp-delete-domain', function(e) {
+        e.preventDefault();
+        let $this = jQuery(this);
+        let domainId = $this.data('id');
+       
+        // Confirm
+        if ( !confirm('Are you sure you want to delete this domain?') ) {
+            return;
+        }
+
+        jQuery.ajax({
+            type: 'delete',
+            url: Licenser.rest_url + 'licenses/domains/' + domainId,
+            beforeSend: function(xhr) {
+                // Nonce
+                xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
+                $this.closest('.postbox').remove();
+            },
+            complete: function(data) {
+                
+            },
+            success: function(data) {
+                jQuery(document).trigger("lmfwppt_notice", ['Domain deleted successfully.', 'success']);
+            },
+            error: function(data) {
+                jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
+            },
+        });
+    });
+
     // Add package
     jQuery(document).on('change', '.products_list', function(e, is_edit){
 
@@ -349,6 +379,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                 jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
             },
         });
+
 
         // if ( !is_edit ) {
         //     jQuery('#lmfwppt_package_list').val('');

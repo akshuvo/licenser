@@ -44,7 +44,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
                         <label for="name"><?php esc_html_e( 'Product Name', 'licenser' ); ?></label>
                         <input type="text" name="name" id="name" class="regular-text product_name_input" placeholder="Your Theme or Plugin Name" value="<?php echo esc_attr( $product->name ); ?>" required>
                     </div>
-
+                
                     <div class="lmfwppt-form-field">
                         <label for="id"><?php esc_html_e( 'Product ID', 'licenser' ); ?></label>
                         <input type="text" id="id" class="regular-text "  value="<?php echo esc_attr( $product->uuid ); ?>" readonly>
