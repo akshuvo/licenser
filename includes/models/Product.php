@@ -51,7 +51,7 @@ class Product {
             'columns' => [],
             'get_by' => '',
         ] );
-        global $lwpdb;
+        global $wpdb;
         $columns = !empty( $args['columns'] ) && is_array( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
 
         // Where
@@ -59,12 +59,12 @@ class Product {
 
         // Get By
         if( $args['get_by'] == 'uuid' ){
-            $where .= $lwpdb->wpdb->prepare( " AND uuid = %s", $id );
+            $where .= $wpdb->prepare( " AND uuid = %s", $id );
         } else {
-            $where .= $lwpdb->wpdb->prepare( " AND id = %d", $id );
+            $where .= $wpdb->prepare( " AND id = %d", $id );
         }
 
-        $product = $lwpdb->wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->products} WHERE {$where} LIMIT 1" );
+        $product = $wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->products} WHERE {$where} LIMIT 1" );
 
         // Return if no product found
         if( empty( $product ) ){
@@ -104,7 +104,7 @@ class Product {
      * @var int
      */
     public function get_all( $args = [] ) {
-        global $lwpdb;
+        global $wpdb;
 
         $defaults = [
             'number' => 20,
@@ -126,23 +126,23 @@ class Product {
         $where = ' 1=1 ';
 
         if( !empty( $args['name'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND name = %s", $args['name'] );
+            $where .= $wpdb->prepare( " AND name = %s", $args['name'] );
         }
 
         if( !empty( $args['slug'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND slug = %s", $args['slug'] );
+            $where .= $wpdb->prepare( " AND slug = %s", $args['slug'] );
         }
 
         if( !empty( $args['uuid'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND uuid = %s", $args['uuid'] );
+            $where .= $wpdb->prepare( " AND uuid = %s", $args['uuid'] );
         }
 
         if( !empty( $args['product_type'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND product_type = %s", $args['product_type'] );
+            $where .= $wpdb->prepare( " AND product_type = %s", $args['product_type'] );
         }
 
         if( !empty( $args['status'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND status = %s", $args['status'] );
+            $where .= $wpdb->prepare( " AND status = %s", $args['status'] );
         }
 
         // Order
@@ -150,7 +150,7 @@ class Product {
 
         $limit = '';
         if( $args['number'] != -1 ){
-            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
         // Columns
@@ -158,7 +158,7 @@ class Product {
 
         $query = "SELECT {$columns} FROM {$lwpdb->products} WHERE {$where} {$limit}";
 
-        $items = $lwpdb->wpdb->get_results( $query );
+        $items = $wpdb->get_results( $query );
 
         // Return if no product found
         if( empty( $items ) ){
@@ -214,11 +214,11 @@ class Product {
             $data['banners'] = json_encode( $data['banners'] );
         }        
 
-        global $lwpdb;
+        global $wpdb;
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $lwpdb->wpdb->update(
+            $wpdb->update(
                 $lwpdb->products,
                 [
                     'name' => sanitize_text_field( $data['name'] ),
@@ -243,7 +243,7 @@ class Product {
 
             $insert_id = $data['id'];
         } else {
-            $lwpdb->wpdb->insert(
+            $wpdb->insert(
                 $lwpdb->products,
                 [
                     'name' => sanitize_text_field( $data['name'] ),
@@ -264,7 +264,7 @@ class Product {
                 ] 
             );
 
-            $insert_id = $lwpdb->wpdb->insert_id;
+            $insert_id = $wpdb->insert_id;
         }
 
         // Product Release
@@ -303,9 +303,9 @@ class Product {
      * @return bool
      */
     public function delete( $id ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $lwpdb->wpdb->delete(
+        $wpdb->delete(
             $lwpdb->products,
             [
                 'id' => $id
@@ -327,9 +327,9 @@ class Product {
             return false;
         }
 
-        global $lwpdb;
+        global $wpdb;
 
-        $lwpdb->wpdb->update(
+        $wpdb->update(
             $lwpdb->products,
             [
                 'status' => $status

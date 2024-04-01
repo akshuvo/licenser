@@ -18,10 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 require_once( dirname( __FILE__ ) . '/vendor/autoload.php' );
 
 // Access the global $lwpdb instance
-global $lwpdb;
+// global $wpdb;
 
 // Create an instance of the lwpdb class
-$lwpdb = Licenser\Controllers\DB::instance();
+// $lwpdb = Licenser\Controllers\DB::instance();
 
 /**
  * The main plugin class

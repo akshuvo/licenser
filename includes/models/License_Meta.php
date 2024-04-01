@@ -21,13 +21,13 @@ class License_Meta {
      * @return array
      */
     public function get_value( $license_id, $meta_key = '' ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $where = $lwpdb->wpdb->prepare( " WHERE license_id = %d", $license_id );
+        $where = $wpdb->prepare( " WHERE license_id = %d", $license_id );
 
-        $where .= $lwpdb->wpdb->prepare( " AND meta_key = %s", $meta_key );
+        $where .= $wpdb->prepare( " AND meta_key = %s", $meta_key );
        
-        return $lwpdb->wpdb->get_var( "SELECT meta_value FROM {$lwpdb->license_meta} {$where}" );
+        return $wpdb->get_var( "SELECT meta_value FROM {$lwpdb->license_meta} {$where}" );
     }
 
     /**
@@ -38,15 +38,15 @@ class License_Meta {
      * @return int
      */
     public function update( $license_id, $meta_key, $meta_value ) {
-        global $lwpdb;
+        global $wpdb;
 
         // Check if exists
-        $exists = $lwpdb->wpdb->get_var( $lwpdb->wpdb->prepare( "SELECT COUNT(*) FROM {$lwpdb->license_meta} WHERE license_id = %d AND meta_key = %s", $license_id, $meta_key ) );
+        $exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$lwpdb->license_meta} WHERE license_id = %d AND meta_key = %s", $license_id, $meta_key ) );
 
         if( $exists ){
-            return $lwpdb->wpdb->update( $lwpdb->license_meta, [ 'meta_value' => $meta_value ], [ 'license_id' => $license_id, 'meta_key' => $meta_key ] );
+            return $wpdb->update( $lwpdb->license_meta, [ 'meta_value' => $meta_value ], [ 'license_id' => $license_id, 'meta_key' => $meta_key ] );
         } else {
-            return $lwpdb->wpdb->insert( $lwpdb->license_meta, [ 'license_id' => $license_id, 'meta_key' => $meta_key, 'meta_value' => $meta_value ] );
+            return $wpdb->insert( $lwpdb->license_meta, [ 'license_id' => $license_id, 'meta_key' => $meta_key, 'meta_value' => $meta_value ] );
         }
     }
 
@@ -58,9 +58,9 @@ class License_Meta {
      * @return int
      */
     public function delete( $license_id, $meta_key ) {
-        global $lwpdb;
+        global $wpdb;
 
-        return $lwpdb->wpdb->delete( $lwpdb->license_meta, [ 'license_id' => $license_id, 'meta_key' => $meta_key ] );
+        return $wpdb->delete( $lwpdb->license_meta, [ 'license_id' => $license_id, 'meta_key' => $meta_key ] );
     }
 
     /**
@@ -70,9 +70,9 @@ class License_Meta {
      * @return int
      */
     public function delete_all( $license_id ) {
-        global $lwpdb;
+        global $wpdb;
 
-        return $lwpdb->wpdb->delete( $lwpdb->license_meta, [ 'license_id' => $license_id ] );
+        return $wpdb->delete( $lwpdb->license_meta, [ 'license_id' => $license_id ] );
     }
 
 }

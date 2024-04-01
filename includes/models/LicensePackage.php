@@ -13,10 +13,10 @@ class LicensePackage {
      * @var int
      */
     public function get( $id ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $package = $lwpdb->wpdb->get_row(
-            $lwpdb->wpdb->prepare(
+        $package = $wpdb->get_row(
+            $wpdb->prepare(
                 "SELECT * FROM {$lwpdb->license_packages} WHERE id = %d",
                 $id
             )
@@ -36,7 +36,7 @@ class LicensePackage {
      * @var int
      */
     public function get_all( $args = [] ) {
-        global $lwpdb;
+        global $wpdb;
 
         $defaults = [
             'number' => 20,
@@ -52,11 +52,11 @@ class LicensePackage {
         $where = ' 1=1 ';
 
         if( !empty( $args['product_id'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $args['product_id'] );
+            $where .= $wpdb->prepare( " AND product_id = %d", $args['product_id'] );
         }
 
         if( !empty( $args['package_id'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND package_id = %s", $args['package_id'] );
+            $where .= $wpdb->prepare( " AND package_id = %s", $args['package_id'] );
         }
 
         // Order
@@ -64,12 +64,12 @@ class LicensePackage {
 
         $limit = '';
         if( $args['number'] != -1 ){
-            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
         $query = "SELECT * FROM {$lwpdb->license_packages} WHERE {$where} {$limit}";
 
-        $packages = $lwpdb->wpdb->get_results( $query );
+        $packages = $wpdb->get_results( $query );
 
         // Return if no package found
         if( empty( $packages ) ){
@@ -95,11 +95,11 @@ class LicensePackage {
             'domain_limit' => '',
         ] );
 
-        global $lwpdb;
+        global $wpdb;
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $lwpdb->wpdb->update(
+            $wpdb->update(
                 $lwpdb->license_packages,
                 [
                     'product_id' => intval( $data['product_id'] ),
@@ -115,7 +115,7 @@ class LicensePackage {
 
             $insert_id = $data['id'];
         } else {
-            $lwpdb->wpdb->insert(
+            $wpdb->insert(
                 $lwpdb->license_packages,
                 [
                     'product_id' => intval( $data['product_id'] ),
@@ -126,7 +126,7 @@ class LicensePackage {
                 ] 
             );
 
-            $insert_id = $lwpdb->wpdb->insert_id;
+            $insert_id = $wpdb->insert_id;
         }
 
 
@@ -140,9 +140,9 @@ class LicensePackage {
      * @return int
      */
     public function delete( $id ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $lwpdb->wpdb->delete(
+        $wpdb->delete(
             $lwpdb->license_packages,
             [
                 'id' => $id

@@ -18,7 +18,7 @@ class ProductRelease {
             'version' => '',
         ] );
 
-        global $lwpdb;
+        global $wpdb;
         $columns = !empty( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
 
         // Where
@@ -26,30 +26,30 @@ class ProductRelease {
 
         // Get By
         if( $args['get_by'] == 'product_id' ){
-            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $id );
+            $where .= $wpdb->prepare( " AND product_id = %d", $id );
         } else {
-            $where .= $lwpdb->wpdb->prepare( " AND id = %d", $id );
+            $where .= $wpdb->prepare( " AND id = %d", $id );
         }
 
         // Version
         if( !empty( $args['version'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND version = %s", $args['version'] );
+            $where .= $wpdb->prepare( " AND version = %s", $args['version'] );
         }
 
         // Order
         $where .= " ORDER BY id DESC, release_date DESC";
 
-        return $lwpdb->wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->product_releases} WHERE {$where} LIMIT 1" );
+        return $wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->product_releases} WHERE {$where} LIMIT 1" );
     }
 
     /**
      * Get Stable Release
      */
     public function get_stable( $product_id ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $release = $lwpdb->wpdb->get_row(
-            $lwpdb->wpdb->prepare(
+        $release = $wpdb->get_row(
+            $wpdb->prepare(
                 "SELECT * FROM {$lwpdb->product_releases} WHERE product_id = %d ORDER BY id DESC, release_date DESC LIMIT 1",
                 $product_id
             )
@@ -64,7 +64,7 @@ class ProductRelease {
      * @var int
      */
     public function get_all( $args = [] ) {
-        global $lwpdb;
+        global $wpdb;
 
         $defaults = [
             'number' => 20,
@@ -80,7 +80,7 @@ class ProductRelease {
         $where = ' 1=1 ';
 
         if( !empty( $args['product_id'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $args['product_id'] );
+            $where .= $wpdb->prepare( " AND product_id = %d", $args['product_id'] );
         }
 
         // Order
@@ -88,12 +88,12 @@ class ProductRelease {
 
         $limit = '';
         if( !empty( $args['number'] ) ){
-            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
         $query = "SELECT * FROM {$lwpdb->product_releases} WHERE {$where} {$limit}";
 
-        $items = $lwpdb->wpdb->get_results( $query );
+        $items = $wpdb->get_results( $query );
 
         return $items;
     }
@@ -115,11 +115,11 @@ class ProductRelease {
             'release_date' => '',
         ] );
 
-        global $lwpdb;
+        global $wpdb;
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $lwpdb->wpdb->update(
+            $wpdb->update(
                 $lwpdb->product_releases,
                 [
                     'product_id' => intval( $data['product_id'] ),
@@ -136,7 +136,7 @@ class ProductRelease {
 
             $insert_id = $data['id'];
         } else {
-            $lwpdb->wpdb->insert(
+            $wpdb->insert(
                 $lwpdb->product_releases,
                 [
                     'product_id' => intval( $data['product_id'] ),
@@ -148,7 +148,7 @@ class ProductRelease {
                 ] 
             );
 
-            $insert_id = $lwpdb->wpdb->insert_id;
+            $insert_id = $wpdb->insert_id;
         }
 
 
