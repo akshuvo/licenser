@@ -50,7 +50,7 @@ class Product {
 
         // Add version to meta
         if( !empty( $domain_id ) ){
-            $add_meta = License_Meta::instance()->update( $license->id, 'installed_version_' . $domain_id, $product->version );
+            $add_meta = License_Meta::instance()->uplicenser_date( $license->id, 'installed_version_' . $domain_id, $product->version );
         }
 
         // Download link

@@ -7,7 +7,12 @@ $product_type = $page == 'licenser-themes' ? 'theme' : 'plugin';
 
 ?>
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php esc_html_e( sprintf( 'License Manager: %ss', $product_type ), 'licenser' ); ?></h1>
+    <h1 class="wp-heading-inline">
+        <?php 
+            /* translators: %s: Product Type */
+            echo esc_html( sprintf( __('License Manager: %ss', 'licenser' ), $product_type )  ); 
+        ?>
+    </h1>
 
     <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-'.$product_type.'s&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New Product', 'licenser' ); ?></a>
 

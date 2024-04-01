@@ -222,7 +222,7 @@ class Public_Apis extends RestController {
         }
 
         // TODO: Show all changelog
-        $changelog = '<h4>' . $product->stable_release->version . ' - ' . date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) . '</h4>' . $product->stable_release->changelog;
+        $changelog = '<h4>' . $product->stable_release->version . ' - ' . licenser_date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) . '</h4>' . $product->stable_release->changelog;
 
         $response = [
             'id' => $product->uuid,

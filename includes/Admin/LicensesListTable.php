@@ -87,14 +87,14 @@ class LicensesListTable extends \WP_List_Table{
 	}
 
 	protected function column_dated($item){
-		return date('j F Y',strtotime($item->dated));
+		return licenser_date('j F Y',strtotime($item->dated));
 	}
 
-	protected function column_end_date($item){
+	protected function column_end_licenser_date($item){
 		if( $item->is_lifetime == "1" ){
 			return __( 'Lifetime', 'licenser' );
 		}
-		return date('j F Y',strtotime($item->end_date));
+		return licenser_date('j F Y',strtotime($item->end_date));
 	}
 
 	public function column_license_details( $item ){	

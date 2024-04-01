@@ -127,7 +127,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
                                             
                                             <span class="release-version"><?php esc_html_e( 'Version:', 'licenser' ); ?> <span><?php echo esc_html( $product->stable_release->version ); ?></span></span>
                                             
-                                            <span class="release-date"><?php esc_html_e( 'Released on:', 'licenser' ); ?> <span><?php echo esc_html( date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) ); ?></span></span>
+                                            <span class="release-date"><?php esc_html_e( 'Released on:', 'licenser' ); ?> <span><?php echo esc_html( licenser_date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) ); ?></span></span>
 
                                         </span>
                                         <span class="dashicons indicator_field last-icon"></span>
@@ -212,7 +212,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
             <div class="lmfwppt-buttons lmwppt-inner-card card-shameless">
                 
                 <?php if( isset( $product_id ) ) : ?>
-                    <input class="lmfwppt_edit_id" type="hidden" name="id" value="<?php esc_attr_e( $product_id ); ?>">
+                    <input class="lmfwppt_edit_id" type="hidden" name="id" value="<?php echo esc_attr( $product_id ); ?>">
                 <?php endif; ?>
                 
                 <div class="submit_btn_area"> 

@@ -81,7 +81,7 @@ class ProductsListTable extends \WP_List_Table{
 	}
 
 	protected function column_dated($item){
-		return date('j F Y',strtotime($item->dated));
+		return licenser_date('j F Y',strtotime($item->dated));
 	}
 
 	public function prepare_items( $product_type = null ){

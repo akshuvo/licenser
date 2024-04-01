@@ -241,7 +241,7 @@ class Order_Handler{
                 $domain_limit = isset( $get_package->domain_limit ) ? intval( $get_package->domain_limit ) : 0;
     
                 // Calculate End Date
-                $end_date = date( "Y-m-d H:i:s", strtotime( "+{$update_period} day", current_time('timestamp') ) );
+                $end_date = licenser_date( "Y-m-d H:i:s", strtotime( "+{$update_period} day", current_time('timestamp') ) );
 
                 // Generate License Key
                 $license_key = \Licenser\Models\License::instance()->generate_key();

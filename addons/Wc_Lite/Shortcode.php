@@ -72,7 +72,7 @@ class Shortcode{
                         if ( $expire_date ) {
                             $expired_label = strtotime($expire_date) < time() ? sprintf('<span class="expired-label">(%s)</span>', __('Expired. Want to renew?', 'licenser')) : '';
                         }
-                        $expire_date = date('j F Y',strtotime($expire_date));
+                        $expire_date = licenser_date('j F Y',strtotime($expire_date));
                     }
 
                     // If no package id
@@ -143,7 +143,7 @@ class Shortcode{
                                             $key = isset( $domain->id ) ? sanitize_text_field( $domain->id ) : '';
                                             $url = isset( $domain->domain ) ? sanitize_text_field( $domain->domain ) : '';
                                             $status = isset( $domain->status ) && $domain->status == 1 ? __('Active', 'licenser') : __('Inactive', 'licenser');
-                                            // $dated = isset( $domain->dated ) ? gmdate('Y-m-d H:i:s', $domain->dated) : '';
+                                            // $dated = isset( $domain->dated ) ? licenser_date('Y-m-d H:i:s', $domain->dated) : '';
                                             ?>
                                             <tr>
                                                 <td>

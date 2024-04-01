@@ -218,7 +218,7 @@ class Product {
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $wpdb->update(
+            $wpdb->uplicenser_date(
                 $wpdb->licenser_products,
                 [
                     'name' => sanitize_text_field( $data['name'] ),
@@ -329,7 +329,7 @@ class Product {
 
         global $wpdb;
 
-        $wpdb->update(
+        $wpdb->uplicenser_date(
             $wpdb->licenser_products,
             [
                 'status' => $status

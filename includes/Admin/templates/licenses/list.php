@@ -1,7 +1,7 @@
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php esc_html_e( 'License Manager: Licenses', 'lmfwppt' ); ?></h1>
+    <h1 class="wp-heading-inline"><?php esc_html_e( 'License Manager: Licenses', 'licenser' ); ?></h1>
 
-    <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'lmfwppt' ); ?></a>
+    <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'licenser' ); ?></a>
 
     <form action="" method="post">
         <?php 

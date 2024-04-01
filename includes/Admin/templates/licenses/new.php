@@ -145,7 +145,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                                 $url = isset( $domain->domain ) ? sanitize_text_field( $domain->domain ) : '';
                                 $status = isset( $domain->status ) && $domain->status == 1 ? __('Active', 'licenser') : __('Inactive', 'licenser');
                                 $status_tag_class = isset( $domain->status ) && $domain->status == 1 ? 'lwp-tag-success' : '';
-                                // $dated = isset( $domain->dated ) ? gmdate('Y-m-d H:i:s', $domain->dated) : '';
+                                // $dated = isset( $domain->dated ) ? licenser_date('Y-m-d H:i:s', $domain->dated) : '';
                                 ?>
                                 <div class="postbox">
                                     <h4>

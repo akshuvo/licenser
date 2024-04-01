@@ -99,7 +99,7 @@ class LicensePackage {
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $wpdb->update(
+            $wpdb->uplicenser_date(
                 $wpdb->licenser_license_packages,
                 [
                     'product_id' => intval( $data['product_id'] ),

@@ -178,14 +178,14 @@ class License {
             'end_date' => '',
             'is_lifetime' => 0,
             'domain_limit' => '',
-            'dated' => date('Y-m-d H:i:s'),
+            'dated' => licenser_date('Y-m-d H:i:s'),
         ] );
 
         global $wpdb;
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $wpdb->update(
+            $wpdb->uplicenser_date(
                 $wpdb->licenser_licenses,
                 [
                     'status' => intval( $data['status'] ),
@@ -194,7 +194,7 @@ class License {
                     'package_id' => sanitize_text_field( $data['package_id'] ),
                     'source' => sanitize_text_field( $data['source'] ),
                     'source_id' => intval( $data['source_id'] ),
-                    'end_date' => date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
+                    'end_date' => licenser_date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
                     'is_lifetime' => intval( $data['is_lifetime'] ),
                     'domain_limit' => intval( $data['domain_limit'] )
                 ],
@@ -221,7 +221,7 @@ class License {
                     'package_id' => sanitize_text_field( $data['package_id'] ),
                     'source' => sanitize_text_field( $data['source'] ),
                     'source_id' => intval( $data['source_id'] ),
-                    'end_date' => date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
+                    'end_date' => licenser_date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
                     'is_lifetime' => intval( $data['is_lifetime'] ),
                     'domain_limit' => intval( $data['domain_limit'] ),
                     'dated' => sanitize_text_field( $data['dated'] ),
@@ -399,14 +399,14 @@ class License {
             'license_id' => '',
             'domain' => '',
             'status' => '',
-            'dated' => date('Y-m-d H:i:s'),
+            'dated' => licenser_date('Y-m-d H:i:s'),
         ] );
 
         global $wpdb;
 
         // Update
         if( !empty( $args['id'] ) ){
-            $wpdb->update(
+            $wpdb->uplicenser_date(
                 $wpdb->licenser_license_domains,
                 [
                     'license_id' => intval( $args['license_id'] ),
