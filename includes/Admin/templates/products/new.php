@@ -29,9 +29,9 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
         <div class="lmwppt-inner-card card-shameless">
             <?php if( isset( $_GET['id'] ) ) : ?>
-                <h1><?php _e( 'Edit Product', 'licenser' ); ?></h1>
+                <h1><?php esc_html_e( 'Edit Product', 'licenser' ); ?></h1>
             <?php else : ?>
-                <h1><?php _e( 'Add New Product', 'licenser' ); ?></h1>
+                <h1><?php esc_html_e( 'Add New Product', 'licenser' ); ?></h1>
             <?php endif; ?>
         </div>
 

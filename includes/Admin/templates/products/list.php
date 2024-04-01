@@ -6,14 +6,8 @@ $page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : null;
 $product_type = $page == 'licenser-themes' ? 'theme' : 'plugin';
 
 ?>
-<?php if( isset( $_GET['deleted'] ) ) :   ?>
-<div class="notice notice-alt is-dismissible notice-success">
-    <p><?php echo sprintf(__("%s Deleted.", "lmfwppt"), ucfirst($product_type)) ?></p>
-</div>
-<?php endif; ?>
-
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php esc_html_e( 'License Manager: '.$product_type.'s', 'licenser' ); ?></h1>
+    <h1 class="wp-heading-inline"><?php esc_html_e( sprintf( 'License Manager: %ss', $product_type ), 'licenser' ); ?></h1>
 
     <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-'.$product_type.'s&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New Product', 'licenser' ); ?></a>
 

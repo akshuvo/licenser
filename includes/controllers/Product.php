@@ -26,7 +26,7 @@ class Product {
         if( !empty( $args['license_key'] ) ){
             $license = License_Controller::instance()->check( $args['license_key'] );
             if( is_wp_error( $license ) ){
-                wp_die( $license->get_error_message() );
+                wp_die( esc_html( $license->get_error_message() ) );
             }
         }
 
@@ -39,7 +39,7 @@ class Product {
 
         // Return if no product found
         if( empty( $product ) ){
-            wp_die( __( 'No product found.', 'licenser' ) );
+            wp_die( esc_html__( 'No product found.', 'licenser' ) );
         }
 
         // TODO: Check if the license can download the latest version
@@ -91,6 +91,6 @@ class Product {
             exit;
         }
 
-        wp_die( __( 'No file found.', 'licenser' ) );
+        wp_die( esc_html__( 'No file found.', 'licenser' ) );
     }
 }

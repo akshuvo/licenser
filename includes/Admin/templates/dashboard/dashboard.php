@@ -2,17 +2,17 @@
 
 ?>
 <div class="wrap">
-   <h1 class="wp-heading-inline"><?php _e( 'Overview', 'lmfwppt' ); ?></h1>
+   <h1 class="wp-heading-inline"><?php esc_html_e( 'Overview', 'licenser' ); ?></h1>
 </div>
  
 
 <div class="lmwppt-main-section">
-   <a href="<?php echo admin_url( 'admin.php?page=licenser-plugins' ); ?>">
+   <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-plugins' ) ); ?>">
    <div class="lmwppt-inner">
       <div class="lmwppt-content">
 
          <div class="lmwppt-title">
-            <h3 class="wp-heading-inline"><?php _e( 'Total Plugin', 'lmfwppt' ); ?></h3>
+            <h3 class="wp-heading-inline"><?php esc_html_e( 'Total Plugin', 'licenser' ); ?></h3>
          </div>
          <div class="lmwppt-icon">
            <span class="dashicons dashicons-admin-plugins lmwppt-icon-2"></span>
@@ -24,12 +24,12 @@
       </div>
    </div>
    </a>
-   <a href="<?php echo admin_url( 'admin.php?page=licenser-themes' ); ?>">
+   <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-themes' ) ); ?>">
    <div class="lmwppt-inner">
       <div class="lmwppt-content">
 
          <div class="lmwppt-title">
-            <h3 class="wp-heading-inline"><?php _e( 'Total Theme', 'lmfwppt' ); ?></h3>
+            <h3 class="wp-heading-inline"><?php esc_html_e( 'Total Theme', 'licenser' ); ?></h3>
          </div>
          <div class="lmwppt-icon">
             <span class="dashicons dashicons-admin-appearance lmwppt-icon-3"></span>
@@ -41,11 +41,11 @@
       </div>
    </div>
    </a>
-   <a href="<?php echo admin_url( 'admin.php?page=licenser-licenses' ); ?>">
+   <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses' ) ); ?>">
    <div class="lmwppt-inner">
       <div class="lmwppt-content">
          <div class="lmwppt-title">
-            <h3 class="wp-heading-inline"><?php _e( 'Total License', 'lmfwppt' ); ?></h3>
+            <h3 class="wp-heading-inline"><?php esc_html_e( 'Total License', 'licenser' ); ?></h3>
          </div>
          <div class="lmwppt-icon">
             <span class="dashicons dashicons-tickets-alt lmwppt-icon-1"></span>
