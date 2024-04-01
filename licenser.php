@@ -1,9 +1,8 @@
 <?php
 /**
- * Plugin Name: Licenser - License Manager for WordPress
+ * Plugin Name: Licenser - Self-Hosted License Manager
  * Plugin URI: https://github.com/akshuvo/licenser
- * Github Plugin URI: https://github.com/akshuvo/licenser
- * Description: Self-Hosted license manager for WordPress
+ * Description: A self-hosted license manager for your digital products.
  * Author: AddonMaster
  * Author URI: https://addonmaster.com
  * Version: 1.0.8
