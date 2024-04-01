@@ -133,6 +133,7 @@ class Order_Handler{
         // Product Name
         if ( isset( $cart_item['licenser_product_name'] ) && $cart_item['licenser_product_name'] ) {
             $item_data[] = array(
+                /* translators: %s: Product Type */
                 'key'     => sprintf( __( '%s Name', 'licenser' ), $type_label ),
                 'value'   => $cart_item['licenser_product_name'],
                 'display' => '',
