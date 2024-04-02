@@ -134,13 +134,13 @@ class License {
         // Order
         $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
-        $limit = '';
+        // Limit
         if( $args['number'] != -1 ){
-            $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $where .= $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
         $licenses = $wpdb->get_results(
-            "SELECT * FROM {$wpdb->licenser_licenses} WHERE {$where} {$limit}"
+            "SELECT * FROM {$wpdb->licenser_licenses} WHERE {$where}"
         );
 
         // Return if no license found

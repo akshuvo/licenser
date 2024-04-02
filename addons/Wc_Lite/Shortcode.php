@@ -19,12 +19,13 @@ class Shortcode{
             'status' => ['wc-processing', 'wc-completed'],
             'is_license_order' => 'yes'
         );
-        $orders = wc_get_orders( $args );
+        $order_ids = wc_get_orders( $args );
 
         // Licenser Unique User ID
         // $licenser_user_id = get_user_meta( $user_id, 'licenser_user_id', true );
 
-        $get_licenses = \Licenser\Models\License::instance()->get_all( [
+        // Get Licenses if orders found
+        $get_licenses = $order_ids ? \Licenser\Models\License::instance()->get_all( [
             'number' => -1,
             'offset' => 0,
             'orderby' => 'id',
@@ -32,10 +33,8 @@ class Shortcode{
             'count_total' => true,
             // 'user_uuid' => $licenser_user_id,
             'source' => 'wc',
-            'source_id' => (array) $orders,
-        ] );
-
-        $get_licenses = false;
+            'source_id' => (array) $order_ids,
+        ] ) : [];
 
         echo sprintf("<h4>%s</h4>", esc_html__('License Manager', 'licenser'));
 
