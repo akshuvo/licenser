@@ -35,6 +35,8 @@ class Shortcode{
             'source_id' => (array) $orders,
         ] );
 
+        $get_licenses = false;
+
         echo sprintf("<h4>%s</h4>", esc_html__('License Manager', 'licenser'));
 
         if ( !empty( $get_licenses ) ) : ?>
