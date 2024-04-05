@@ -9,8 +9,11 @@ $products = $product_model->get_all([
    'status' => 'active',
    'number' => -1,
    'inc_packages' => false,
-   'columns' => 'id, name, product_type',
+   'columns' => ' name, product_type, uuid',
 ]);
+echo '<pre>';
+print_r($products);
+echo '</pre>';
 ?>
 <div class="wrap">
       <div class="lmwppt-wrap">
@@ -25,9 +28,9 @@ $products = $product_model->get_all([
                      <label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
                      <select name="product_type" class="product_type" id="product_type" required>
                         <option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
-                           <?php foreach( $product_model->get_types() as $key => $value ) : ?>
-                              <option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $value ); ?></option>
-                           <?php endforeach; ?>
+                        <?php foreach( $product_model->get_types() as $key => $value ) : ?>
+                           <option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $value ); ?></option>
+                        <?php endforeach; ?>
                      </select>
                   </div>
 
@@ -36,7 +39,7 @@ $products = $product_model->get_all([
                      <select id="select_product" name="select_product" class="select_product products_list" required>
                         <option value="" class="blank">Select Product</option>
                         <?php foreach ( $products as $product ): ?>   
-                           <option value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>"><?php echo esc_html( $product->name ); ?></option>
+                           <option value="<?php echo esc_attr( $product->uuid ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt--' ); ?>"><?php echo esc_html( $product->name ); ?></option>
                         <?php endforeach; ?>
                      </select>
                   </div>
@@ -50,7 +53,7 @@ $products = $product_model->get_all([
                      </select>
                   </div>
 
-                  <div class="lmfwppt-form-field parent-slug-menu hidden hide-on-section-type">
+                  <div class="lmfwppt-form-field parent-slug-menu  hide-on-section-type">
                      <label for="lmfwppt_parent_menu_slug"><?php esc_html_e( 'Parent Menu Slug', 'licenser' ); ?></label>
                      <input type="text" list="parent_slug_list" name="parent_slug" id="lmfwppt_parent_menu_slug" class="regular-text" placeholder="<?php esc_attr_e( 'Parent Menu Slug', 'licenser' ); ?>">
                      <datalist id="parent_slug_list">
@@ -77,18 +80,134 @@ $products = $product_model->get_all([
                      <input type="text" name="menu_title" id="lmfwppt_menu_title" class="regular-text lmfwppt_menu_title" placeholder="<?php esc_attr_e( 'Menu Title', 'licenser' ); ?>">
                   </div>
 
+                  <div class="lmfwppt-form-field d-flex">
+                     <label class="me-1">
+                        <input type="checkbox" name="inc-licensing" id="inc-licensing" checked>
+                        <?php esc_html_e( 'Include Licensing', 'licenser' ); ?>
+                     </label>
+                     <label class="me-1">
+                        <input type="checkbox" name="inc-updater" id="inc-updater" checked>
+                        <?php esc_html_e( 'Include Updater', 'licenser' ); ?>
+                     </label>
+                     <label>
+                        <input type="checkbox" name="inc-insights" id="inc-insights">
+                        <?php esc_html_e( 'Include Insights', 'licenser' ); ?>
+                     </label>
+                  </div>
+
                </div>
             </div>
             <div class="lmwppt-inner-card lmfwppt-buttons card-shameless">
                
                <div class="submit_btn_area"> 
       
-                  <?php submit_button( __( 'Generate', 'licenser' ), 'primary' ); ?> 
+                  <button type="button" class="button button-primary" id="submit"><?php esc_html_e( 'Generate SDK', 'licenser' ); ?></button>
                   <span class="spinner"></span>
                </div>
                <div class="lmfwppt-notices"></div>  
+
+               
             </div>
-            <div class="sdk_generator_response"></div>
+
+            <div class="lmwppt-inner-card ">
+               <div class="lmfwppt-form-section">
+                  <h2><?php esc_html_e( 'How to use', 'licenser' ); ?></h2>
+                  <h3><?php esc_html_e( 'Step 1: Clone the Licenser client library', 'licenser' ); ?></h3>
+                  <p><?php esc_html_e( 'Navigate to your project using shell. And clone the Licenser client repository inside your project', 'licenser' ); ?></p>
+                  <p>
+                  <pre class="licenser-code-text">
+                     cd your-plugin-or-theme
+                     git clone https://github.com/LicenserWP/client.git licenser
+                  </pre>
+                  </p>
+                  
+                  <p><?php printf( __( 'Or download the client library from %s and include it in your plugin or theme\'s root directory. The client library folder name should be `licenser` and the structure should be like the following:', 'licenser' ), '<a href="' . esc_url( 'https://github.com/LicenserWP/client' ) . '" target="_blank">' . esc_html( 'https://github.com/LicenserWP/client' ) . '</a>' ); ?></p>
+
+                  <p>
+                     <pre class="licenser-code-text">
+                     ├── your-plugin-or-theme
+                     │   ├── licenser
+                     │   │   ├── src
+                     │   │   │   ├── Client.php
+                     │   │   │   ├── Insights.php
+                     │   │   │   ├── License.php
+                     │   │   │   ├── Updater.php
+                     │   │   │
+                     </pre>
+                  </p>
+
+                  <h3><?php esc_html_e( 'Step 2: Add the following code in your plugin or theme file', 'licenser' ); ?></h3>
+                  <div class="client_generator_response"></div>
+               </div>
+            </div>
+            
          </form>
       </div>
 </div>
+<style>
+.client_generator_response .CodeMirror {
+   height: 100%;
+   border: 1px solid #dbdbdb;
+}
+.licenser-code-text {
+   background-color: #f1f1f1;
+   padding: 10px;
+   border-radius: 5px;
+   white-space: pre-line;
+}
+</style>
+<script type="text/javascript">
+   jQuery(document).ready(function($){
+      jQuery(document).on('click', '#submit', function(e){
+         licenser_generate_client();
+      });
+
+      function licenser_generate_client(){
+         let product_type = jQuery('#product_type').val();
+         let product_id = jQuery('#select_product').val();
+         let product_name = jQuery('#select_product option:selected').text();
+         let product_slug = product_name.toLowerCase().replace(/ /g, '_');
+         let menu_type = jQuery('#lmfwppt_menu_select').val();
+         let parent_slug = jQuery('#lmfwppt_parent_menu_slug').val();
+         let page_title = jQuery('#lmfwppt_page_title').val();
+         let menu_title = jQuery('#lmfwppt_menu_title').val();
+         let apiUrl = '<?php echo licenser_api_url(); ?>';
+
+         console.log(product_type, product_id, menu_type, parent_slug, page_title, menu_title);
+
+         let output = `
+&lt?php
+/**
+ * Initialize Licenser client
+ *
+ * @return void
+ */
+function ${product_slug}_licenser_client_init() {
+
+   if ( ! class_exists( 'Licenser\Client' ) ) {
+      require_once __DIR__ . '/licenser/src/Client.php';
+   }
+
+   $client = new Licenser\Client( '${product_id}', '${product_name}', __FILE__, '${apiUrl}' );
+
+	// Active license page and checker
+	$license = $client->license();
+	$license->add_settings_page([
+		'type' => 'section'
+	]);
+
+	// Active updater
+	$client->updater()->init( $client );
+
+}
+${product_slug}_licenser_client_init();`;
+
+
+         output = `<textarea class="fancy-textarea" readonly>${output}</textarea>`;
+         jQuery('.client_generator_response').html(output);
+
+         wp.codeEditor.initialize(jQuery('.fancy-textarea'), licenser_cm);
+
+      }
+   });
+</script>
