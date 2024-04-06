@@ -11,16 +11,13 @@ $products = $product_model->get_all([
    'inc_packages' => false,
    'columns' => ' name, product_type, uuid',
 ]);
-echo '<pre>';
-print_r($products);
-echo '</pre>';
 ?>
 <div class="wrap">
       <div class="lmwppt-wrap">
          <div class="lmwppt-inner-card card-shameless">
             <h1><?php esc_html_e( 'SDK Generator', 'licenser' ); ?></h1>
          </div>
-         <form action="" method="post" id="sdk-generator-add-form">
+         <form action="" method="post" id="sdk-generator-form">
             <div class="lmwppt-inner-card">
                <div class="lmfwppt-form-section">
 
@@ -101,7 +98,7 @@ echo '</pre>';
                
                <div class="submit_btn_area"> 
       
-                  <button type="button" class="button button-primary" id="submit"><?php esc_html_e( 'Generate SDK', 'licenser' ); ?></button>
+                  <button type="submit" class="button button-primary" id="submit"><?php esc_html_e( 'Generate SDK', 'licenser' ); ?></button>
                   <span class="spinner"></span>
                </div>
                <div class="lmfwppt-notices"></div>  
@@ -136,7 +133,7 @@ echo '</pre>';
                      </pre>
                   </p>
 
-                  <h3><?php esc_html_e( 'Step 2: Add the following code in your plugin or theme file', 'licenser' ); ?></h3>
+                  
                   <div class="client_generator_response"></div>
                </div>
             </div>
@@ -158,7 +155,22 @@ echo '</pre>';
 </style>
 <script type="text/javascript">
    jQuery(document).ready(function($){
-      jQuery(document).on('click', '#submit', function(e){
+      // Implement Fields
+      jQuery(document).on('change', '#select_product', function(e){
+         let product_id = jQuery(this).val();
+         let product_name = jQuery('#select_product option:selected').text();
+         let product_slug = product_name.toLowerCase().replace(/ /g, '_');
+
+         // Set Page Title
+         jQuery('#lmfwppt_page_title').val(product_name + ' License Activation');
+
+         // Set Menu Title
+         jQuery('#lmfwppt_menu_title').val(product_name + ' License');
+
+      });
+
+      jQuery(document).on('submit', '#sdk-generator-form', function(e){
+         e.preventDefault();
          licenser_generate_client();
       });
 
@@ -172,8 +184,17 @@ echo '</pre>';
          let page_title = jQuery('#lmfwppt_page_title').val();
          let menu_title = jQuery('#lmfwppt_menu_title').val();
          let apiUrl = '<?php echo licenser_api_url(); ?>';
+         let inc_licensing = jQuery('#inc-licensing').is(':checked');
+         let inc_updater = jQuery('#inc-updater').is(':checked');
+         let inc_insights = jQuery('#inc-insights').is(':checked');
 
-         console.log(product_type, product_id, menu_type, parent_slug, page_title, menu_title);
+         // Section HTML
+         let sectionHtml = '';
+         if( product_type == 'plugin' ){
+            sectionHtml = `<h3><?php esc_html_e( 'Step 2: Add the following code to your plugin file.', 'licenser' ); ?></h3>`;
+         } else {
+            sectionHtml = `<h3><?php esc_html_e( "Step 2: Add the following code to your theme's functions.php file.", 'licenser' ); ?></h3>`;
+         }
 
          let output = `
 &lt?php
@@ -189,21 +210,54 @@ function ${product_slug}_licenser_client_init() {
    }
 
    $client = new Licenser\Client( '${product_id}', '${product_name}', __FILE__, '${apiUrl}' );
+   `;
 
+   if( inc_licensing ){
+      output += `
 	// Active license page and checker
-	$license = $client->license();
-	$license->add_settings_page([
-		'type' => 'section'
-	]);
+	$license = $client->license();`;
 
+   if( menu_type != 'section' ){
+      output += `
+	$license->add_settings_page([
+      'type'        => '${menu_type}',
+      'menu_title'  => '${menu_title}',
+      'page_title'  => '${page_title}',
+      'menu_slug'   => '${product_slug}_settings',
+      'parent_slug' => '${parent_slug}',
+	]);
+   `;
+   } else {
+      output += `
+    $license->add_settings_page([
+       'type' => 'section'
+    ]);
+   `;
+   }
+   }
+
+
+   if( inc_updater ){
+      output += `
 	// Active updater
 	$client->updater()->init( $client );
+   `;
+   }
+
+
+   if( inc_insights ){
+      output += `
+    // Active insights
+    $client->insights()->init();`;
+   }
+
+   output += `
 
 }
 ${product_slug}_licenser_client_init();`;
 
 
-         output = `<textarea class="fancy-textarea" readonly>${output}</textarea>`;
+         output = `${sectionHtml}<textarea class="fancy-textarea" readonly>${output}</textarea>`;
          jQuery('.client_generator_response').html(output);
 
          wp.codeEditor.initialize(jQuery('.fancy-textarea'), licenser_cm);
