@@ -13,10 +13,16 @@ $products = $product_model->get_all([
 ]);
 ?>
 <div class="wrap">
-      <div class="licenser-root">
-         <div class="lmwppt-inner-card card-shameless">
-            <h1><?php esc_html_e( 'SDK Generator', 'licenser' ); ?></h1>
-         </div>
+   <div class="licenser-root">
+      <!-- Header  -->
+      <div class="licenser-header">
+            <div class="licenser-header__title">
+               <h1><?php esc_html_e( 'SDK Generator', 'licenser' ); ?></h1>
+            </div>
+      </div>
+      <!-- Header  -->
+      <!-- Content  -->
+      <div class="licenser-content">
          <form action="" method="post" id="sdk-generator-form">
             <div class="lmwppt-inner-card">
                <div class="lmfwppt-form-section">
@@ -139,7 +145,10 @@ $products = $product_model->get_all([
             </div>
             
          </form>
+  
       </div>
+      <!-- Content  -->
+   </div>
 </div>
 <style>
 .client_generator_response .CodeMirror {
