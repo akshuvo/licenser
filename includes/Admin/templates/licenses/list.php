@@ -1,17 +1,26 @@
 <div class="wrap">
-    <h1 class="wp-heading-inline"><?php esc_html_e( 'License Manager: Licenses', 'licenser' ); ?></h1>
+   <div class="licenser-root">
+      <!-- Header  -->
+      <div class="licenser-header">
+         <div class="licenser-header__title">
+            <h1><?php esc_html_e( 'Licenses', 'licenser' ); ?></h1>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'licenser' ); ?></a>
+         </div>
+      </div>
+      <!-- Header  -->
+      <!-- Content  -->
+      <div class="licenser-content">
+        <form action="" method="post">
+            <?php 
+                $table = new Licenser\Admin\LicensesListTable();
+                $table->prepare_items();
+                $table->display();
 
-    <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'licenser' ); ?></a>
-
-    <form action="" method="post">
-        <?php 
-            $table = new Licenser\Admin\LicensesListTable();
-            $table->prepare_items();
-            $table->display();
-
-        ?>
-    </form>
-
+            ?>
+        </form>
+      </div>
+    <!-- Content  -->
+    </div>
 </div>
 
 <script type="text/javascript">

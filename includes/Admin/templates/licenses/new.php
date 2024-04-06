@@ -40,17 +40,23 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
 }
 
 ?>
+
 <div class="wrap">
-
-    <div class="licenser-wrap">
-
-        <div class="lmwppt-inner-card card-shameless">
+   <div class="licenser-root">
+      <!-- Header  -->
+      <div class="licenser-header">
+         <div class="licenser-header__title">
             <?php if( isset( $_GET['id'] ) ) : ?>
                 <h1><?php esc_html_e( 'Edit License', 'licenser' ); ?></h1>
             <?php else : ?>
                 <h1><?php esc_html_e( 'Add New License', 'licenser' ); ?></h1>
             <?php endif; ?>
-        </div>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'licenser' ); ?></a>
+         </div>
+      </div>
+      <!-- Header  -->
+      <!-- Content  -->
+      <div class="licenser-content">
 
         <form action="" method="post" id="license-add-form">
             
@@ -185,9 +191,11 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
             
         </form>
 
+        </div>
+    <!-- Content  -->
     </div>
- 
 </div>
+
 
 
 <script>

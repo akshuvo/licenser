@@ -2,7 +2,7 @@
  * Admin CSS for License Manager
  */
 
-.licenser-wrap, .licenser-wrap * {
+.licenser-root, .licenser-root * {
     box-sizing: border-box;
 }
 

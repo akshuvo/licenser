@@ -6,31 +6,35 @@ $page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : null;
 $product_type = $page == 'licenser-themes' ? 'theme' : 'plugin';
 
 ?>
+
 <div class="wrap">
-    <h1 class="wp-heading-inline">
-        <?php 
-            /* translators: %s: Product Type */
-            echo esc_html( sprintf( __('License Manager: %ss', 'licenser' ), $product_type )  ); 
-        ?>
-    </h1>
+   <div class="licenser-root">
+      <!-- Header  -->
+      <div class="licenser-header">
+         <div class="licenser-header__title">
+            <h1>
+                <?php 
+                    /* translators: %s: Product Type */
+                    echo esc_html( sprintf( __('License Manager: %ss', 'licenser' ), $product_type )  ); 
+                ?>
+            </h1>
+            <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'licenser' ); ?></a>
+         </div>
+      </div>
+      <!-- Header  -->
+      <!-- Content  -->
+      <div class="licenser-content">
+        <form action="" method="post">
+            <?php 
+                $table = new Licenser\Admin\ProductsListTable();
+                $table->prepare_items($product_type);
+                $table->display();
 
-    <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-'.$product_type.'s&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New Product', 'licenser' ); ?></a>
-
-    <?php if ( isset( $_GET['updated'] ) ) { ?>
-        <div class="notice notice-success">
-            <p><?php esc_html_e( 'Product License has been updated successfully!', 'licenser' ); ?></p>
-        </div>
-    <?php } ?>
-
-    <form action="" method="post">
-    	<?php 
-    		$table = new Licenser\Admin\ProductsListTable();
-    		$table->prepare_items($product_type);
-    		$table->display();
-
-    	?>
-    </form>
-
+            ?>
+        </form>
+      </div>
+    <!-- Content  -->
+    </div>
 </div>
 
 <script type="text/javascript">
