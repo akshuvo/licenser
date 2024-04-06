@@ -42,7 +42,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
 ?>
 <div class="wrap">
 
-    <div class="lmwppt-wrap">
+    <div class="licenser-wrap">
 
         <div class="lmwppt-inner-card card-shameless">
             <?php if( isset( $_GET['id'] ) ) : ?>

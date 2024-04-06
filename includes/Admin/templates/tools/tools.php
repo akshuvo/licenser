@@ -13,7 +13,7 @@ $products = $product_model->get_all([
 ]);
 ?>
 <div class="wrap">
-      <div class="lmwppt-wrap">
+      <div class="licenser-wrap">
          <div class="lmwppt-inner-card card-shameless">
             <h1><?php esc_html_e( 'SDK Generator', 'licenser' ); ?></h1>
          </div>
