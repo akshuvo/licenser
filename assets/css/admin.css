@@ -482,7 +482,7 @@ p.submit {
 body[class*="licenser"] #wpcontent,
 body[class*="licenser"] #wpbody-content {
     padding: 0;
-    overflow-x: hidden!important;
+    /* overflow-x: hidden!important; */
     min-height: calc(100vh - 32px);
 }
 body[class*="licenser"] .wrap {
@@ -507,3 +507,41 @@ body[class*="licenser"] .wrap {
     border-bottom: 1px solid #e5e5e5;
 }
 /* New Layout  */
+
+.licenser-sidenav {
+    height: 100%;
+    padding: 20px;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 32px;
+    background: rgb(255, 255, 255);
+    border-radius: 3px;
+    border: 1px solid rgb(226, 228, 231);
+}
+
+.licenser-sidenav a {
+    display: flex;
+    text-decoration: none;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #646970;
+    font-size: 13px;
+    padding: 5px 8px;
+    border-radius: 7px;
+    margin: 4px 0;
+    width: 200px;
+}
+
+.licenser-sidenav a:hover,
+.licenser-sidenav a:focus,
+.licenser-sidenav a.active {
+    background: #f0f0f1;
+    color: #303030;
+}
+
+.licenser-sidenav li {
+    margin: 0;
+}
+
+.licenser-sidenav a span {}
