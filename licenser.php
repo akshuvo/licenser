@@ -34,6 +34,8 @@ final class Licenser {
     private function __construct() {
         $this->define_constants();
 
+        // add_action( 'muplugins_loaded', [ $this, 'muplugins_loaded' ] );
+
         register_activation_hook( __FILE__, [ $this, 'activate' ] );
 
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
