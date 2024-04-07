@@ -36,7 +36,7 @@ class Admin_Handler{
 	        //return;
 	    }
 
-	    wp_enqueue_script( 'licenser-wc-admin', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), LICENSER_VERSION );
+	    wp_enqueue_script( 'licenser-wc-admin', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), LICENSER_VERSION, true );
 	}
 
     /**

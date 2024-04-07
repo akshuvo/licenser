@@ -1,24 +1,23 @@
 <div class="wrap">
    <div class="licenser-root">
-      <!-- Header  -->
-      <div class="licenser-header">
-         <div class="licenser-header__title">
+    <!-- Header  -->
+    <div class="licenser-header">
+        <div class="licenser-header__title">
             <h1><?php esc_html_e( 'Licenses', 'licenser' ); ?></h1>
-            <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'licenser' ); ?></a>
-         </div>
-      </div>
-      <!-- Header  -->
-      <!-- Content  -->
-      <div class="licenser-content">
+        </div>
+        <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'licenser' ); ?></a>
+    </div>
+    <!-- Header  -->
+    <!-- Content  -->
+    <div class="licenser-content">
         <form action="" method="post">
             <?php 
                 $table = new Licenser\Admin\LicensesListTable();
                 $table->prepare_items();
                 $table->display();
-
             ?>
         </form>
-      </div>
+    </div>
     <!-- Content  -->
     </div>
 </div>
