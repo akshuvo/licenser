@@ -56,7 +56,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	p    ublic function create_item_permissions_check( $request ) {
+	public function create_item_permissions_check( $request ) {
 		return current_user_can( 'manage_options' );
 	}
 
