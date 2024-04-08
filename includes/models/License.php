@@ -185,7 +185,7 @@ class License {
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $wpdb->uplicenser_date(
+            $wpdb->update(
                 $wpdb->licenser_licenses,
                 [
                     'status' => intval( $data['status'] ),
@@ -406,7 +406,7 @@ class License {
 
         // Update
         if( !empty( $args['id'] ) ){
-            $wpdb->uplicenser_date(
+            $wpdb->update(
                 $wpdb->licenser_license_domains,
                 [
                     'license_id' => intval( $args['license_id'] ),

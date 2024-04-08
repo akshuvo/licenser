@@ -222,7 +222,7 @@ class Public_Apis extends RestController {
         }
 
         // TODO: Show all changelog
-        $changelog = '<h4>' . $product->stable_release->version . ' - ' . licenser_date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) . '</h4>' . $product->stable_release->changelog;
+        $changelog = isset( $product->stable_release ) && !empty( $product->stable_release ) ? '<h4>' . $product->stable_release->version . ' - ' . licenser_date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) . '</h4>' . $product->stable_release->changelog : '';
 
         $response = [
             'id' => $product->uuid,
@@ -245,8 +245,8 @@ class Public_Apis extends RestController {
                 'description' => $product->description,
                 'changelog' => $changelog,
             ],
-            'new_version' => $product->stable_release->version,
-            'last_updated' => $product->stable_release->release_date,
+            'new_version' => isset( $product->stable_release->version ) ? $product->stable_release->version : '',
+            'last_updated' => isset( $product->stable_release->release_date ) ? $product->stable_release->release_date : '',
             'package' => $download_url,
             'download_link' => $download_url,
             'author' => $product->author_name,

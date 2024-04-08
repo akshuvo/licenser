@@ -117,7 +117,7 @@ class ProductRelease {
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $wpdb->uplicenser_date(
+            $wpdb->update(
                 $wpdb->licenser_product_releases,
                 [
                     'product_id' => intval( $data['product_id'] ),

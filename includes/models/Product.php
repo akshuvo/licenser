@@ -64,35 +64,45 @@ class Product {
             $where .= $wpdb->prepare( " AND id = %d", $id );
         }
 
-        $product = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} LIMIT 1" );
+        // Cache Key
+        $cache_key = 'product_' . md5( $id . '_' . serialize( $args ) );
 
-        // Return if no product found
-        if( empty( $product ) ){
-            return false;
-        }
+        // Get Product
+        if ( false === ( $product = licenser_get_cache( $cache_key ) ) ) {
 
-        // Banners
-        if( !empty( $product->banners ) ){
-            $product->banners = json_decode( $product->banners, true );
-        }
+            $product = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} LIMIT 1" );
 
-        // Stable Release
-        if( $args['inc_stable_release'] ){
-            $product->stable_release = ProductRelease::instance()->get_stable( $product->id );
-        }
+            // Return if no product found
+            if( empty( $product ) ){
+                return false;
+            }
 
-        // Releases
-        if( $args['inc_releases'] ){
-            $product->releases = ProductRelease::instance()->get_all([
-                'product_id' => $product->id,
-            ]);
-        }
+            // Banners
+            if( !empty( $product->banners ) ){
+                $product->banners = json_decode( $product->banners, true );
+            }
 
-        // Packages
-        if( $args['inc_packages'] ){
-            $product->packages = LicensePackage::instance()->get_all([
-                'product_id' => $product->id,
-            ]);
+            // Stable Release
+            if( $args['inc_stable_release'] ){
+                $product->stable_release = ProductRelease::instance()->get_stable( $product->id );
+            }
+
+            // Releases
+            if( $args['inc_releases'] ){
+                $product->releases = ProductRelease::instance()->get_all([
+                    'product_id' => $product->id,
+                ]);
+            }
+
+            // Packages
+            if( $args['inc_packages'] ){
+                $product->packages = LicensePackage::instance()->get_all([
+                    'product_id' => $product->id,
+                ]);
+            }
+
+            // Set Cache
+            licenser_set_cache( $cache_key, $product );
         }
 
         return $product;
@@ -216,7 +226,7 @@ class Product {
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $wpdb->uplicenser_date(
+            $wpdb->update(
                 $wpdb->licenser_products,
                 [
                     'name' => sanitize_text_field( $data['name'] ),
@@ -327,7 +337,7 @@ class Product {
 
         global $wpdb;
 
-        $wpdb->uplicenser_date(
+        $wpdb->update(
             $wpdb->licenser_products,
             [
                 'status' => $status

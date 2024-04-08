@@ -37,14 +37,14 @@ class License_Meta {
      * @param array $data
      * @return int
      */
-    public function uplicenser_date( $license_id, $meta_key, $meta_value ) {
+    public function update( $license_id, $meta_key, $meta_value ) {
         global $wpdb;
 
         // Check if exists
         $exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->licenser_license_meta} WHERE license_id = %d AND meta_key = %s", $license_id, $meta_key ) );
 
         if( $exists ){
-            return $wpdb->uplicenser_date( $wpdb->licenser_license_meta, [ 'meta_value' => $meta_value ], [ 'license_id' => $license_id, 'meta_key' => $meta_key ] );
+            return $wpdb->update( $wpdb->licenser_license_meta, [ 'meta_value' => $meta_value ], [ 'license_id' => $license_id, 'meta_key' => $meta_key ] );
         } else {
             return $wpdb->insert( $wpdb->licenser_license_meta, [ 'license_id' => $license_id, 'meta_key' => $meta_key, 'meta_value' => $meta_value ] );
         }

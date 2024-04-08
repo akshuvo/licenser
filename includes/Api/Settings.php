@@ -85,7 +85,7 @@ class Settings extends RestController {
         
         $params = $request->get_params();
 
-        $createdata = SettingsModel::instance()->uplicenser_date( $params );
+        $createdata = SettingsModel::instance()->update( $params );
         
         return rest_ensure_response( SettingsModel::instance()->get_all() );
     }

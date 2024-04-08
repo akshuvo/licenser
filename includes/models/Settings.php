@@ -12,7 +12,7 @@ class Settings {
      * @param array $data
      * @return int
      */
-    public function uplicenser_date( $data ) {
+    public function update( $data ) {
         update_option('lmfwppt_settings', $data);
     }
 
