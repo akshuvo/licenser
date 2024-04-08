@@ -267,7 +267,7 @@ class Order_Handler{
                 if ( !empty( $license_id ) ) {
                     update_post_meta( $order_id, "license_generated_item_id_{$item_id}", $license_id );
                     update_post_meta( $order_id, "license_generated_item_key_{$item_id}", $license_key );
-                    update_post_meta( $order_id, "license_generated_product_slug_{$item_id}", $licenser_product_id );
+                    update_post_meta( $order_id, "licenser_product_id_{$item_id}", $licenser_product_id );
     
                     // Save custom meta for future usages
                     update_post_meta( $order_id, "is_license_order", 'yes' );
@@ -331,7 +331,7 @@ class Order_Handler{
         // Get license key by id
         $license_key_id = get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true );
         $license_key = get_post_meta( $order_id, "license_generated_item_key_{$item_id}", true );
-        $product_slug = get_post_meta( $order_id, "license_generated_product_slug_{$item_id}", true );
+        $product_id = get_post_meta( $order_id, "licenser_product_id_{$item_id}", true );
 
         if ( empty( $license_key_id ) ) {
             return;
@@ -344,11 +344,12 @@ class Order_Handler{
         );
 
         // Download Link
-        $download_link = add_query_arg( array(
-            'product_slug' => $product_slug,
-            'license_key' => $license_key,
-            'action' => 'download',
-        ), licenser_api_url() );
+        $product = \Licenser\Models\Product::instance()->get( $product_id, [
+            'inc_stable_release' => false,
+            'inc_releases' => false,
+            'inc_packages' => false,
+        ]);
+        $download_link = licenser_product_download_url( $product->uuid, $license_key );
 
         if ( $download_link ) {
             echo sprintf('<li><strong class="wc-item-meta-label">%s</strong>: <a href="%s" target="_blank">%s</a></li></ul>',

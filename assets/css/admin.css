@@ -93,7 +93,6 @@
 .lmfwppt-form-field input:not([type="checkbox"]):not([type="radio"]),
 .lmfwppt-form-field textarea,
 .lmfwppt-form-field select {
-  background-color: #fff;
   border: 1px solid #a7aaad;
   border-radius: 3px;
   height: 56px;
@@ -104,8 +103,14 @@
   width: 100%;
 }
 
+.lmfwppt-form-field input:not([type="checkbox"]):not([type="radio"]):not([readonly]),
+.lmfwppt-form-field textarea:not([readonly]),
+.lmfwppt-form-field select {
+  background-color: #fff;
+}
+
 .lmfwppt-form-field textarea {
-    height: 130px;
+    min-height: 130px;
 }
 
 .lmfwppt-form-field select {

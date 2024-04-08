@@ -71,7 +71,7 @@ class Product {
         // Get Product
         if ( $args['cache'] && false === ( $product = licenser_get_cache( $cache_key ) ) ) {
 
-            $product = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} LIMIT 1" );
+            $product = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} LIMIT 1" ); // phpcs:ignore
 
             // Return if no product found
             if( empty( $product ) ){

@@ -329,7 +329,7 @@ class Public_Apis extends RestController {
             'inc_stable_release' => true,
             'inc_releases' => false,
             'inc_packages' => false,
-            'get_by' => 'uuid',
+            'get_by' => 'uuid', //
         ]);
 
         if ( ! $product ) {

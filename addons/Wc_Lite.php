@@ -5,6 +5,7 @@ class Wc_Lite {
 
     // constructor
     public function __construct() {
+
         // Defines
         $this->defines();
 
