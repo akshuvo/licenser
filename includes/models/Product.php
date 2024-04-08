@@ -50,6 +50,7 @@ class Product {
             'inc_packages' => true,
             'columns' => [],
             'get_by' => '',
+            'cache' => true,
         ] );
         global $wpdb;
         $columns = !empty( $args['columns'] ) && is_array( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
@@ -65,10 +66,10 @@ class Product {
         }
 
         // Cache Key
-        $cache_key = 'product_' . md5( $id . '_' . serialize( $args ) );
+        $cache_key = 'product_' . $id . md5( serialize( $args ) );
 
         // Get Product
-        if ( false === ( $product = licenser_get_cache( $cache_key ) ) ) {
+        if ( $args['cache'] && false === ( $product = licenser_get_cache( $cache_key ) ) ) {
 
             $product = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} LIMIT 1" );
 
@@ -250,6 +251,10 @@ class Product {
             );
 
             $insert_id = $data['id'];
+
+            // Delete Cache
+            licenser_delete_cache( 'product_' . $insert_id, true );
+            licenser_delete_cache( 'product_' . $data['uuid'], true );
         } else {
             $wpdb->insert(
                 $wpdb->licenser_products,

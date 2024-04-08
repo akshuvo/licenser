@@ -63,7 +63,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
                             
                                 <div class="lmfwppt-form-field">
                                     <label for="id"><?php esc_html_e( 'Product ID', 'licenser' ); ?></label>
-                                    <input type="text" id="id" class="regular-text "  value="<?php echo esc_attr( $product->uuid ); ?>" readonly>
+                                    <input type="text" id="id" name="uuid" class="regular-text "  value="<?php echo esc_attr( $product->uuid ); ?>" readonly>
                                 </div>
 
                                 <div class="lmfwppt-form-field">
