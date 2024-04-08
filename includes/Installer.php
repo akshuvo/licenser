@@ -51,7 +51,9 @@ class Installer {
 	          `created_by` int(20) unsigned NOT NULL,
               `status` varchar(30) DEFAULT NULL,
 	          `dated` datetime NOT NULL DEFAULT NOW(),
-	          PRIMARY KEY (`id`)
+	          	PRIMARY KEY (`id`),
+				UNIQUE KEY `uuid` (`uuid`),
+				INDEX `idx_uuid` (`uuid`)
 	        ) $charset_collate";
 
 			// Drop Below Table
@@ -66,7 +68,8 @@ class Installer {
               `file_name` varchar(255) DEFAULT NULL,
               `download_link` varchar(255) DEFAULT NULL,
               `release_date` datetime NOT NULL DEFAULT NOW(),
-              PRIMARY KEY (`id`)
+              PRIMARY KEY (`id`),
+			  INDEX `idx_product_id` (`product_id`)
             ) $charset_collate";
 
 	        // Drop Below Table
@@ -80,7 +83,8 @@ class Installer {
 	          `package_id` varchar(255) NOT NULL UNIQUE,
 	          `update_period` int(128),
 	          `domain_limit` int(128),
-	          PRIMARY KEY (`id`)
+	          	PRIMARY KEY (`id`),
+			    INDEX `idx_product_id` (`product_id`)
 	        ) $charset_collate";
 
 	        // Drop Below Table
@@ -99,7 +103,11 @@ class Installer {
 	          `is_lifetime` tinyint(1) NOT NULL DEFAULT 0,
 	          `domain_limit` INT(128) NULL,
 	          `dated` datetime NOT NULL DEFAULT NOW(),
-	          PRIMARY KEY (`id`)
+	          PRIMARY KEY (`id`),
+			  INDEX `idx_license_key` (`license_key`),
+			  INDEX `idx_product_id` (`product_id`),
+			  INDEX `idx_package_id` (`package_id`),
+			  INDEX `idx_source_id` (`source_id`)
 	        ) $charset_collate";
 
 			// License Meta Table
@@ -108,7 +116,9 @@ class Installer {
 	          `license_id` bigint(20) unsigned NOT NULL,
 	          `meta_key` varchar(255) NOT NULL,
 	          `meta_value` longtext NOT NULL,
-	          PRIMARY KEY (`id`)
+	          PRIMARY KEY (`id`),
+			  INDEX `idx_license_id` (`license_id`),
+			  INDEX `idx_meta_key` (`meta_key`)
 	        ) $charset_collate";
 
 	        // Drop Below Table
@@ -121,7 +131,8 @@ class Installer {
 	          `domain` varchar(255) NOT NULL,
 	          `status` tinyint(1) NOT NULL DEFAULT 1,
 	          `dated` datetime NOT NULL DEFAULT NOW(),
-	          PRIMARY KEY (`id`)
+	          PRIMARY KEY (`id`),
+			  INDEX `idx_license_id` (`license_id`)
 	        ) $charset_collate";
 
 	        // Call function
