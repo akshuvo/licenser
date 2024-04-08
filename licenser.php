@@ -78,9 +78,9 @@ final class Licenser {
 
         // new Licenser\Assets();
 
-        if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-            new Licenser\Ajax();
-        }
+        // if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+        //     new Licenser\Ajax();
+        // }
 
         if ( is_admin() ) {
             new Licenser\Admin();

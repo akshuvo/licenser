@@ -148,3 +148,35 @@ function licenser_get_clean_url( $url ) {
 
     return $clean_url;
 }
+
+/**
+ * Transient Cache
+ */
+function licenser_cache_key() {
+    return 'lwp_cache_';
+}
+
+// Get Cache
+function licenser_get_cache( $key ) {
+    return get_transient( licenser_cache_key() . $key );
+}
+
+// Set Cache
+function licenser_set_cache( $key, $value, $expiration = 0 ) {
+    return set_transient( licenser_cache_key() . $key, $value, $expiration );
+}
+
+// Delete Cache
+function licenser_delete_cache( $key, $sql_method = false ) {
+
+    // Transient Key
+    $key = licenser_cache_key() . $key;
+
+    if ( $sql_method ) {
+        global $wpdb;
+        $wpdb->query( "DELETE FROM {$wpdb->prefix}options WHERE option_name LIKE '%_transient_{$key}%'" );
+        $wpdb->query( "DELETE FROM {$wpdb->prefix}options WHERE option_name LIKE '%_transient_timeout_{$key}%'" );
+    } else {
+        return delete_transient( $key );
+    }
+}
