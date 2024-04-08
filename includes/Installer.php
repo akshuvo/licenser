@@ -7,7 +7,7 @@ namespace Licenser;
  */
 class Installer {
 
-    var $db_version = 26; // initial db version, don't use floats
+    var $db_version = 27; // initial db version, don't use floats
     var $db_version_key = "licenser_db_version";
 
     /**
@@ -52,7 +52,6 @@ class Installer {
               `status` varchar(30) DEFAULT NULL,
 	          `dated` datetime NOT NULL DEFAULT NOW(),
 	          	PRIMARY KEY (`id`),
-				UNIQUE KEY `uuid` (`uuid`),
 				INDEX `idx_uuid` (`uuid`)
 	        ) $charset_collate";
 
