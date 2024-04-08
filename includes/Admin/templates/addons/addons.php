@@ -3,7 +3,7 @@
         <!-- Header  -->
         <div class="licenser-header">
             <div class="licenser-header__title">
-                <h1><?php esc_html_e( 'Addons', 'licenser' ); ?></h1>
+                <h2><?php esc_html_e( 'Addons', 'licenser' ); ?></h2>
             </div>
         </div>
         <!-- Header  -->

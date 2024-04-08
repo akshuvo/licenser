@@ -3,7 +3,7 @@
     <!-- Header  -->
     <div class="licenser-header">
         <div class="licenser-header__title">
-            <h1><?php esc_html_e( 'Licenses', 'licenser' ); ?></h1>
+            <h2><?php esc_html_e( 'Licenses', 'licenser' ); ?></h2>
         </div>
         <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'licenser' ); ?></a>
     </div>

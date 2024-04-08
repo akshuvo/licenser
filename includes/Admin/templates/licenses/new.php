@@ -47,9 +47,9 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
         <div class="licenser-header">
             <div class="licenser-header__title">
                 <?php if( isset( $_GET['id'] ) ) : ?>
-                    <h1><?php esc_html_e( 'Edit License', 'licenser' ); ?></h1>
+                    <h2><?php esc_html_e( 'Edit License', 'licenser' ); ?></h2>
                 <?php else : ?>
-                    <h1><?php esc_html_e( 'Add New License', 'licenser' ); ?></h1>
+                    <h2><?php esc_html_e( 'Add New License', 'licenser' ); ?></h2>
                 <?php endif; ?>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-licenses&action=new' ) ); ?>" class="page-title-action"><?php esc_html_e( 'Add New License', 'licenser' ); ?></a>
             </div>

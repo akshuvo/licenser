@@ -21,7 +21,7 @@ $settings = Settings::instance()->get_all();
         <!-- Header  -->
         <div class="licenser-header">
             <div class="licenser-header__title">
-                <?php esc_html_e( 'License Manager Settings', 'licenser' ); ?>
+                <h2><?php esc_html_e( 'License Manager Settings', 'licenser' ); ?></h2>
             </div>
         </div>
         <!-- Header  -->

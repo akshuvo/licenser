@@ -17,7 +17,7 @@ $products = $product_model->get_all([
       <!-- Header  -->
       <div class="licenser-header">
             <div class="licenser-header__title">
-               <h1><?php esc_html_e( 'SDK Generator', 'licenser' ); ?></h1>
+               <h2><?php esc_html_e( 'SDK Generator', 'licenser' ); ?></h2>
             </div>
       </div>
       <!-- Header  -->

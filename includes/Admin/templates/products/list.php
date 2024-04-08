@@ -12,12 +12,12 @@ $product_type = $page == 'licenser-themes' ? 'theme' : 'plugin';
     <!-- Header  -->
     <div class="licenser-header">
         <div class="licenser-header__title">
-            <h1>
+            <h2>
                 <?php 
                     /* translators: %s: Product Type */
                     echo esc_html( sprintf( __('License Manager: %ss', 'licenser' ), $product_type )  ); 
                 ?>
-            </h1>
+            </h2>
         </div>
         <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-'.$product_type.'s&action=new' ) ); ?>" class="page-title-action"><?php echo esc_html( sprintf( __('Add New %s', 'licenser'), $product_type ) ); ?></a>
     </div>

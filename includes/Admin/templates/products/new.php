@@ -31,9 +31,9 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
         <div class="licenser-header">
             <div class="licenser-header__title">
             <?php if( isset( $_GET['id'] ) ) : ?>
-                <h1><?php esc_html_e( 'Edit Product', 'licenser' ); ?></h1>
+                <h2><?php esc_html_e( 'Edit Product', 'licenser' ); ?></h2>
             <?php else : ?>
-                <h1><?php esc_html_e( 'Add New Product', 'licenser' ); ?></h1>
+                <h2><?php esc_html_e( 'Add New Product', 'licenser' ); ?></h2>
             <?php endif; ?>
             </div>
         </div>
