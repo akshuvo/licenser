@@ -61,145 +61,146 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
             <div class="d-flex">
                 <div class="licenser-sidenav">
                     <ul>
-                        <li><a href="#general"><?php esc_html_e('General', 'licenser'); ?></a></li>
-                        <li><a href="#general"><?php esc_html_e('General', 'licenser'); ?></a></li>
-                        <li><a href="#general"><?php esc_html_e('General', 'licenser'); ?></a></li>
-                        <li><a href="#general"><?php esc_html_e('General', 'licenser'); ?></a></li>
+                        <li><a href="#license"><?php esc_html_e('License', 'licenser'); ?></a></li>
+                        <li><a href="#meta-data"><?php esc_html_e('Meta Data', 'licenser'); ?></a></li>
                     </ul>
                 </div>
-
-                <form action="" method="post" id="license-add-form">
-                    
-                    <div class="lmwppt-inner-card">
-                        <div class="lmfwppt-form-section" id="product-information">
-                            <h2><?php esc_html_e( 'Product Information', 'licenser' ); ?></h2>
-
-                            <div class="lmfwppt-form-field">
-                                <label for="download_link"><?php esc_html_e( 'License Key', 'licenser' ); ?></label>
-                                <div class="lmfwppt-file-field">
-                                    <input type="text" name="license_key" id="license_key" class="regular-text" placeholder="<?php esc_attr_e( 'License Key', 'licenser' ); ?>" value="<?php echo esc_attr( $license->license_key );?>" readonly required />
-
-                                    <button class="button" type="button" id="generate_key">
-                                    <span class="generate-key-label"><?php esc_html_e( 'Generate Key', 'licenser' ); ?></span>
-                                    <span class="spinner key-spinner"></span>
-                                    </button>
-                                    
-                                </div>
-                            </div>
-
+                <div class="licenser-navcontent w-100">
+                    <form action="" method="post" id="license-add-form">
                         
-                            <div class="lmfwppt-form-field">
-                                <label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
-                                <select name="product_type" id="product_type">
-                                    <option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
-                                    <?php foreach( $product_model->get_types() as $key => $value ) : ?>
-                                        <option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $value ); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
+                        <div class="lmwppt-inner-card">
+                            <div class="lmfwppt-form-section" id="product-information">
+                                <h2><?php esc_html_e( 'Product Information', 'licenser' ); ?></h2>
+
+                                <div class="lmfwppt-form-field">
+                                    <label for="download_link"><?php esc_html_e( 'License Key', 'licenser' ); ?></label>
+                                    <div class="lmfwppt-file-field">
+                                        <input type="text" name="license_key" id="license_key" class="regular-text" placeholder="<?php esc_attr_e( 'License Key', 'licenser' ); ?>" value="<?php echo esc_attr( $license->license_key );?>" readonly required />
+
+                                        <button class="button" type="button" id="generate_key">
+                                        <span class="generate-key-label"><?php esc_html_e( 'Generate Key', 'licenser' ); ?></span>
+                                        <span class="spinner key-spinner"></span>
+                                        </button>
+                                        
+                                    </div>
+                                </div>
+
                             
-                            <!-- Select Product -->
-                            <div class="lmfwppt-form-field lmfwppt_theme_products">
-                                <label for="product_list"><?php esc_html_e( 'Select Product', 'licenser' ); ?></label>
-                                <select name="product_id" class="products_list" id="product_list" >
-                                    <option value="" class="blank"><?php esc_html_e( 'Select Product', 'licenser' ); ?></option>
-                                    <?php foreach ( $products as $product ): ?>   
-                                        <option data-product_type="<?php echo esc_attr( $product->product_type ); ?>" value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt' ); ?>" <?php selected( $license->product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
+                                <div class="lmfwppt-form-field">
+                                    <label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
+                                    <select name="product_type" id="product_type">
+                                        <option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
+                                        <?php foreach( $product_model->get_types() as $key => $value ) : ?>
+                                            <option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $value ); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                
+                                <!-- Select Product -->
+                                <div class="lmfwppt-form-field lmfwppt_theme_products">
+                                    <label for="product_list"><?php esc_html_e( 'Select Product', 'licenser' ); ?></label>
+                                    <select name="product_id" class="products_list" id="product_list" >
+                                        <option value="" class="blank"><?php esc_html_e( 'Select Product', 'licenser' ); ?></option>
+                                        <?php foreach ( $products as $product ): ?>   
+                                            <option data-product_type="<?php echo esc_attr( $product->product_type ); ?>" value="<?php echo esc_attr( $product->id ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt' ); ?>" <?php selected( $license->product_id, $product->id ); ?>><?php echo esc_html( $product->name ); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                
+                                <!--  License Package -->
+                                <div class="lmfwppt-form-field lmfwppt_license_package" id="lmfwppt_license_package">
+                                    <label for="lmfwppt_package_list"><?php esc_html_e( 'Select Package', 'licenser' ); ?></label>
+                                    <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php echo esc_attr( $license->package_id ); ?>" >
+                                        <option value="<?php echo esc_attr( $license->package_id ); ?>" class="blank"><?php esc_html_e( 'Select Package', 'licenser' ); ?></option>
+                                        
+                                    </select>
+                                </div>
+
                             
-                            <!--  License Package -->
-                            <div class="lmfwppt-form-field lmfwppt_license_package" id="lmfwppt_license_package">
-                                <label for="lmfwppt_package_list"><?php esc_html_e( 'Select Package', 'licenser' ); ?></label>
-                                <select name="package_id" id="lmfwppt_package_list" data-pack_value="<?php echo esc_attr( $license->package_id ); ?>" >
-                                    <option value="<?php echo esc_attr( $license->package_id ); ?>" class="blank"><?php esc_html_e( 'Select Package', 'licenser' ); ?></option>
+                                <div class="lmfwppt-form-field">
+                                    <div class="d-flex">
+                                        <label for="end_date" class="me-1"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
+                                        <label>
+                                            <input type="checkbox" name="is_lifetime"  <?php checked( $license->is_lifetime, '1' ); ?>>
+                                            <?php esc_html_e( 'Lifetime', 'licenser' ); ?>
+                                        </label>
+                                    </div>
+                                    <input type="datetime-local" name="end_date" id="end_date" class="regular-text licenser-date-time" placeholder="License End Date" value="<?php echo esc_attr( $license->end_date ); ?>">
                                     
-                                </select>
-                            </div>
-
-                        
-                            <div class="lmfwppt-form-field">
-                                <div class="d-flex">
-                                    <label for="end_date" class="me-1"><?php esc_html_e( 'License End Date', 'licenser' ); ?></label>
-                                    <label>
-                                        <input type="checkbox" name="is_lifetime"  <?php checked( $license->is_lifetime, '1' ); ?>>
-                                        <?php esc_html_e( 'Lifetime', 'licenser' ); ?>
-                                    </label>
-                                </div>
-                                <input type="text" name="end_date" id="end_date" class="regular-text product_name_input" placeholder="License End Date" value="<?php echo esc_attr( $license->end_date ); ?>">
-                            </div>
-
-                            <div class="lmfwppt-form-field">
-                                <label for="domain_limit"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
-                                <input type="number" name="domain_limit" id="domain_limit" class="regular-text product_name_input" placeholder="Enter Domain Limit" value="<?php echo esc_attr( $license->domain_limit ); ?>">
-                                <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
-                            </div>
-                        
-                            <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
-                                <div class="lwp-col-half">
-                                    <label for="source"><?php esc_html_e( 'Source', 'licenser' ); ?></label>
-                                    <input type="text" name="source" id="source" class="regular-text" value="<?php echo esc_attr( $license->source ); ?>">
+                                  
                                 </div>
 
-                                <div class="lwp-col-half">
-                                    <label for="source_id"><?php esc_html_e( 'Source ID', 'licenser' ); ?></label>
-                                    <input type="number" name="source_id" id="source_id" class="regular-text" placeholder="" value="<?php echo esc_attr( $license->source_id ); ?>">
+                                <div class="lmfwppt-form-field">
+                                    <label for="domain_limit"><?php esc_html_e( 'License Domain Limit', 'licenser' ); ?></label>
+                                    <input type="number" name="domain_limit" id="domain_limit" class="regular-text " placeholder="Enter Domain Limit" value="<?php echo esc_attr( $license->domain_limit ); ?>">
+                                    <div><?php esc_html_e( 'Leave empty for lifetime updates.', 'licenser' ); ?></div>
+                                </div>
+                            
+                                <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
+                                    <div class="lwp-col-half">
+                                        <label for="source"><?php esc_html_e( 'Source', 'licenser' ); ?></label>
+                                        <input type="text" name="source" id="source" class="regular-text" value="<?php echo esc_attr( $license->source ); ?>">
+                                    </div>
+
+                                    <div class="lwp-col-half">
+                                        <label for="source_id"><?php esc_html_e( 'Source ID', 'licenser' ); ?></label>
+                                        <input type="number" name="source_id" id="source_id" class="regular-text" placeholder="" value="<?php echo esc_attr( $license->source_id ); ?>">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="lmwppt-inner-card">
-                        <div class="lmfwppt-form-section" id="license-information">
-                            <h2>Activated Domains</h2>
-                            <div id="lmfwppt_domains_fields">
-                                <?php //$license_handler::get_domains_html( $get_domains ); ?>
+                        <div class="lmwppt-inner-card">
+                            <div class="lmfwppt-form-section" id="license-information">
+                                <h2>Activated Domains</h2>
+                                <div id="lmfwppt_domains_fields">
+                                    <?php //$license_handler::get_domains_html( $get_domains ); ?>
 
-                                <?php if( !empty( $get_domains ) ) : ?>
-                                    <?php foreach( $get_domains as $domain ):
-                                        $domain_id = isset( $domain->id ) ? sanitize_text_field( $domain->id ) : '';
-                                        $url = isset( $domain->domain ) ? sanitize_text_field( $domain->domain ) : '';
-                                        $status = isset( $domain->status ) && $domain->status == 1 ? __('Active', 'licenser') : __('Inactive', 'licenser');
-                                        $status_tag_class = isset( $domain->status ) && $domain->status == 1 ? 'lwp-tag-success' : '';
-                                        // $dated = isset( $domain->dated ) ? licenser_date('Y-m-d H:i:s', $domain->dated) : '';
-                                        ?>
-                                        <div class="postbox">
-                                            <h4>
-                                                <span class="lwp-tag ms-1 me-1 <?php echo esc_attr( $status_tag_class ); ?>"><?php echo esc_html( $status ); ?></span>
-                                                <?php echo esc_html( $url . ' - (id:'.$domain_id.')' ); ?> 
-                                                <div class="lwp-postbox-actions">
-                                                    <a class="lwp-action-item lwp-tooltip" target="_blank" href="<?php echo esc_url( $url ); ?>" data-title="<?php esc_html_e( 'Visit Domain', 'licenser' ); ?>">
-                                                        <span class="dashicons dashicons-external"></span>
-                                                    </a>
-                                                    <a href="javascript:void(0);" class="lwp-action-item lwp-tooltip lwp-delete-domain" data-title="<?php esc_html_e( 'Delete Domain', 'licenser' ); ?>" data-id="<?php echo esc_attr( $domain_id ); ?>">
-                                                        <span class="dashicons dashicons-trash"></span>
-                                                    </a>
-                                                </div>
+                                    <?php if( !empty( $get_domains ) ) : ?>
+                                        <?php foreach( $get_domains as $domain ):
+                                            $domain_id = isset( $domain->id ) ? sanitize_text_field( $domain->id ) : '';
+                                            $url = isset( $domain->domain ) ? sanitize_text_field( $domain->domain ) : '';
+                                            $status = isset( $domain->status ) && $domain->status == 1 ? __('Active', 'licenser') : __('Inactive', 'licenser');
+                                            $status_tag_class = isset( $domain->status ) && $domain->status == 1 ? 'lwp-tag-success' : '';
+                                            // $dated = isset( $domain->dated ) ? licenser_date('Y-m-d H:i:s', $domain->dated) : '';
+                                            ?>
+                                            <div class="postbox">
+                                                <h4>
+                                                    <span class="lwp-tag ms-1 me-1 <?php echo esc_attr( $status_tag_class ); ?>"><?php echo esc_html( $status ); ?></span>
+                                                    <?php echo esc_html( $url . ' - (id:'.$domain_id.')' ); ?> 
+                                                    <div class="lwp-postbox-actions">
+                                                        <a class="lwp-action-item lwp-tooltip" target="_blank" href="<?php echo esc_url( $url ); ?>" data-title="<?php esc_html_e( 'Visit Domain', 'licenser' ); ?>">
+                                                            <span class="dashicons dashicons-external"></span>
+                                                        </a>
+                                                        <a href="javascript:void(0);" class="lwp-action-item lwp-tooltip lwp-delete-domain" data-title="<?php esc_html_e( 'Delete Domain', 'licenser' ); ?>" data-id="<?php echo esc_attr( $domain_id ); ?>">
+                                                            <span class="dashicons dashicons-trash"></span>
+                                                        </a>
+                                                    </div>
 
-                                            </h4>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <div class="licenser-not-found"><?php esc_html_e( "No Domains", "licenser" ); ?></div>
-                                <?php endif; ?> 
+                                                </h4>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <div class="licenser-not-found"><?php esc_html_e( "No Domains", "licenser" ); ?></div>
+                                    <?php endif; ?> 
+                                </div>
                             </div>
                         </div>
-                    </div>
-                
-                    <div class="lmwppt-inner-card lmfwppt-buttons card-shameless">
-
-                        <?php if( isset( $license_id ) ) : ?>
-                            <input class="lmfwppt_edit_id" type="hidden" name="id" value="<?php echo esc_attr( $license_id ); ?>">
-                        <?php endif; ?>
-                        
-                        <div class="submit_btn_area"> 
-                            <?php submit_button( $submit_button_label, 'primary', 'add_license' ); ?> 
-                            <span class="spinner"></span>
-                        </div>  
-                        <div class="lmfwppt-notices"></div>  
-                    </div>
                     
-                </form>
+                        <div class="lmwppt-inner-card lmfwppt-buttons card-shameless">
+
+                            <?php if( isset( $license_id ) ) : ?>
+                                <input class="lmfwppt_edit_id" type="hidden" name="id" value="<?php echo esc_attr( $license_id ); ?>">
+                            <?php endif; ?>
+                            
+                            <div class="submit_btn_area"> 
+                                <?php submit_button( $submit_button_label, 'primary', 'add_license' ); ?> 
+                                <span class="spinner"></span>
+                            </div>  
+                            <div class="lmfwppt-notices"></div>  
+                        </div>
+                        
+                    </form>
+                </div>
             </div>
 
         </div>
