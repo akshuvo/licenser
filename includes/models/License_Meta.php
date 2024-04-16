@@ -38,10 +38,7 @@ class License_Meta {
      */
     public function get_all( $license_id ) {
         global $wpdb;
-
-        $where = $wpdb->prepare( " WHERE license_id = %d", $license_id );
-
-        return $wpdb->get_results( "SELECT * FROM {$wpdb->licenser_license_meta} {$where}" );
+        return $wpdb->get_results( $wpdb->prepare( "SELECT id, meta_key, meta_value FROM {$wpdb->licenser_license_meta} WHERE license_id = %d", $license_id ) );
     }
 
     /**

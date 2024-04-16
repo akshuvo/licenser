@@ -266,7 +266,7 @@ class Order_Handler{
                 // Save License Key
                 if ( !empty( $license_id ) ) {
                     update_post_meta( $order_id, "license_generated_item_id_{$item_id}", $license_id );
-                    update_post_meta( $order_id, "license_generated_item_key_{$item_id}", $license_key );
+                    // update_post_meta( $order_id, "license_generated_item_key_{$item_id}", $license_key );
                     update_post_meta( $order_id, "licenser_product_id_{$item_id}", $licenser_product_id );
     
                     // Save custom meta for future usages

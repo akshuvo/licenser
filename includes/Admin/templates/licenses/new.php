@@ -1,6 +1,7 @@
 <?php
 use Licenser\Models\License;
 use Licenser\Models\Product;
+use Licenser\Models\License_Meta;
 
 // Product instance
 $product_model = Product::instance();
@@ -25,9 +26,14 @@ $products = $product_model->get_all([
 // echo "<pre>"; print_r($products); echo "</pre>";
 
 // Get Domains 
-$get_domains = $license_model->get_domains([
+$get_domains = $license_id ? $license_model->get_domains([
     'license_id' => $license_id,
-]);
+]) : [];
+
+// Get Meta Data
+$meta_data = $license_id ? License_Meta::instance()->get_all( $license_id ) : [];
+
+echo "<pre>"; print_r($meta_data); echo "</pre>";
 
 // Submit button label for Add
 $submit_button_label = __( 'Add License', 'licenser' );
@@ -151,14 +157,13 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         </div>
                         <div class="lmwppt-inner-card">
                             <div class="lmfwppt-form-section" id="license-information">
-                                <h2>Activated Domains</h2>
+                                <h2><?php esc_html_e( 'Active Domains', 'licenser' ); ?></h2>
                                 <div id="lmfwppt_domains_fields">
-                                    <?php //$license_handler::get_domains_html( $get_domains ); ?>
 
                                     <?php if( !empty( $get_domains ) ) : ?>
                                         <?php foreach( $get_domains as $domain ):
-                                            $domain_id = isset( $domain->id ) ? sanitize_text_field( $domain->id ) : '';
-                                            $url = isset( $domain->domain ) ? sanitize_text_field( $domain->domain ) : '';
+                                            $domain_id = isset( $domain->id ) ? intval( $domain->id ) : '';
+                                            $url = isset( $domain->domain ) ? $domain->domain : '';
                                             $status = isset( $domain->status ) && $domain->status == 1 ? __('Active', 'licenser') : __('Inactive', 'licenser');
                                             $status_tag_class = isset( $domain->status ) && $domain->status == 1 ? 'lwp-tag-success' : '';
                                             // $dated = isset( $domain->dated ) ? licenser_date('Y-m-d H:i:s', $domain->dated) : '';
@@ -200,6 +205,36 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" ) {
                         </div>
                         
                     </form>
+
+                    <div id="meta-data">
+                        <div class="lmwppt-inner-card">
+                            <div class="lmfwppt-form-section" id="licenser-metadata">
+                                <h2><?php esc_html_e( 'Meta Data', 'licenser' ); ?></h2>
+                                <div>
+                                    <?php if( !empty( $meta_data ) ) : ?>
+                                        <?php foreach( $meta_data as $meta ): 
+                                            $meta_id = isset( $meta->id ) ? intval( $meta->id ) : '';
+                                            ?>
+                                            <div class="postbox">
+                                                <h4 class="d-flex">
+                                                    <div class="ms-1"><?php echo esc_html( $meta->meta_key ); ?></div>
+                                                    <div class="ms-1"><?php echo esc_html( $meta->meta_value ); ?></div>
+                                                    <div class="lwp-postbox-actions">
+                                                        <a href="javascript:void(0);" class="lwp-action-item lwp-tooltip lwp-delete-meta" data-title="<?php esc_html_e( 'Delete Meta', 'licenser' ); ?>" data-id="<?php echo esc_attr( $meta_id ); ?>">
+                                                            <span class="dashicons dashicons-trash"></span>
+                                                        </a>
+                                                    </div>
+                                                </h4>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <div class="licenser-not-found"><?php esc_html_e( 'No Meta Data', 'licenser' ); ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
