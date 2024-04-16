@@ -33,8 +33,6 @@ $get_domains = $license_id ? $license_model->get_domains([
 // Get Meta Data
 $meta_data = $license_id ? License_Meta::instance()->get_all( $license_id ) : [];
 
-echo "<pre>"; print_r($meta_data); echo "</pre>";
-
 // Submit button label for Add
 $submit_button_label = __( 'Add License', 'licenser' );
 
