@@ -47,8 +47,9 @@ class License {
                 'count_total' => true,
             ] );
 
+            // TODO: Fix domain limit check on download
             if( !$license->exists_domain_id && $domain_count >= $license->domain_limit ){
-                return new \WP_Error( 'domain_limit_exceeded', __( 'Domain limit exceeded.', 'licenser' ) );
+                //return new \WP_Error( 'domain_limit_exceeded', __( 'Domain limit exceeded.', 'licenser' ) );
             }
         }
 
