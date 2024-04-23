@@ -61,33 +61,29 @@ class Public_Apis extends RestController {
                         $action = $request->get_param( 'action' );
                         $license_key = $request->get_param( 'license_key' );
 
-                        error_log( print_r( $request->get_params(), true ) ); 
-
                         // Get Product
                         $product = Product::instance()->get( $uuid, [
                             'inc_stable_release' => false,
                             'inc_releases' => false,
                             'inc_packages' => false,
                             'get_by' => 'uuid',
-                            'columns' => [ 'status' ]
+                            'columns' => [ 'status', 'id' ]
                         ]);
                         
                         // Check if product exists
                         if ( ! $product ) {
-                            return new WP_Error(
-                                'not_found',
-                                __( 'Invalid Product UUID.', 'licenser'),
-                                [ 'status' => 404 ]
-                            );
+                            return rest_ensure_response( [
+                                'success' => false,
+                                'error' => __( 'Invalid Product ID.', 'licenser'),
+                            ] );
                         }
 
                         // Check if product is active
                         if ( $product->status != 'active' ) {
-                            return new WP_Error(
-                                'not_found',
-                                __( 'Product is not active.', 'licenser'),
-                                [ 'status' => 404 ]
-                            );
+                            return [
+                                'success' => false,
+                                'error' => __( 'Product is not active.', 'licenser'),
+                            ];
                         }
                         
                         // License Controller
@@ -102,12 +98,19 @@ class Public_Apis extends RestController {
                                 'url' => $request->get_param( 'url' ),
                                 'is_local' => $request->get_param( 'is_local' ),
                                 'client' => $request->get_param( 'client' ),
+                                'product_id' => $product->id,
                             ] );
                         } elseif ( $action == 'deactivate' ) {
                             $response = $license_controller->deactivate( $request );
                         }
 
-                        error_log( print_r( $response, true ) ); 
+                        // Check if response is error
+                        if( is_wp_error( $response ) ){
+                            $response = [
+                                'success' => false,
+                                'error' => $response->get_error_message(),
+                            ];
+                        }
 
                         return rest_ensure_response( $response );
                     },
@@ -176,8 +179,6 @@ class Public_Apis extends RestController {
      */
     public function get_product_by_uuid( $request ) {
 
-        error_log( print_r( $request->get_params(), true ) );
-
         $uuid = $request->get_param( 'uuid' );
 
         $product = Product::instance()->get( $uuid, [
@@ -202,7 +203,6 @@ class Public_Apis extends RestController {
             $response = $this->prepare_response_for_theme( $product, $request );
         }
   
-        error_log( print_r( $response, true ) );
         return rest_ensure_response( $response );
     }
 
@@ -215,7 +215,14 @@ class Public_Apis extends RestController {
      */
     public function prepare_response_for_plugin( $product, $request ) {
 
-        $download_url = licenser_product_download_url( $product->uuid, $request->get_param( 'license_key' ) );
+        $license_key = $request->get_param( 'license_key' );
+        $download_url = licenser_product_download_url( $product->uuid, $license_key );
+        if ( !empty( $license_key ) ) {
+            $download_url = add_query_arg( 'refurl', $request->get_param('url'), $download_url );
+        }
+
+        // TODO: Show all changelog
+        $changelog = isset( $product->stable_release ) && !empty( $product->stable_release ) ? '<h4>' . $product->stable_release->version . ' - ' . licenser_date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) . '</h4>' . $product->stable_release->changelog : '';
 
         $response = [
             'id' => $product->uuid,
@@ -236,14 +243,16 @@ class Public_Apis extends RestController {
             'requires' => $product->requires,
             'sections' => [
                 'description' => $product->description,
-                'changelog' => '<h3>1.2.3</h3> <p><em>Release Date - Jan 8, 2024</em></p> <p>Test</p>',
+                'changelog' => $changelog,
             ],
-            'new_version' => $product->stable_release->version,
-            'last_updated' => $product->stable_release->release_date,
+            'new_version' => isset( $product->stable_release->version ) ? $product->stable_release->version : '',
+            'last_updated' => isset( $product->stable_release->release_date ) ? $product->stable_release->release_date : '',
             'package' => $download_url,
             'download_link' => $download_url,
             'author' => $product->author_name,
         ];
+
+
 
         return $response;
     }
@@ -257,7 +266,11 @@ class Public_Apis extends RestController {
      */
     public function prepare_response_for_theme( $product, $request ) {
 
-        $download_url = licenser_product_download_url( $product->uuid, $request->get_param( 'license_key' ) );
+        $license_key = $request->get_param( 'license_key' );
+        $download_url = licenser_product_download_url( $product->uuid, $license_key );
+        if ( !empty( $license_key ) ) {
+            $download_url = add_query_arg( 'refurl', $request->get_param('url'), $download_url );
+        }
 
         $response = [
             'id' => $product->uuid,
@@ -300,18 +313,29 @@ class Public_Apis extends RestController {
 
         $uuid = $request->get_param( 'uuid' );
         $license_key = $request->get_param( 'license_key' );
+        $refurl = $request->get_param( 'refurl' );
 
+        // Check if license key is provided
+        if ( empty( $license_key ) ) {
+            return new WP_Error(
+                'missing_license_key',
+                __( 'License key is required.' ),
+                [ 'status' => 400 ]
+            );
+        }
+
+        // Get Product
         $product = Product::instance()->get( $uuid, [
             'inc_stable_release' => true,
             'inc_releases' => false,
             'inc_packages' => false,
-            'get_by' => 'uuid',
+            'get_by' => 'uuid', //
         ]);
 
         if ( ! $product ) {
             return new WP_Error(
                 'not_found',
-                __( 'Invalid Product UUID.' ),
+                __( 'Invalid Product ID.' ),
                 [ 'status' => 404 ]
             );
         }
@@ -320,6 +344,7 @@ class Public_Apis extends RestController {
         return Product_Controller::instance()->download( [
             'product_id' => $product->id,
             'license_key' => $license_key,
+            'ref_domain' => $refurl,
             // 'version' => $product->stable_release->version,
         ] );
     }

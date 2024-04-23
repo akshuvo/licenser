@@ -24,9 +24,12 @@ class Menu {
         $parent_slug = 'licenser';
         $capability = 'manage_options';
 
+        $pro_tag = defined('LICENSER_PRO_VERSION') ? '<span class="menu-counter" style="background: #e27731;">'.__( 'PRO', 'licenser' ).'</span>' : '';
+
         $hook = add_menu_page(
             __( 'Licenser', 'licenser' ),
-            __( 'Licenser', 'licenser' ),
+            // __( 'Licenser %s', 'licenser' ),
+            sprintf( __( 'Licenser %s', 'licenser' ), $pro_tag ),
             $capability,
             $parent_slug,
             [ $this, 'dashboard_page' ],

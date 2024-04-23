@@ -44,7 +44,7 @@ trait SingletonTrait {
 	 * Prevent unserializing.
 	 */
 	final public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Unserializing instances of this class is forbidden.', 'tinytopcrm' ), '4.6' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing instances of this class is forbidden.', 'licenser' ), '1.0' );
 		die();
 	}
 }

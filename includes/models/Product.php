@@ -9,6 +9,7 @@ class Product {
     // Product Default Fields
     public $default_fields = [
         'name' => '',
+        'uuid' => '',
         'slug' => '',
         'product_type' => '',
         'tested' => '',
@@ -49,49 +50,60 @@ class Product {
             'inc_packages' => true,
             'columns' => [],
             'get_by' => '',
+            'cache' => true,
         ] );
-        global $lwpdb;
-        $columns = !empty( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
+        global $wpdb;
+        $columns = !empty( $args['columns'] ) && is_array( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
 
         // Where
         $where = ' 1=1 ';
 
         // Get By
         if( $args['get_by'] == 'uuid' ){
-            $where .= $lwpdb->wpdb->prepare( " AND uuid = %s", $id );
+            $where .= $wpdb->prepare( " AND uuid = %s", $id );
         } else {
-            $where .= $lwpdb->wpdb->prepare( " AND id = %d", $id );
+            $where .= $wpdb->prepare( " AND id = %d", $id );
         }
 
-        $product = $lwpdb->wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->products} WHERE {$where} LIMIT 1" );
+        // Cache Key
+        $cache_key = 'product_' . $id . md5( serialize( $args ) );
 
-        // Return if no product found
-        if( empty( $product ) ){
-            return false;
-        }
+        // Get Product
+        if ( $args['cache'] && false === ( $product = licenser_get_cache( $cache_key ) ) ) {
 
-        // Banners
-        if( !empty( $product->banners ) ){
-            $product->banners = json_decode( $product->banners, true );
-        }
+            $product = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} LIMIT 1" ); // phpcs:ignore
 
-        // Stable Release
-        if( $args['inc_stable_release'] ){
-            $product->stable_release = ProductRelease::instance()->get_stable( $product->id );
-        }
+            // Return if no product found
+            if( empty( $product ) ){
+                return false;
+            }
 
-        // Releases
-        if( $args['inc_releases'] ){
-            $product->releases = ProductRelease::instance()->get_all([
-                'product_id' => $product->id,
-            ]);
-        }
+            // Banners
+            if( !empty( $product->banners ) ){
+                $product->banners = json_decode( $product->banners, true );
+            }
 
-        // Packages
-        if( $args['inc_packages'] ){
-            $product->packages = LicensePackage::instance()->get_all([
-                'product_id' => $product->id,
-            ]);
+            // Stable Release
+            if( $args['inc_stable_release'] ){
+                $product->stable_release = ProductRelease::instance()->get_stable( $product->id );
+            }
+
+            // Releases
+            if( $args['inc_releases'] ){
+                $product->releases = ProductRelease::instance()->get_all([
+                    'product_id' => $product->id,
+                ]);
+            }
+
+            // Packages
+            if( $args['inc_packages'] ){
+                $product->packages = LicensePackage::instance()->get_all([
+                    'product_id' => $product->id,
+                ]);
+            }
+
+            // Set Cache
+            licenser_set_cache( $cache_key, $product );
         }
 
         return $product;
@@ -103,7 +115,7 @@ class Product {
      * @var int
      */
     public function get_all( $args = [] ) {
-        global $lwpdb;
+        global $wpdb;
 
         $defaults = [
             'number' => 20,
@@ -125,39 +137,37 @@ class Product {
         $where = ' 1=1 ';
 
         if( !empty( $args['name'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND name = %s", $args['name'] );
+            $where .= $wpdb->prepare( " AND name = %s", $args['name'] );
         }
 
         if( !empty( $args['slug'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND slug = %s", $args['slug'] );
+            $where .= $wpdb->prepare( " AND slug = %s", $args['slug'] );
         }
 
         if( !empty( $args['uuid'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND uuid = %s", $args['uuid'] );
+            $where .= $wpdb->prepare( " AND uuid = %s", $args['uuid'] );
         }
 
         if( !empty( $args['product_type'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND product_type = %s", $args['product_type'] );
+            $where .= $wpdb->prepare( " AND product_type = %s", $args['product_type'] );
         }
 
         if( !empty( $args['status'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND status = %s", $args['status'] );
+            $where .= $wpdb->prepare( " AND status = %s", $args['status'] );
         }
 
         // Order
         $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
-        $limit = '';
+        // Limit
         if( $args['number'] != -1 ){
-            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $where .= $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
         // Columns
         $columns = sanitize_text_field( $args['columns'] );
 
-        $query = "SELECT {$columns} FROM {$lwpdb->products} WHERE {$where} {$limit}";
-
-        $items = $lwpdb->wpdb->get_results( $query );
+        $items = $wpdb->get_results( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where}" );
 
         // Return if no product found
         if( empty( $items ) ){
@@ -210,15 +220,15 @@ class Product {
 
         // Banner
         if( !empty( $data['banners'] ) && is_array( $data['banners'] ) ){
-            $data['banners'] = json_encode( $data['banners'] );
+            $data['banners'] = wp_json_encode( $data['banners'] );
         }        
 
-        global $lwpdb;
+        global $wpdb;
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $lwpdb->wpdb->update(
-                $lwpdb->products,
+            $wpdb->update(
+                $wpdb->licenser_products,
                 [
                     'name' => sanitize_text_field( $data['name'] ),
                     'slug' => sanitize_text_field( $data['slug'] ),
@@ -241,9 +251,13 @@ class Product {
             );
 
             $insert_id = $data['id'];
+
+            // Delete Cache
+            licenser_delete_cache( 'product_' . $insert_id, true );
+            licenser_delete_cache( 'product_' . $data['uuid'], true );
         } else {
-            $lwpdb->wpdb->insert(
-                $lwpdb->products,
+            $wpdb->insert(
+                $wpdb->licenser_products,
                 [
                     'name' => sanitize_text_field( $data['name'] ),
                     'slug' => sanitize_text_field( $data['slug'] ),
@@ -263,7 +277,7 @@ class Product {
                 ] 
             );
 
-            $insert_id = $lwpdb->wpdb->insert_id;
+            $insert_id = $wpdb->insert_id;
         }
 
         // Product Release
@@ -281,7 +295,6 @@ class Product {
         // License Package
         if( !empty( $data['license_packages'] ) && is_array( $data['license_packages'] ) ){
             foreach( $data['license_packages'] as $package ){
-                error_log( print_r( $package, true ) );
                 $license_package = LicensePackage::instance()->create([
                     'id' => isset( $package['id'] ) ? $package['id'] : '',
                     'product_id' => $insert_id,
@@ -294,5 +307,51 @@ class Product {
         }
 
         return $insert_id;
+    }
+
+    /**
+     * Delete Product
+     * 
+     * @param int $id
+     * @return bool
+     */
+    public function delete( $id ) {
+        global $wpdb;
+
+        $wpdb->delete(
+            $wpdb->licenser_products,
+            [
+                'id' => $id
+            ]
+        );
+
+        return true;
+    }
+
+    /**
+     * Update Status
+     * 
+     * @param int $id
+     * @param string $status
+     * @return bool
+     */
+    public function update_status( $id, $status ) {
+        if( !in_array( $status, [ 'active', 'trash', 'draft' ] ) ){
+            return false;
+        }
+
+        global $wpdb;
+
+        $wpdb->update(
+            $wpdb->licenser_products,
+            [
+                'status' => $status
+            ],
+            [
+                'id' => $id
+            ]
+        );
+
+        return true;
     }
 }

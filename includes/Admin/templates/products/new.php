@@ -13,7 +13,7 @@ $product = !empty( $product_id ) ? $product_model->get( $product_id ) : (object)
 // Product Packages
 $product_packages = isset( $product->packages ) ? $product->packages : [];
 
-echo '<pre>'; print_r($product); echo '</pre>';
+// echo '<pre>'; print_r($product); echo '</pre>';
 
 
 $submit_button_label = __( 'Add Product', 'licenser' );
@@ -24,199 +24,236 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
 
 ?>
+
 <div class="wrap">
-    <div class="lmwppt-wrap">
-
-        <div class="lmwppt-inner-card card-shameless">
+    <div class="licenser-root">
+        <!-- Header  -->
+        <div class="licenser-header">
+            <div class="licenser-header__title">
             <?php if( isset( $_GET['id'] ) ) : ?>
-                <h1><?php _e( 'Edit Product', 'licenser' ); ?></h1>
+                <h2><?php esc_html_e( 'Edit Product', 'licenser' ); ?></h2>
             <?php else : ?>
-                <h1><?php _e( 'Add New Product', 'licenser' ); ?></h1>
+                <h2><?php esc_html_e( 'Add New Product', 'licenser' ); ?></h2>
             <?php endif; ?>
-        </div>
-
-        <form action="" method="post" id="product-form">
-            <div class="lmwppt-inner-card">
-                <div class="lmfwppt-form-section" id="product-information">
-                    <h2><?php esc_html_e( 'Product Information', 'licenser' ); ?></h2>
-
-                    <div class="lmfwppt-form-field">
-                        <label for="name"><?php esc_html_e( 'Product Name', 'licenser' ); ?></label>
-                        <input type="text" name="name" id="name" class="regular-text product_name_input" placeholder="Your Theme or Plugin Name" value="<?php echo esc_attr( $product->name ); ?>" required>
-                    </div>
-
-                    <div class="lmfwppt-form-field">
-                        <label for="slug"><?php esc_html_e( 'Product Slug', 'licenser' ); ?></label>
-                        <input type="text" name="slug" id="slug" class="regular-text product_slug_input" placeholder="your-theme-or-plugin-name" value="<?php echo esc_attr( $product->slug ); ?>" required>
-                    </div>
-
-                    <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
-                        <div class="lwp-col-half">
-                            <label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
-                            <select name="product_type" id="product_type">
-                                <option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
-                                <?php foreach( $product_model->get_types() as $key => $value ) : ?>
-                                    <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $product->product_type, $key ); ?> ><?php echo esc_html( $value ); ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="lwp-col-half">
-                            <label for="requires_php"><?php esc_html_e( 'Requires PHP Version', 'licenser' ); ?></label>
-                            <input type="text" name="requires_php" id="requires_php" class="regular-text" placeholder="<?php esc_attr_e( '7.4', 'licenser' ); ?>" value="<?php echo esc_attr( $product->requires_php ); ?>">
-                        </div>
-                    </div>
-
-                    <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
-                        <div class="lwp-col-half">
-                            <label for="requires"><?php esc_html_e( 'Requires WordPress Version', 'licenser' ); ?></label>
-                            <input type="text" name="requires" id="requires" class="regular-text" placeholder="<?php esc_attr_e( '4.7', 'licenser' ); ?>" value="<?php echo esc_attr( $product->requires ); ?>">
-                        </div>
-                        <div class="lwp-col-half">
-                            <label for="product_tested"><?php esc_html_e( 'Tested up to', 'licenser' ); ?></label>
-                            <input type="text" name="tested" id="product_tested" class="regular-text" placeholder="<?php esc_attr_e( '5.7', 'licenser' ); ?>" value="<?php echo esc_attr( $product->tested ); ?>">
-                        </div>
-                    </div>
-
-                    <div class="lmfwppt-form-field">
-                        <label for="author"><?php esc_html_e( 'Author Name', 'licenser' ); ?></label>
-                        <input type="text" name="author_name" id="author" class="regular-text product_name_input" placeholder="Author Name" value="<?php echo esc_attr( $product->author_name ); ?>">
-                    </div>
-
-                    <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
-                        <div class="lwp-col-half">
-                            <label for="homepage_url"><?php esc_html_e( 'Homepage URL', 'licenser' ); ?></label>
-                            <input type="url" name="homepage_url" id="homepage_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $product->homepage_url ); ?>">
-                        </div>
-
-                        <div class="lwp-col-half">
-                            <label for="demo_url"><?php esc_html_e( 'Demo URL', 'licenser' ); ?></label>
-                            <input type="url" name="demo_url" id="demo_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $product->demo_url ); ?>">
-                        </div>
-                    </div>
-
-                    <div class="lmfwppt-form-field">
-                        <label for="description"><?php esc_html_e( 'Description', 'licenser' ); ?></label>
-                        <textarea name="description" id="description" class="regular-text" placeholder="<?php esc_attr_e( 'Description', 'licenser' ); ?>"><?php echo esc_attr( $product->description ); ?></textarea>
-                    </div>
-                </div>
             </div>
-
-            <!-- Release -->
-            <div class="lmwppt-inner-card release-information">
-                <div class="d-flex justify-content-between mb-15">
-                    <h2 class="mb-0"><?php esc_html_e( 'Release Information', 'licenser' ); ?></h2>
-                    <?php if( isset( $product->stable_release->download_link ) && !empty( $product->stable_release->download_link ) ) : ?>
-                        <button class="button twp-btn twp-btn-lg add-release-btn hide-on-add-release" type="button"><?php esc_html_e( 'Add New Release', 'licenser' ); ?></button>
-                    <?php endif; ?>
+        </div>
+        <!-- Header  -->
+        <!-- Content  -->
+        <div class="licenser-content">
+            <div class="d-flex">
+                <div class="licenser-sidenav">
+                    <ul>
+                        <li><a href="#general"><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e('General', 'licenser'); ?></a></li>
+                        <li><a href="#general"><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e('General', 'licenser'); ?></a></li>
+                        <li><a href="#general"><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e('General', 'licenser'); ?></a></li>
+                        <li><a href="#general"><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e('General', 'licenser'); ?></a></li>
+                        <li><a href="#general"><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e('General', 'licenser'); ?></a></li>
+                    </ul>
                 </div>
-                <div class="add-release-form"></div>
-                <?php if( isset( $product->stable_release->download_link ) && !empty( $product->stable_release->download_link ) ) : ?>
-                    <div class="lmfwppt-form-field">
-                        <div class="postbox lwp-postbox"> 
-                            <a class="header lmfwppt-toggle-head" data-toggle="collapse">
-                                <span id="poststuff">
-                                    <h2 class="hndle">
-                                        <span class="release-head">
-                                            
-                                            <span class="lwp-tag lwp-tag-success"><?php esc_html_e( 'Stable', 'licenser' ); ?></span>
-                                            
-                                            <span class="release-version"><?php esc_html_e( 'Version:', 'licenser' ); ?> <span><?php echo esc_html( $product->stable_release->version ); ?></span></span>
-                                            
-                                            <span class="release-date"><?php esc_html_e( 'Released on:', 'licenser' ); ?> <span><?php echo esc_html( date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) ); ?></span></span>
+                <div class="licenser-navcontent w-100">
+                    <form action="" method="post" id="product-form">
+                        <div class="lmwppt-inner-card">
+                            <div class="lmfwppt-form-section" id="product-information">
+                                <h2><?php esc_html_e( 'Product Information', 'licenser' ); ?></h2>
 
-                                        </span>
-                                        <span class="dashicons indicator_field last-icon"></span>
-                                    </h2>
-                                </span>
-                            </a>
-                            <div class="collapse lmfwppt-toggle-wrap">
-                                <div class="inside">
-                                    <div class="mb-15">
-                                        <strong><?php esc_html_e( 'File Name:', 'licenser' ); ?></strong> <span><?php echo esc_html( $product->stable_release->file_name ); ?></span>
-                                        <span class="twp-spacer"></span>
-                                        <strong><?php esc_html_e( 'Download Link:', 'licenser' ); ?></strong> <span><a target="_blank" href="<?php echo esc_url( $product->stable_release->download_link ); ?>" target="_blank"><?php echo esc_html( $product->stable_release->download_link ); ?> <span class="dashicons dashicons-external"></span></a></span>
+                                <div class="lmfwppt-form-field">
+                                    <label for="name"><?php esc_html_e( 'Product Name', 'licenser' ); ?></label>
+                                    <input type="text" name="name" id="name" class="regular-text product_name_input" placeholder="Your Theme or Plugin Name" value="<?php echo esc_attr( $product->name ); ?>" required>
+                                </div>
+                            
+                                <div class="lmfwppt-form-field">
+                                    <label for="id"><?php esc_html_e( 'Product ID', 'licenser' ); ?></label>
+                                    <input type="text" id="id" name="uuid" class="regular-text "  value="<?php echo esc_attr( $product->uuid ); ?>" readonly>
+                                </div>
+
+                                <div class="lmfwppt-form-field">
+                                    <label for="slug"><?php esc_html_e( 'Product Slug', 'licenser' ); ?></label>
+                                    <input type="text" name="slug" id="slug" class="regular-text product_slug_input" placeholder="your-theme-or-plugin-name" value="<?php echo esc_attr( $product->slug ); ?>" required>
+                                </div>
+
+                                <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
+                                    <div class="lwp-col-half">
+                                        <label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
+                                        <select name="product_type" id="product_type">
+                                            <option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
+                                            <?php foreach( $product_model->get_types() as $key => $value ) : ?>
+                                                <option value="<?php echo esc_attr( $key ); ?>" <?php selected( $product->product_type, $key ); ?> ><?php echo esc_html( $value ); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     </div>
-                                    <div class="mb-15">
-                                        <label><?php esc_html_e( 'Changelog:', 'licenser' ); ?></label>
-                                        <span class="pre"><?php echo esc_html( $product->stable_release->changelog ); ?></span>
+                                    <div class="lwp-col-half">
+                                        <label for="requires_php"><?php esc_html_e( 'Requires PHP Version', 'licenser' ); ?></label>
+                                        <input type="text" name="requires_php" id="requires_php" class="regular-text" placeholder="<?php esc_attr_e( '7.4', 'licenser' ); ?>" value="<?php echo esc_attr( $product->requires_php ); ?>">
                                     </div>
+                                </div>
+
+                                <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
+                                    <div class="lwp-col-half">
+                                        <label for="requires"><?php esc_html_e( 'Requires WordPress Version', 'licenser' ); ?></label>
+                                        <input type="text" name="requires" id="requires" class="regular-text" placeholder="<?php esc_attr_e( '4.7', 'licenser' ); ?>" value="<?php echo esc_attr( $product->requires ); ?>">
+                                    </div>
+                                    <div class="lwp-col-half">
+                                        <label for="product_tested"><?php esc_html_e( 'Tested up to', 'licenser' ); ?></label>
+                                        <input type="text" name="tested" id="product_tested" class="regular-text" placeholder="<?php esc_attr_e( '5.7', 'licenser' ); ?>" value="<?php echo esc_attr( $product->tested ); ?>">
+                                    </div>
+                                </div>
+
+                                <div class="lmfwppt-form-field">
+                                    <label for="author"><?php esc_html_e( 'Author Name', 'licenser' ); ?></label>
+                                    <input type="text" name="author_name" id="author" class="regular-text product_name_input" placeholder="Author Name" value="<?php echo esc_attr( $product->author_name ); ?>">
+                                </div>
+
+                                <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
+                                    <div class="lwp-col-half">
+                                        <label for="homepage_url"><?php esc_html_e( 'Homepage URL', 'licenser' ); ?></label>
+                                        <input type="url" name="homepage_url" id="homepage_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $product->homepage_url ); ?>">
+                                    </div>
+
+                                    <div class="lwp-col-half">
+                                        <label for="demo_url"><?php esc_html_e( 'Demo URL', 'licenser' ); ?></label>
+                                        <input type="url" name="demo_url" id="demo_url" class="regular-text product_name_input" placeholder="https://example.com" value="<?php echo esc_attr( $product->demo_url ); ?>">
+                                    </div>
+                                </div>
+
+                                <div class="lmfwppt-form-field">
+                                    <label for="description"><?php esc_html_e( 'Description', 'licenser' ); ?></label>
+                                    <textarea name="description" id="description" class="regular-text" placeholder="<?php esc_attr_e( 'Description', 'licenser' ); ?>"><?php echo esc_attr( $product->description ); ?></textarea>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                <?php else: ?>
-                    <div class="twp-not-found hide-on-add-release">
-                        <span class="dashicons dashicons-info-outline"></span>
-                        <h2><?php esc_html_e( 'No Release Found', 'licenser' ); ?></h2>
-                        <p><?php esc_html_e( 'No release found for this product. Add a release to show here.', 'licenser' ); ?></p>
-                        <button class="button twp-btn twp-btn-lg add-release-btn" type="button"><?php esc_html_e( 'Create Your First Release', 'licenser' ); ?></button>
-                    </div>
+
+                        <!-- Release -->
+                        <div class="lmwppt-inner-card release-information">
+                            <div class="d-flex justify-content-between mb-15">
+                                <h2 class="mb-0"><?php esc_html_e( 'Release Information', 'licenser' ); ?></h2>
+                                <?php if( isset( $product->stable_release->download_link ) && !empty( $product->stable_release->download_link ) ) : ?>
+                                    <button class="button twp-btn twp-btn-lg add-release-btn hide-on-add-release" type="button"><?php esc_html_e( 'Add New Release', 'licenser' ); ?></button>
+                                <?php endif; ?>
+                            </div>
+                            <div class="add-release-form"></div>
+                            <?php if( isset( $product->stable_release->download_link ) && !empty( $product->stable_release->download_link ) ) : ?>
+                                <div class="lmfwppt-form-field">
+                                    <div class="postbox lwp-postbox"> 
+                                        <a class="header lmfwppt-toggle-head" data-toggle="collapse">
+                                            <span id="poststuff">
+                                                <h2 class="hndle">
+                                                    <span class="release-head">
+                                                        
+                                                        <span class="lwp-tag lwp-tag-success me-1"><?php esc_html_e( 'Stable', 'licenser' ); ?></span>
+                                                        
+                                                        <span class="release-version"><?php esc_html_e( 'Version:', 'licenser' ); ?> <span><?php echo esc_html( $product->stable_release->version ); ?></span></span>
+                                                        
+                                                        <span class="release-date"><?php esc_html_e( 'Released on:', 'licenser' ); ?> <span><?php echo esc_html( licenser_date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) ); ?></span></span>
+
+                                                    </span>
+                                                    <span class="dashicons indicator_field last-icon"></span>
+                                                </h2>
+                                            </span>
+                                        </a>
+                                        <div class="collapse lmfwppt-toggle-wrap">
+                                            <div class="inside">
+                                                <div class="mb-15">
+                                                    <strong><?php esc_html_e( 'File Name:', 'licenser' ); ?></strong> <span><?php echo esc_html( $product->stable_release->file_name ); ?></span>
+                                                    <span class="twp-spacer"></span>
+                                                    <strong><?php esc_html_e( 'Download Link:', 'licenser' ); ?></strong> <span><a target="_blank" href="<?php echo esc_url( $product->stable_release->download_link ); ?>" target="_blank"><?php echo esc_html( $product->stable_release->download_link ); ?> <span class="dashicons dashicons-external"></span></a></span>
+                                                </div>
+                                                <div class="mb-15">
+                                                    <label><?php esc_html_e( 'Changelog:', 'licenser' ); ?></label>
+                                                    <span class="pre"><?php echo esc_html( $product->stable_release->changelog ); ?></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            <?php else: ?>
+                                <div class="twp-not-found hide-on-add-release">
+                                    <span class="dashicons dashicons-info-outline"></span>
+                                    <h2><?php esc_html_e( 'No Release Found', 'licenser' ); ?></h2>
+                                    <p><?php esc_html_e( 'No release found for this product. Add a release to show here.', 'licenser' ); ?></p>
+                                    <button class="button twp-btn twp-btn-lg add-release-btn" type="button"><?php esc_html_e( 'Create Your First Release', 'licenser' ); ?></button>
+                                </div>
 
 
-                <?php endif; ?>
+                            <?php endif; ?>
 
-               
-            </div>
-            <!-- /Release -->
-
-            
-            <div class="lmwppt-inner-card">
-                <div class="lmfwppt-form-section" id="license-information">
-                    <h2><?php esc_html_e( 'License Packages', 'licenser' ); ?></h2>
-                    <div id="license-packages-fields">
                         
-                    </div>
-                    <button class="button add-license-package" type="button"><?php esc_html_e( 'Add License Package', 'licenser' ); ?></button>
-                </div>
-            </div>
-            <!-- banner -->
-            <div class="lmwppt-inner-card">
-                <div class="lmfwppt-form-section" id="product-information">
-                    <h2><?php esc_html_e( 'Banners and Icon', 'licenser' ); ?></h2>
-
-                    <div class="lmfwppt-form-field">
-                        <label for="icon_url"><?php esc_html_e( 'Icon', 'licenser' ); ?></label>
-                        <div class="lmfwppt-file-field">
-                            <input type="url" name="icon_url" id="icon_url" class="regular-text" placeholder="<?php esc_attr_e( 'icon-128x128.png', 'licenser' ); ?>" value="<?php echo esc_attr( $product->icon_url ); ?>">
-                            <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#icon_url" type="button" id="icon_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
                         </div>
-                    </div> 
+                        <!-- /Release -->
 
-                    <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
-                        <div class="lwp-col-half">
-                            <label for="banner_low"><?php esc_html_e( 'Banner Low', 'licenser' ); ?></label>
-                            <div class="lmfwppt-file-field">
-                                <input type="url" name="banners[low]" id="banner_low" class="regular-text" placeholder="<?php esc_attr_e( 'banner-772x250.png', 'licenser' ); ?>" value="<?php echo esc_attr( $product->banners['low'] ); ?>" required>
-                                <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#banner_low" type="button" id="banners_low_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
+                        
+                        <div class="lmwppt-inner-card">
+                            <div class="lmfwppt-form-section" id="license-information">
+                                <h2><?php esc_html_e( 'License Packages', 'licenser' ); ?></h2>
+                                <div id="license-packages-fields">
+                                    
+                                </div>
+                                <button class="button add-license-package" type="button"><?php esc_html_e( 'Add License Package', 'licenser' ); ?></button>
                             </div>
-                        </div> 
-                        <div class="lwp-col-half">
-                            <label for="banner_high"><?php esc_html_e( 'Banner High Resolution', 'licenser' ); ?></label>
-                            <div class="lmfwppt-file-field">
-                                <input type="url" name="banners[high]" id="banner_high" class="regular-text" placeholder="<?php esc_attr_e( 'banner-1544x500.png', 'licenser' ); ?>" value="<?php echo esc_attr( $product->banners['high'] ); ?>">
-                                <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#banner_high" type="button" id="banners_high_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
+                        </div>
+                        <!-- banner -->
+                        <div class="lmwppt-inner-card">
+                            <div class="lmfwppt-form-section" id="product-information">
+                                <h2><?php esc_html_e( 'Banners and Icon', 'licenser' ); ?></h2>
+
+                                <div class="lmfwppt-form-field">
+                                    <label for="icon_url"><?php esc_html_e( 'Icon', 'licenser' ); ?></label>
+                                    <div class="lmfwppt-file-field">
+                                        <input type="url" name="icon_url" id="icon_url" class="regular-text" placeholder="<?php esc_attr_e( 'icon-128x128.png', 'licenser' ); ?>" value="<?php echo esc_attr( $product->icon_url ); ?>">
+                                        <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#icon_url" type="button" id="icon_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
+                                    </div>
+                                </div> 
+
+                                <div class="lmfwppt-form-field lwp-row lwp-col-gap-20">
+                                    <div class="lwp-col-half">
+                                        <label for="banner_low"><?php esc_html_e( 'Banner Low', 'licenser' ); ?></label>
+                                        <div class="lmfwppt-file-field">
+                                            <input type="url" name="banners[low]" id="banner_low" class="regular-text" placeholder="<?php esc_attr_e( 'banner-772x250.png', 'licenser' ); ?>" value="<?php echo esc_attr( $product->banners['low'] ); ?>" >
+                                            <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#banner_low" type="button" id="banners_low_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
+                                        </div>
+                                    </div> 
+                                    <div class="lwp-col-half">
+                                        <label for="banner_high"><?php esc_html_e( 'Banner High Resolution', 'licenser' ); ?></label>
+                                        <div class="lmfwppt-file-field">
+                                            <input type="url" name="banners[high]" id="banner_high" class="regular-text" placeholder="<?php esc_attr_e( 'banner-1544x500.png', 'licenser' ); ?>" value="<?php echo esc_attr( $product->banners['high'] ); ?>">
+                                            <button title="Select Banner Image" class="button trigger_media_frame" data-push_selector="#banner_high" type="button" id="banners_high_link_button"><?php esc_html_e( 'Select File', 'licenser' ); ?></button>
+                                        </div>
+                                    </div> 
+                                </div>
+
                             </div>
-                        </div> 
+                        </div>
+            
+
+                        <div class="lmfwppt-buttons lmwppt-inner-card card-shameless">
+                            
+                            <?php if( isset( $product_id ) ) : ?>
+                                <input class="lmfwppt_edit_id" type="hidden" name="id" value="<?php echo esc_attr( $product_id ); ?>">
+                            <?php endif; ?>
+                            
+                            <div class="submit_btn_area"> 
+                                <?php submit_button( $submit_button_label, 'primary', 'submit_product_license' ); ?> 
+                                <span class="spinner"></span>
+                            </div>   
+                            <div class="lmfwppt-notices"></div> 
+                        </div>
+                    </form>
+
+                    <div class=" lmwppt-inner-card ">
+                        <div class="lmfwppt-form-field">
+                            <label for="api-url"><?php esc_html_e( 'Public API URL', 'licenser' ); ?></label>
+                            <div class="lmfwppt-file-field field-group-overlap">
+                                <input type="text" id="api-url" class="regular-text "  value="<?php echo esc_attr( home_url('/wp-json/licenser/v1/public/products/' . $product->uuid ) ); ?>" readonly>
+                                <span class="lwp-tag lwp-tag-success"><?php esc_html_e( 'POST', 'licenser' ); ?></span>
+                            </div>
+                            
+                        </div>
                     </div>
-
                 </div>
-            </div>
-  
 
-            <div class="lmfwppt-buttons lmwppt-inner-card card-shameless">
-                
-                <?php if( isset( $product_id ) ) : ?>
-                    <input class="lmfwppt_edit_id" type="hidden" name="id" value="<?php esc_attr_e( $product_id ); ?>">
-                <?php endif; ?>
-                
-                <div class="submit_btn_area"> 
-                    <?php submit_button( $submit_button_label, 'primary', 'submit_product_license' ); ?> 
-                    <span class="spinner"></span>
-                </div>   
-                <div class="lmfwppt-notices"></div> 
             </div>
-        </form>
+        </div>
+        <!-- Content  -->
     </div>
 </div>
 
@@ -323,7 +360,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
     // Load Product Packages
     jQuery(document).on('load_product_packages', function(){
-        let productPackages = <?php echo json_encode( $product_packages ); ?>;
+        let productPackages = <?php echo wp_json_encode( $product_packages ); ?>;
         let template = wp.template('license-package-field');
 
         // Data push
@@ -468,7 +505,7 @@ if ( isset( $_GET['action'] ) && $_GET['action'] == "edit" && isset( $_GET['id']
 
             <div class="lwp-col-half">
                 <label for="release_date"><?php esc_html_e( 'Release Date', 'licenser' ); ?></label>
-                <input type="text" name="release_date" id="release_date" class="regular-text" placeholder="<?php esc_attr_e( '01-23-2023', 'licenser' ); ?>">
+                <input type="date" name="release_date" id="release_date" class="regular-text" placeholder="<?php esc_attr_e( '01-23-2023', 'licenser' ); ?>">
             </div>
         </div>
 

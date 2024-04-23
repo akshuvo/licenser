@@ -8,6 +8,19 @@ function licenser_table( $table ) {
 }
 
 /**
+ * gmdate
+ *
+ * @return Array
+ */
+function licenser_date( $format, $timestamp = null ) {
+    if ( is_null( $timestamp ) ) {
+        $timestamp = current_time( 'timestamp' );
+    }
+
+    return gmdate( $format, $timestamp );
+}
+
+/**
  * Get Settings
  */
 function licenser_get_option( $name = null ){
@@ -21,33 +34,18 @@ function licenser_get_option( $name = null ){
 }
 
 // API URL
-function lmfwppt_api_url(){
-    return apply_filters( 'lmfwppt_api_url', home_url('/') );
+function licenser_api_url(){
+    // return 'https://c0c7-103-106-239-17.ngrok-free.app/';
+    return apply_filters( 'licenser_api_url', home_url('/') );
 }
 
 // Download URL
-function licenser_product_download_url( $product_id, $license_key = '' ) {
-    // http://licenser.local/wp-json/licenser/v1/public/products/download/ce78f257-1254-4680-993d-24c199a21a30?license_key=xxx
+function licenser_product_download_url( $product_uuid, $license_key = '' ) {
     return add_query_arg( [
         'license_key' => $license_key,
-    ], lmfwppt_api_url() . 'wp-json/licenser/v1/public/products/download/' . $product_id );
+    ], licenser_api_url() . 'wp-json/licenser/v1/public/products/download/' . $product_uuid );
 }
 
-// Get Product list
-function lmfwppt_get_product_list( $product_type ){
-
-    if ( !$product_type ) {
-        return;
-    }
-
-    global $wpdb;
-    $wpdb_products = licenser_table('products');
-
-    $product_list = $wpdb->prepare("SELECT id,name FROM {$wpdb_products} WHERE product_type = %s ", $product_type );
-
-    $items = $wpdb->get_results( $product_list );
-    return $items;
-}
 
 /**
  * Parse file path and see if its remote or local.
@@ -55,7 +53,7 @@ function lmfwppt_get_product_list( $product_type ){
  * @param  string $file_path File path.
  * @return array
  */
-function lmfwppt_parse_file_path( $file_path ) {
+function licenser_parse_file_path( $file_path ) {
     $wp_uploads     = wp_upload_dir();
     $wp_uploads_dir = $wp_uploads['basedir'];
     $wp_uploads_url = $wp_uploads['baseurl'];
@@ -108,24 +106,23 @@ function lmfwppt_parse_file_path( $file_path ) {
 }
 
 // Media Frame State Saving Ajax
-add_action('wp_ajax_lmfwppt_media_frame_state', 'lmfwppt_media_frame_state_action');
-function lmfwppt_media_frame_state_action(){
+add_action('wp_ajax_licenser_media_frame_state', 'licenser_media_frame_state_action');
+function licenser_media_frame_state_action(){
     $state = isset( $_POST['state'] ) ? sanitize_text_field( $_POST['state'] ) : '';
-    update_option( 'lmfwppt_media_frame_state', $state );
-    echo $state;
-    wp_die();
+    update_option( 'licenser_media_frame_state', $state );
+    wp_send_json_success($state);
 }
 
 // Change Upload Directory for License Manager
-add_filter( 'wp_handle_upload_prefilter', 'lmfwwpt_license_manager_pre_upload' );
-function lmfwwpt_license_manager_pre_upload( $file ) {
-    add_filter('upload_dir', 'lmfwwpt_license_manager_uploads_dir');
+add_filter( 'wp_handle_upload_prefilter', 'licenser_license_manager_pre_upload' );
+function licenser_license_manager_pre_upload( $file ) {
+    add_filter('upload_dir', 'licenser_license_manager_uploads_dir');
     return $file;
 }
 
-function lmfwwpt_license_manager_uploads_dir( $param ){
+function licenser_license_manager_uploads_dir( $param ){
 
-    if ( get_option('lmfwppt_media_frame_state') == 'open' ) {
+    if ( get_option('licenser_media_frame_state') == 'open' ) {
         $mydir = '/license-manager';
 
         $param['path'] = $param['basedir'] . $mydir;
@@ -136,7 +133,7 @@ function lmfwwpt_license_manager_uploads_dir( $param ){
 }
 
 // Get Host/Path from URL
-function lmfwppt_get_clean_url( $url ) {
+function licenser_get_clean_url( $url ) {
     $parsed_url = wp_parse_url( $url );
     $host       = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
     $path       = isset( $parsed_url['path'] ) ? $parsed_url['path'] : '';
@@ -150,4 +147,36 @@ function lmfwppt_get_clean_url( $url ) {
     $clean_url = untrailingslashit( $clean_url );
 
     return $clean_url;
+}
+
+/**
+ * Transient Cache
+ */
+function licenser_cache_key() {
+    return 'lwp_cache_';
+}
+
+// Get Cache
+function licenser_get_cache( $key ) {
+    return get_transient( licenser_cache_key() . $key );
+}
+
+// Set Cache
+function licenser_set_cache( $key, $value, $expiration = 0 ) {
+    return set_transient( licenser_cache_key() . $key, $value, $expiration );
+}
+
+// Delete Cache
+function licenser_delete_cache( $key, $sql_method = false ) {
+
+    // Transient Key
+    $key = licenser_cache_key() . $key;
+
+    if ( $sql_method ) {
+        global $wpdb;
+        $wpdb->query( "DELETE FROM {$wpdb->prefix}options WHERE option_name LIKE '%_transient_{$key}%'" );
+        $wpdb->query( "DELETE FROM {$wpdb->prefix}options WHERE option_name LIKE '%_transient_timeout_{$key}%'" );
+    } else {
+        return delete_transient( $key );
+    }
 }

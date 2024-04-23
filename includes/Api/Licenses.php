@@ -61,29 +61,43 @@ class Licenses extends RestController {
                 ],
             ]
         );
-  
+
+        // Single Route
         register_rest_route(
             $this->namespace,
-            '/' . $this->rest_base . '/(?P<action>[\S]+)',
+            '/' . $this->rest_base . '/(?P<id>[\d]+)',
             [
-                'args'   => [
-                    'action' => [
-                        'description' => __( 'Action name will through correct data.' ),
-                        'type'        => 'string',
+                [
+                    'methods'             => WP_REST_Server::DELETABLE,
+                    'callback'            => [ $this, 'delete_item' ],
+                    'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+                    'args'                => [
+                        'id' => [
+                            'description' => __( 'License ID.' ),
+                            'type'        => 'integer',
+                            'required'    => true,
+                        ],
                     ],
                 ],
+            ]
+        );
+
+        // Domain Route - Single
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/domains/(?P<id>[\d]+)',
+            [
                 [
-                    'methods'             => \WP_REST_Server::CREATABLE,
-                    'callback'            => [ $this, 'create_actions' ],
-                    'permission_callback' => [ $this, 'get_item_permissions_check' ],
-                    // 'args'                => $this->get_endpoint_args_for_item_schema( true ),
-                ],
-                [
-                    'methods'             => \WP_REST_Server::READABLE,
-                    'callback'            => [ $this, 'get_item' ],
-                    'permission_callback' => [ $this, 'get_item_permissions_check' ],
-                    // 'args'                => [ 'context' => $this->get_context_param( [ 'default' => 'view' ] ), ],
-                    // 'args'                => $this->get_collection_params(),
+                    'methods'             => WP_REST_Server::DELETABLE,
+                    'callback'            => [ $this, 'delete_domain' ],
+                    'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+                    'args'                => [
+                        'id' => [
+                            'description' => __( 'Domain ID.' ),
+                            'type'        => 'integer',
+                            'required'    => true,
+                        ],
+                    ],
                 ],
             ]
         );
@@ -119,14 +133,11 @@ class Licenses extends RestController {
         $params = $request->get_params();
 
         // Is Lifetime Checkbox Checked
-        if( $params['is_lifetime'] == 'on' ){
-            $params['is_lifetime'] = 1;
-        }
+        $params['is_lifetime'] = isset( $params['is_lifetime'] ) ? 1 : 0;
         
-        $license = License::instance()->create( $params );
+        $license_id = License::instance()->create( $params );
         
-
-        return rest_ensure_response( $params );
+        return rest_ensure_response( License::instance()->get( $license_id ) );
     }
 
 
@@ -195,36 +206,36 @@ class Licenses extends RestController {
         return $response;
     }
 
-    // Create Actions
-    public function create_actions( $request ) {
-        $action = $request->get_param( 'action' );
+    /**
+     * Delete a single item
+     *
+     * @param WP_REST_Request $request Full data about the request.
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    public function delete_item( $request ) {
 
-        $request = [
-            'product_slug' => $request->get_param( 'product_slug' ),
-            'action'   => $action,
-            'license_key'   => $request->get_param( 'license_key' ),
-            'domain'   => $request->get_param( 'domain' ),
-        ];
+        $id = $request->get_param( 'id' );
 
-        // License Object Class
-        $licenseobj = new LMFWPPT_LicenseHandler();
+        $delete = License::instance()->delete( $id );
 
-        // If action is activate_license then activate the license
-        if ( 'validate' === $action ) {
-            $response = $licenseobj->download_product( $request );
-        }
-
-        if ( ! $response ) {
-            return new WP_Error(
-                'rest_license_invalid_id',
-                __( 'Invalid Action.' ),
-                [ 'status' => 404 ]
-            );
-        }
-
-        return rest_ensure_response( $response );
+        return rest_ensure_response( $delete );
     }
 
+    /**
+     * Delete domain
+     *
+     * @param WP_REST_Request $request Full data about the request.
+     *
+     * @return WP_Error|WP_REST_Response
+     */
+    public function delete_domain( $request ) {
 
+        $id = $request->get_param( 'id' );
+
+        $delete = License::instance()->delete_domain( $id );
+
+        return rest_ensure_response( $delete );
+    }
 
 }

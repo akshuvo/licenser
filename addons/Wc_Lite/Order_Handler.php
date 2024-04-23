@@ -29,6 +29,9 @@ class Order_Handler{
         // Content Show on my-account dashboard
         if ( isset( $_GET['wc_tab'] ) && $_GET['wc_tab'] == 'license_manager' ) {
             add_action( 'woocommerce_account_dashboard', [$this, 'licenses_endpoint_content'], 30 );
+
+            // Enqueue Scripts
+            add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         }
 
 	}
@@ -44,6 +47,7 @@ class Order_Handler{
      */
     function add_cart_item_data( $cart_item_data, $product_id, $variation_id ) {
         
+        // WC Product ID
         $product_id = isset( $variation_id ) && $variation_id != "0" ? sanitize_text_field( $variation_id ) : sanitize_text_field( $product_id );
 
         // Check if active licensing
@@ -73,6 +77,7 @@ class Order_Handler{
 
         // Get Package
         $package = \Licenser\Models\LicensePackage::instance()->get( $package_id );
+
 
         // Package Label
         $package_label = isset( $package->label ) ? sanitize_text_field( $package->label ) : '';
@@ -128,6 +133,7 @@ class Order_Handler{
         // Product Name
         if ( isset( $cart_item['licenser_product_name'] ) && $cart_item['licenser_product_name'] ) {
             $item_data[] = array(
+                /* translators: %s: Product Type */
                 'key'     => sprintf( __( '%s Name', 'licenser' ), $type_label ),
                 'value'   => $cart_item['licenser_product_name'],
                 'display' => '',
@@ -196,13 +202,13 @@ class Order_Handler{
     
         // Check If order status = completed, processing
         if ( !in_array( $order->get_status(), [ 'processing', 'completed' ] ) ) {
-            // return false;
+            return false;
         }
     
         // Create License for Each Order Items
         foreach ( $order->get_items() as $item_id => $item ) {
-            // Stop creating license key fro same order
-            // if ( !get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true ) ) {
+            // Stop creating license key for same order
+            if ( !get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true ) ) {
     
                 $product_id = $item->get_product_id();
                 $variation_id = $item->get_variation_id();
@@ -224,20 +230,30 @@ class Order_Handler{
                 if( empty( $get_package ) ) {
                     return;
                 }
+
+                // TODO: How quantity will be handled?
+                // > $update_period x $quantity
+                // > $domain_limit x $quantity
+                // > $license_key x $quantity
     
                 // Package Period
                 $update_period = isset( $get_package->update_period ) ? intval( $get_package->update_period ) : 0;
                 $domain_limit = isset( $get_package->domain_limit ) ? intval( $get_package->domain_limit ) : 0;
     
                 // Calculate End Date
-                $end_date = date( "Y-m-d H:i:s", strtotime( "+{$update_period} day", current_time('timestamp') ) );
+                $end_date = licenser_date( "Y-m-d H:i:s", strtotime( "+{$update_period} day", current_time('timestamp') ) );
 
                 // Generate License Key
                 $license_key = \Licenser\Models\License::instance()->generate_key();
     
+                // Product Slug
+                // $get_product = LMFWPPT_ProductsHandler::get_product_details_by_package_id( $package_id );
+                $licenser_product_id = get_post_meta( $product_id, 'licenser_product_id', true );
+
                 // Insert License
                 $license_id = \Licenser\Models\License::instance()->create( [
                     'status' => 1,
+                    'product_id' => $licenser_product_id,
                     'package_id' => $package_id,
                     'source' => 'wc',
                     'source_id' => $order_id,
@@ -247,20 +263,16 @@ class Order_Handler{
                     'license_key' => $license_key,
                 ] );
     
-                // Product Slug
-                // $get_product = LMFWPPT_ProductsHandler::get_product_details_by_package_id( $package_id );
-                $licenser_product_id = get_post_meta( $product_id, 'licenser_product_id', true );
-    
-    
+                // Save License Key
                 if ( !empty( $license_id ) ) {
                     update_post_meta( $order_id, "license_generated_item_id_{$item_id}", $license_id );
-                    update_post_meta( $order_id, "license_generated_item_key_{$item_id}", $license_key );
-                    update_post_meta( $order_id, "license_generated_product_slug_{$item_id}", $licenser_product_id );
+                    // update_post_meta( $order_id, "license_generated_item_key_{$item_id}", $license_key );
+                    update_post_meta( $order_id, "licenser_product_id_{$item_id}", $licenser_product_id );
     
                     // Save custom meta for future usages
                     update_post_meta( $order_id, "is_license_order", 'yes' );
                 }
-            // }
+            }
         }
     
         // Send order invoice if not already sent
@@ -319,7 +331,7 @@ class Order_Handler{
         // Get license key by id
         $license_key_id = get_post_meta( $order_id, "license_generated_item_id_{$item_id}", true );
         $license_key = get_post_meta( $order_id, "license_generated_item_key_{$item_id}", true );
-        $product_slug = get_post_meta( $order_id, "license_generated_product_slug_{$item_id}", true );
+        $product_id = get_post_meta( $order_id, "licenser_product_id_{$item_id}", true );
 
         if ( empty( $license_key_id ) ) {
             return;
@@ -327,22 +339,23 @@ class Order_Handler{
 
         // Show License key
         echo sprintf('<ul class="wc-item-meta"><li><strong class="wc-item-meta-label">%s</strong>: <code>%s</code></li>',
-            __( 'License Key', 'licenser' ),
-            $license_key
+            esc_html__( 'License Key', 'licenser' ),
+            esc_html($license_key)
         );
 
         // Download Link
-        $download_link = add_query_arg( array(
-            'product_slug' => $product_slug,
-            'license_key' => $license_key,
-            'action' => 'download',
-        ), lmfwppt_api_url() );
+        $product = \Licenser\Models\Product::instance()->get( $product_id, [
+            'inc_stable_release' => false,
+            'inc_releases' => false,
+            'inc_packages' => false,
+        ]);
+        $download_link = licenser_product_download_url( $product->uuid, $license_key );
 
         if ( $download_link ) {
             echo sprintf('<li><strong class="wc-item-meta-label">%s</strong>: <a href="%s" target="_blank">%s</a></li></ul>',
-                __( 'Download Link', 'licenser' ),
-                $download_link,
-                __( 'Download', 'licenser' )
+                esc_html__( 'Download Link', 'licenser' ),
+                esc_url( $download_link ),
+                esc_html__( 'Download', 'licenser' )
             );
         }
 
@@ -375,6 +388,16 @@ class Order_Handler{
         
         return $url;
     }
+
+    /**
+     * Enqueue Scripts
+     *
+     * @return void
+     */
+	function enqueue_scripts() {
+        wp_enqueue_style( 'licenser-wclite-styles', LICENSER_WCLITE_PLUGIN_URL . 'assets/css/styles.css', null, LICENSER_VERSION );
+	    wp_enqueue_script( 'licenser-wclite-scripts', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/scripts.js', array('jquery'), LICENSER_VERSION, true );
+	}
 
     // License Endpoint Content
     public function licenses_endpoint_content() {

@@ -2,6 +2,8 @@
 namespace Licenser\Controllers;
 use Licenser\Controllers\License as License_Controller;
 use Licenser\Models\Product as Product_Model;
+use Licenser\Models\License as License_Model;
+use Licenser\Models\License_Meta;
 use Licenser\Models\ProductRelease;
 // use Licenser\Models\License;
 
@@ -17,37 +19,45 @@ class Product {
             'product_id' => '',
             'license_key' => '',
             'version' => '',
+            'ref_domain' => '',
         ] );
         
         // Check license key
         if( !empty( $args['license_key'] ) ){
             $license = License_Controller::instance()->check( $args['license_key'] );
             if( is_wp_error( $license ) ){
-                wp_die( $license->get_error_message() );
+                wp_die( esc_html( $license->get_error_message() ) );
             }
         }
 
-        // 'columns' => [],
-        //     'get_by' => '',
-        //     'version' => '',
-
         // Get product download url
         $product = ProductRelease::instance()->get( $args['product_id'], [
-            'columns' => [ 'download_link' ],
+            'columns' => [ 'download_link', 'version' ],
             'version' => $args['version'],
             'get_by' => 'product_id',
         ] );
 
         // Return if no product found
         if( empty( $product ) ){
-            wp_die( __( 'No product found.', 'licenser' ) );
+            wp_die( esc_html__( 'No product found.', 'licenser' ) );
+        }
+
+        // TODO: Check if the license can download the latest version
+        // > if not, get the latest version that the license can download
+
+        // Domain ID
+        $domain_id = isset( $license->id ) && $license->id ? License_Model::instance()->domain_exists( $args['ref_domain'], $license->id ) : '';
+
+        // Add version to meta
+        if( !empty( $domain_id ) ){
+            $add_meta = License_Meta::instance()->update( $license->id, 'installed_version_' . $domain_id, $product->version );
         }
 
         // Download link
         $download_link = $product->download_link;
 
         // Parse file path from download link
-        $parsed_file_path = lmfwppt_parse_file_path( $download_link );
+        $parsed_file_path = licenser_parse_file_path( $download_link );
 
         /**
          * Fallback on force download method for remote files.
@@ -81,6 +91,6 @@ class Product {
             exit;
         }
 
-        wp_die( __( 'No file found.', 'licenser' ) );
+        wp_die( esc_html__( 'No file found.', 'licenser' ) );
     }
 }

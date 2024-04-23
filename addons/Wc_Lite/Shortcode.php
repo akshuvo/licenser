@@ -5,41 +5,38 @@ namespace Licenser\Addons\Wc_Lite;
  */
 class Shortcode{
 
-	function __construct(){
-        // Enqueue Scripts
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
-    }
-
-    /**
-     * Enqueue Scripts
-     *
-     * @return void
-     */
-	function enqueue_scripts() {
-	    $ver = current_time( 'timestamp' );
-
-	    wp_enqueue_style( 'lmfwpptwcext-admin-styles', LICENSER_WCLITE_PLUGIN_URL . 'assets/css/styles.css', null, $ver );
-	    wp_enqueue_script( 'lmfwpptwcext-admin-scripts', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/scripts.js', array('jquery'), $ver );
-	}
-
     // License Endpoint Content
     public function output() {
+
         // User ID
         $user_id = get_current_user_id();
 
-        // Licenser Unique User ID
-        $licenser_user_id = get_user_meta( $user_id, 'licenser_user_id', true );
+        // Get latest 3 orders.
+        $args = array(
+            'limit' => 100,
+            'customer_id' => $user_id,
+            'return' => 'ids',
+            'status' => ['wc-processing', 'wc-completed'],
+            'is_license_order' => 'yes'
+        );
+        $order_ids = wc_get_orders( $args );
 
-        $get_licenses = \Licenser\Models\License::instance()->get_all( [
+        // Licenser Unique User ID
+        // $licenser_user_id = get_user_meta( $user_id, 'licenser_user_id', true );
+
+        // Get Licenses if orders found
+        $get_licenses = $order_ids ? \Licenser\Models\License::instance()->get_all( [
             'number' => -1,
             'offset' => 0,
             'orderby' => 'id',
             'order' => 'DESC',
             'count_total' => true,
-            'user_uuid' => $licenser_user_id,
-        ] );
+            // 'user_uuid' => $licenser_user_id,
+            'source' => 'wc',
+            'source_id' => (array) $order_ids,
+        ] ) : [];
 
-        echo sprintf("<h4>%s</h4>", __('License Manager', 'licenser'));
+        echo sprintf("<h4>%s</h4>", esc_html__('License Manager', 'licenser'));
 
         if ( !empty( $get_licenses ) ) : ?>
         <table class="woocommerce-orders-table woocommerce-MyAccount-orders shop_table shop_table_responsive my_account_orders account-orders-table">
@@ -65,43 +62,53 @@ class Shortcode{
                     // Domain Limit
                     $domain_limit = isset($license['domain_limit']) ? sanitize_text_field($license['domain_limit']) : 0;
 
+                    // Expired Text
+                    $expired_label = '';
+
                     // Check if lifetime
                     if ( $is_lifetime != "0" ) {
-                        $expire_date = esc_html('Lifetime', 'licenser');
+                        $expire_date = __('Lifetime', 'licenser');
                     } else {
-                        $expire_date = date('j F Y',strtotime($expire_date));
+                        // check with $expire_date
+                        if ( $expire_date ) {
+                            $expired_label = strtotime($expire_date) < time() ? sprintf('<span class="expired-label">(%s)</span>', __('Expired. Want to renew?', 'licenser')) : '';
+                        }
+                        $expire_date = licenser_date('j F Y',strtotime($expire_date));
                     }
 
-
+                    // If no package id
                     if ( !$package_id ) {
                         continue;
                     }
 
                     global $wpdb;
-                    $get_product = $wpdb->get_row( $wpdb->prepare("SELECT * FROM {$wpdb->prefix}licenser_license_packages as lp INNER JOIN {$wpdb->prefix}licenser_products as p ON p.id = lp.product_id WHERE lp.id = %s", $package_id), ARRAY_A );
+                    $get_product = $wpdb->get_row( 
+                        $wpdb->prepare("SELECT product.uuid, product.name, package.label, product.product_type
+                            FROM {$wpdb->prefix}licenser_license_packages as package 
+                            INNER JOIN {$wpdb->prefix}licenser_products as product ON product.id = package.product_id 
+                            WHERE package.id = %s", 
+                            $package_id
+                        ), 
+                    );
 
-                    $product_name = isset( $get_product['name'] ) ? sanitize_text_field( $get_product['name'] ) : '';
-                    $pack_label = isset( $get_product['label'] ) ? sanitize_text_field( $get_product['label'] ) : '';
+                    $product_type = isset( $get_product->product_type ) ? $get_product->product_type : '';
+                    $product_name = isset( $get_product->name ) ? $get_product->name : '';
+                    $pack_label = isset( $get_product->label ) ? $get_product->label : '';
                     
-                    $product_type = isset($get_product['product_type']) ? sanitize_text_field($get_product['product_type']) : '';
-
-                    
-
+                    // Domain Limit
                     if ( $domain_limit == "0" ) {
-                       $domain_limit = esc_html('Unlimited', 'licenser');
+                       $domain_limit = __('Unlimited', 'licenser');
                     }
 
                     // Download Link
-                    $download_link = add_query_arg( array(
-                        'product_slug' => isset( $get_product['slug'] ) ? $get_product['slug'] : "",
-                        'license_key' => $license_key,
-                        'action' => 'download',
-                    ), lmfwppt_api_url() );
+                    $download_link = licenser_product_download_url( $get_product->uuid, $license_key);
+
 
                     // Get Domains 
-                    $get_domains = [];
+                    $get_domains = \Licenser\Models\License::instance()->get_domains([
+                        'license_id' => $license_id,
+                    ]);
 
-                    //ppr($get_product);
                     ?>
                     <tr class="woocommerce-orders-table__row woocommerce-orders-table__row--status-processing order">
                         
@@ -113,7 +120,7 @@ class Shortcode{
 
                             <!-- activations button -->
                             <div class="show_manage_activations_details">
-                                <a><?php echo esc_html__( "Manage Activations", "licenser" ); ?></a>
+                                <a><?php esc_html_e( "Manage Activations", "licenser" ); ?></a>
                             </div>
 
                             <!-- activations value show -->
@@ -122,40 +129,36 @@ class Shortcode{
 
                                 <a class="activations-close-modal" title="Close">&times;</a>
 
-                                <h5 style="margin:0px;"><?php echo esc_html__( "Manage License:", "licenser" ); ?></h5>
-
-                                <ul class="am-list-ul">
-                                    <li><strong><?php echo esc_html__( "License Key", "licenser" ); ?></strong>: <code><?php echo esc_html( $license_key ); ?></code></li>
-                                    <li><strong><?php echo esc_html__( "Product", "licenser" ); ?></strong>: <?php echo esc_html( $product_name ); ?></li>
-                                </ul>
-                              
-                                
+                                <h5 ><?php esc_html_e( "Manage License:", "licenser" ); ?></h5>
 
                                 <table style="border-width: 1px 1px 1px 1px;">
                                     <thead>
                                         <tr>
-                                            <th><?php echo esc_html__( "Site URL", "licenser" ); ?></th>
-                                            <th><?php echo esc_html__( "Status", "licenser" ); ?></th>
+                                            <th><?php esc_html_e( "Site URL", "licenser" ); ?></th>
+                                            <th><?php esc_html_e( "Status", "licenser" ); ?></th>
                                         </tr>
                                     </thead>
                                    <tbody>
                                     <?php if( !empty( $get_domains ) ) :
                                         foreach( $get_domains as $domain ):
-                                            $key = isset( $domain['id'] ) ? sanitize_text_field( $domain['id'] ) : '';
-                                            $url = isset( $domain['domain'] ) ? sanitize_text_field( $domain['domain'] ) : '';
-                                            $status = isset( $domain['status'] ) ? sanitize_text_field( $domain['status'] ) : '1';
+                                            $key = isset( $domain->id ) ? sanitize_text_field( $domain->id ) : '';
+                                            $url = isset( $domain->domain ) ? sanitize_text_field( $domain->domain ) : '';
+                                            $status = isset( $domain->status ) && $domain->status == 1 ? __('Active', 'licenser') : __('Inactive', 'licenser');
+                                            // $dated = isset( $domain->dated ) ? licenser_date('Y-m-d H:i:s', $domain->dated) : '';
                                             ?>
                                             <tr>
                                                 <td>
                                                     <?php echo esc_html( $url ); ?> 
                                                     <a target="_blank" href="<?php echo esc_url( $url ); ?>">↗</a>
                                                 </td>
-                                                <td><?php echo $status == "1" ? esc_html__( "Active", "licenser" ) : esc_html__( "Inactive", "licenser" ); ?></td>
+                                                <td>
+                                                    <?php echo esc_html( $status ); ?>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                     <tr>
-                                        <td colspan="2"><?php echo esc_html__( "No Domains", "licenser" ); ?></td> 
+                                        <td colspan="2"><?php esc_html_e( "No Domains", "licenser" ); ?></td> 
                                     </tr>
                                     <?php endif; ?>  
                                        
@@ -167,11 +170,11 @@ class Shortcode{
                         </td>
 
                         <td class="woocommerce-orders-table__cell" data-title="<?php esc_attr_e('License Details', 'licenser'); ?>">
-                            <div class="license_product_name"><strong><?php echo esc_html__( "Product Name",'licenser' ); ?>:</strong> <?php echo esc_html( $product_name ); ?> (<?php echo esc_html($pack_label); ?>) </div>
+                            <div class="license_product_name"><strong><?php esc_html_e( "Product Name",'licenser' ); ?>:</strong> <?php echo esc_html( $product_name ); ?> (<?php echo esc_html($pack_label); ?>) </div>
                             <div class="license_details">
-                                <strong><?php echo esc_html__( "Domain Limit", 'licenser' ); ?>:</strong> <?php echo esc_html($domain_limit)?><br>
-                                <strong><?php echo esc_html__( "Product Type", 'licenser' ); ?>:</strong> <?php echo esc_html(ucwords($product_type)); ?> <br>
-                                <strong><?php echo esc_html__( "Expires", 'licenser' ); ?>:</strong> <?php echo esc_html($expire_date); ?>
+                                <strong><?php esc_html_e( "Domain Limit", 'licenser' ); ?>:</strong> <?php echo esc_html($domain_limit)?><br>
+                                <strong><?php esc_html_e( "Product Type", 'licenser' ); ?>:</strong> <?php echo esc_html(ucwords($product_type)); ?> <br>
+                                <strong><?php esc_html_e( "Expires", 'licenser' ); ?>:</strong> <?php echo esc_html($expire_date); ?> <?php echo $expired_label; // phpcs:ignore ?>
                             </div>
                         </td>
 

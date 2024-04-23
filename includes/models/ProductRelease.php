@@ -18,7 +18,7 @@ class ProductRelease {
             'version' => '',
         ] );
 
-        global $lwpdb;
+        global $wpdb;
         $columns = !empty( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
 
         // Where
@@ -26,31 +26,31 @@ class ProductRelease {
 
         // Get By
         if( $args['get_by'] == 'product_id' ){
-            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $id );
+            $where .= $wpdb->prepare( " AND product_id = %d", $id );
         } else {
-            $where .= $lwpdb->wpdb->prepare( " AND id = %d", $id );
+            $where .= $wpdb->prepare( " AND id = %d", $id );
         }
 
         // Version
         if( !empty( $args['version'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND version = %s", $args['version'] );
+            $where .= $wpdb->prepare( " AND version = %s", $args['version'] );
         }
 
         // Order
         $where .= " ORDER BY id DESC, release_date DESC";
 
-        return $lwpdb->wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->product_releases} WHERE {$where} LIMIT 1" );
+        return $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_product_releases} WHERE {$where} LIMIT 1" );
     }
 
     /**
      * Get Stable Release
      */
     public function get_stable( $product_id ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $release = $lwpdb->wpdb->get_row(
-            $lwpdb->wpdb->prepare(
-                "SELECT * FROM {$lwpdb->product_releases} WHERE product_id = %d ORDER BY id DESC, release_date DESC LIMIT 1",
+        $release = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$wpdb->licenser_product_releases} WHERE product_id = %d ORDER BY id DESC, release_date DESC LIMIT 1",
                 $product_id
             )
         );
@@ -64,7 +64,7 @@ class ProductRelease {
      * @var int
      */
     public function get_all( $args = [] ) {
-        global $lwpdb;
+        global $wpdb;
 
         $defaults = [
             'number' => 20,
@@ -80,20 +80,18 @@ class ProductRelease {
         $where = ' 1=1 ';
 
         if( !empty( $args['product_id'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $args['product_id'] );
+            $where .= $wpdb->prepare( " AND product_id = %d", $args['product_id'] );
         }
 
         // Order
         $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
-        $limit = '';
+        // Limit
         if( !empty( $args['number'] ) ){
-            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $where .= $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
-        $query = "SELECT * FROM {$lwpdb->product_releases} WHERE {$where} {$limit}";
-
-        $items = $lwpdb->wpdb->get_results( $query );
+        $items = $wpdb->get_results( "SELECT * FROM {$wpdb->licenser_product_releases} WHERE {$where}" );
 
         return $items;
     }
@@ -115,19 +113,19 @@ class ProductRelease {
             'release_date' => '',
         ] );
 
-        global $lwpdb;
+        global $wpdb;
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $lwpdb->wpdb->update(
-                $lwpdb->product_releases,
+            $wpdb->update(
+                $wpdb->licenser_product_releases,
                 [
                     'product_id' => intval( $data['product_id'] ),
                     'version' => sanitize_text_field( $data['version'] ),
                     'changelog' => wp_kses_post( $data['changelog'] ),
                     'file_name' => sanitize_text_field( $data['file_name'] ),
                     'download_link' => esc_url_raw( $data['download_link'] ),
-                    'release_date' => date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),
+                    'release_date' => licenser_date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),
                 ],
                 [
                     'id' => $data['id']
@@ -136,19 +134,19 @@ class ProductRelease {
 
             $insert_id = $data['id'];
         } else {
-            $lwpdb->wpdb->insert(
-                $lwpdb->product_releases,
+            $wpdb->insert(
+                $wpdb->licenser_product_releases,
                 [
                     'product_id' => intval( $data['product_id'] ),
                     'version' => sanitize_text_field( $data['version'] ),
                     'changelog' => wp_kses_post( $data['changelog'] ),
-                    'file_name' => sanitize_text_field( $data['file_name'] ),
+                    'file_name' => !empty( $data['file_name'] ) ? sanitize_text_field( $data['file_name'] ) : basename( $data['download_link'] ),
                     'download_link' => esc_url_raw( $data['download_link'] ),
-                    'release_date' => date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),
+                    'release_date' => licenser_date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),
                 ] 
             );
 
-            $insert_id = $lwpdb->wpdb->insert_id;
+            $insert_id = $wpdb->insert_id;
         }
 
 

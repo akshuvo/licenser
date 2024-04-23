@@ -10,6 +10,7 @@ class License {
     public $default_fields = [
         'status' => 1,
         'license_key' => '',
+        'product_id' => '',
         'package_id' => '',
         'source' => '',
         'source_id' => '',
@@ -30,7 +31,7 @@ class License {
             'get_by' => '',
         ] );
 
-        global $lwpdb;
+        global $wpdb;
         $columns =  $args['columns'];
 
         // Where
@@ -38,12 +39,12 @@ class License {
 
         // Get By
         if( $args['get_by'] == 'key' ){
-            $where .= $lwpdb->wpdb->prepare( " AND license_key = %s", $id );
+            $where .= $wpdb->prepare( " AND license_key = %s", $id );
         } else {
-            $where .= $lwpdb->wpdb->prepare( " AND id = %d", $id );
+            $where .= $wpdb->prepare( " AND id = %d", $id );
         }
 
-        $license = $lwpdb->wpdb->get_row( "SELECT {$columns} FROM {$lwpdb->licenses} WHERE {$where} LIMIT 1" );
+        $license = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_licenses} WHERE {$where} LIMIT 1" );
 
         // Return if no license found
         if( empty( $license ) ){
@@ -59,7 +60,7 @@ class License {
      * @var int
      */
     public function get_all( $args = [] ) {
-        global $lwpdb;
+        global $wpdb;
 
         $defaults = [
             'number' => 20,
@@ -77,6 +78,7 @@ class License {
             'is_lifetime' => '',
             'domain_limit' => '',
             'dated' => '',
+            'inc_domains' => false,
         ];
 
         $args = wp_parse_args( $args, $defaults );
@@ -84,60 +86,75 @@ class License {
         $where = ' 1=1 ';
 
         if( !empty( $args['product_id'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND product_id = %d", $args['product_id'] );
+            $where .= $wpdb->prepare( " AND product_id = %d", $args['product_id'] );
         }
 
         if( !empty( $args['package_id'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND package_id = %s", $args['package_id'] );
+            $where .= $wpdb->prepare( " AND package_id = %s", $args['package_id'] );
         }
 
         if( !empty( $args['source'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND source = %s", $args['source'] );
+            $where .= $wpdb->prepare( " AND source = %s", $args['source'] );
         }
 
         if( !empty( $args['source_id'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND source_id = %d", $args['source_id'] );
+            if( is_array( $args['source_id'] ) ) {
+                $source_ids = esc_sql( $args['source_id'] );
+                $source_ids = implode( ',', $source_ids );
+                $where .= " AND source_id IN ({$source_ids})";
+            } else {
+                $where .= $wpdb->prepare( " AND source_id = %d", $args['source_id'] );
+            }
         }
 
         if( !empty( $args['status'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND status = %d", $args['status'] );
+            $where .= $wpdb->prepare( " AND status = %d", $args['status'] );
         }
 
         if( !empty( $args['license_key'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND license_key = %s", $args['license_key'] );
+            $where .= $wpdb->prepare( " AND license_key = %s", $args['license_key'] );
         }
 
         if( !empty( $args['end_date'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND end_date = %s", $args['end_date'] );
+            $where .= $wpdb->prepare( " AND end_date = %s", $args['end_date'] );
         }
 
         if( !empty( $args['is_lifetime'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND is_lifetime = %d", $args['is_lifetime'] );
+            $where .= $wpdb->prepare( " AND is_lifetime = %d", $args['is_lifetime'] );
         }
 
         if( !empty( $args['domain_limit'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND domain_limit = %d", $args['domain_limit'] );
+            $where .= $wpdb->prepare( " AND domain_limit = %d", $args['domain_limit'] );
         }
 
         if( !empty( $args['dated'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND dated = %s", $args['dated'] );
+            $where .= $wpdb->prepare( " AND dated = %s", $args['dated'] );
         }
 
         // Order
         $where .= " ORDER BY {$args['orderby']} {$args['order']}";
 
-        $limit = '';
+        // Limit
         if( $args['number'] != -1 ){
-            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $where .= $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
-        $licenses = $lwpdb->wpdb->get_results(
-            "SELECT * FROM {$lwpdb->licenses} WHERE {$where} {$limit}"
+        $licenses = $wpdb->get_results(
+            "SELECT * FROM {$wpdb->licenser_licenses} WHERE {$where}"
         );
 
         // Return if no license found
         if( empty( $licenses ) ){
             return false;
+        }
+
+        // Include Domains
+        if( $args['inc_domains'] ){
+            foreach( $licenses as $key => $license ){
+                $licenses[$key]->domains = isset( $license->id ) ? $this->get_domains([
+                    'license_id' => $license->id,
+                ]) : [];
+            }
         }
 
         return $licenses;
@@ -154,28 +171,30 @@ class License {
         $data = wp_parse_args( $data, [
             'status' => 1,
             'license_key' => '',
+            'product_id' => '',
             'package_id' => '',
             'source' => '',
             'source_id' => '',
             'end_date' => '',
             'is_lifetime' => 0,
             'domain_limit' => '',
-            'dated' => date('Y-m-d H:i:s'),
+            'dated' => licenser_date('Y-m-d H:i:s'),
         ] );
 
-        global $lwpdb;
+        global $wpdb;
 
         // Update
         if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $lwpdb->wpdb->update(
-                $lwpdb->licenses,
+            $wpdb->update(
+                $wpdb->licenser_licenses,
                 [
                     'status' => intval( $data['status'] ),
                     'license_key' => sanitize_text_field( $data['license_key'] ),
+                    'product_id' => sanitize_text_field( $data['product_id'] ),
                     'package_id' => sanitize_text_field( $data['package_id'] ),
                     'source' => sanitize_text_field( $data['source'] ),
                     'source_id' => intval( $data['source_id'] ),
-                    'end_date' => date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
+                    'end_date' => licenser_date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
                     'is_lifetime' => intval( $data['is_lifetime'] ),
                     'domain_limit' => intval( $data['domain_limit'] )
                 ],
@@ -193,22 +212,23 @@ class License {
             }
 
             // Insert
-            $lwpdb->wpdb->insert(
-                $lwpdb->licenses,
+            $wpdb->insert(
+                $wpdb->licenser_licenses,
                 [
                     'status' => intval( $data['status'] ),
                     'license_key' => sanitize_text_field( $data['license_key'] ),
+                    'product_id' => sanitize_text_field( $data['product_id'] ),
                     'package_id' => sanitize_text_field( $data['package_id'] ),
                     'source' => sanitize_text_field( $data['source'] ),
                     'source_id' => intval( $data['source_id'] ),
-                    'end_date' => date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
+                    'end_date' => licenser_date( 'Y-m-d H:i:s', strtotime( $data['end_date'] ) ),
                     'is_lifetime' => intval( $data['is_lifetime'] ),
                     'domain_limit' => intval( $data['domain_limit'] ),
                     'dated' => sanitize_text_field( $data['dated'] ),
                 ] 
             );
 
-            $insert_id = $lwpdb->wpdb->insert_id;
+            $insert_id = $wpdb->insert_id;
         }
 
 
@@ -224,11 +244,13 @@ class License {
         $method = licenser_get_option('license_generate_method');
         $key = '';
     
-        if ($method == 'wp_generate') {
+        if ( $method == 'wp_generate' ) {
             $limit = licenser_get_option('license_code_character_limit');
             $key = wp_generate_password($limit, false, false);
+        } elseif ($method == 'uuid') {
+            $key = wp_generate_uuid4();
         } else {
-            $key = md5(microtime() . rand());
+            $key = md5(microtime() . wp_rand());
         }
     
         $prefix = licenser_get_option('license_code_prefix');
@@ -244,10 +266,10 @@ class License {
      * @return int
      */
     public function delete( $id ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $lwpdb->wpdb->delete(
-            $lwpdb->licenses,
+        $wpdb->delete(
+            $wpdb->licenser_licenses,
             [
                 'id' => $id
             ]
@@ -271,9 +293,10 @@ class License {
             'offset' => 0,
             'orderby' => 'id',
             'order' => 'DESC',
+            'license_id_check' => true,
         ] );
         
-        global $lwpdb;
+        global $wpdb;
 
         // Columns
         $columns = !empty( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
@@ -282,7 +305,9 @@ class License {
 
         // License ID
         if( !empty( $args['license_id'] ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND license_id = %d", $args['license_id'] );
+            $where .= $wpdb->prepare( " AND license_id = %d", $args['license_id'] );
+        } elseif( $args['license_id_check'] ){
+            return false;
         }
 
         // Order
@@ -290,16 +315,16 @@ class License {
 
         $limit = '';
         if( $args['number'] != -1 ){
-            $limit = $lwpdb->wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
+            $limit = $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
         }
 
         // Count Total
         if( $args['count_total'] ) {
-            return $lwpdb->wpdb->get_var( "SELECT COUNT(*) FROM {$lwpdb->license_domains} WHERE {$where}" );
+            return $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->licenser_license_domains} WHERE {$where}" );
         } 
         
-        return $lwpdb->wpdb->get_results(
-            "SELECT {$columns} FROM {$lwpdb->license_domains} WHERE {$where} {$limit}"
+        return $wpdb->get_results(
+            "SELECT {$columns} FROM {$wpdb->licenser_license_domains} WHERE {$where} {$limit}"
         );
     }
     /**
@@ -309,10 +334,10 @@ class License {
      * @return int
      */
     public function delete_domains( $license_id ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $lwpdb->wpdb->delete(
-            $lwpdb->license_domains,
+        $wpdb->delete(
+            $wpdb->licenser_license_domains,
             [
                 'license_id' => $license_id
             ]
@@ -328,10 +353,10 @@ class License {
      * @return int
      */
     public function delete_domain( $id ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $lwpdb->wpdb->delete(
-            $lwpdb->license_domains,
+        $wpdb->delete(
+            $wpdb->licenser_license_domains,
             [
                 'id' => $id
             ]
@@ -348,17 +373,17 @@ class License {
      * @return bool
      */
     public function domain_exists( $domain, $license_id = '' ) {
-        global $lwpdb;
+        global $wpdb;
 
-        $domain = lmfwppt_get_clean_url( $domain );
+        $domain = licenser_get_clean_url( $domain );
 
-        $where = $lwpdb->wpdb->prepare( "domain = %s", $domain );
+        $where = $wpdb->prepare( "domain = %s", $domain );
 
         if( !empty( $license_id ) ){
-            $where .= $lwpdb->wpdb->prepare( " AND license_id = %d", $license_id );
+            $where .= $wpdb->prepare( " AND license_id = %d", $license_id );
         }
 
-        return $lwpdb->wpdb->get_var( "SELECT id FROM {$lwpdb->license_domains} WHERE {$where} LIMIT 1" );
+        return $wpdb->get_var( "SELECT id FROM {$wpdb->licenser_license_domains} WHERE {$where} LIMIT 1" );
     }
 
 
@@ -373,18 +398,19 @@ class License {
             'id' => '',
             'license_id' => '',
             'domain' => '',
-            'status' => ''
+            'status' => '',
+            'dated' => licenser_date('Y-m-d H:i:s'),
         ] );
 
-        global $lwpdb;
+        global $wpdb;
 
         // Update
         if( !empty( $args['id'] ) ){
-            $lwpdb->wpdb->update(
-                $lwpdb->license_domains,
+            $wpdb->update(
+                $wpdb->licenser_license_domains,
                 [
                     'license_id' => intval( $args['license_id'] ),
-                    'domain' => lmfwppt_get_clean_url( $args['domain'] ),
+                    'domain' => licenser_get_clean_url( $args['domain'] ),
                     'status' => intval( $args['status'] ),
                 ],
                 [
@@ -396,22 +422,23 @@ class License {
         }
 
         // Insert
-        $lwpdb->wpdb->insert(
-            $lwpdb->license_domains,
+        $wpdb->insert(
+            $wpdb->licenser_license_domains,
             [
                 'license_id' => intval( $args['license_id'] ),
-                'domain' => lmfwppt_get_clean_url( $args['domain'] ),
+                'domain' => licenser_get_clean_url( $args['domain'] ),
                 'status' => intval( $args['status'] ),
+                'dated' => sanitize_text_field( $args['dated'] ),
             ],
             [
                 '%d',
                 '%s',
                 '%d',
+                '%s',
             ]
         );
 
-        return $lwpdb->wpdb->insert_id;
+        return $wpdb->insert_id;
     }
-
 
 }

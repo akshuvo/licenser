@@ -36,10 +36,7 @@ class Admin_Handler{
 	        //return;
 	    }
 
-	    $ver = current_time( 'timestamp' );
-
-	    wp_enqueue_style( 'lmfwpptwcext-admin-styles', LICENSER_WCLITE_PLUGIN_URL . 'assets/css/admin.css', null, $ver );
-	    wp_enqueue_script( 'lmfwpptwcext-admin-scripts', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), $ver );
+	    wp_enqueue_script( 'licenser-wc-admin', LICENSER_WCLITE_PLUGIN_URL . 'assets/js/admin.js', array('jquery'), LICENSER_VERSION, true );
 	}
 
     /**
