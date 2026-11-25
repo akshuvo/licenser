@@ -1,352 +1,383 @@
 <?php
-namespace Licenser\API;
-use Licenser\Controllers\RestController;
-use Licenser\Controllers\Product as Product_Controller;
-use Licenser\Controllers\License as License_Controller;
-use Licenser\Models\Product;
 
+namespace Licenser\Api;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+use Licenser\Controllers\License as License_Controller;
+use Licenser\Controllers\Product as Product_Controller;
+use Licenser\Controllers\RestController;
+use Licenser\Models\Product;
+use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
-use WP_Error;
 
 /**
- * REST Class
+ * Public REST API routes consumed by LicenserWP/client SDK.
  */
 class Public_Apis extends RestController {
 
-    /**
-     * Initialize the class
-     */
-    function __construct() {
-        $this->rest_base = 'public';
-    }
+	/**
+	 * Initialize the class.
+	 */
+	public function __construct() {
+		$this->rest_base = 'public';
+	}
 
-    /**
-     * Registers the routes for the objects of the controller.
-     *
-     * @return void
-     */
-    public function register_routes() {
+	/**
+	 * Register public REST routes.
+	 *
+	 * @return void
+	 */
+	public function register_routes() {
+		// Get product metadata & latest release info by UUID.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/products/(?P<uuid>[\S]+)',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'get_product_by_uuid' ],
+					'permission_callback' => '__return_true',
+					'args'                => [
+						'uuid' => [
+							'description' => __( 'Product UUID.', 'licenser' ),
+							'type'        => 'string',
+							'required'    => true,
+						],
+					],
+				],
+			]
+		);
 
-        // Get Product by UUID
-        register_rest_route(
-            $this->namespace,
-            '/' . $this->rest_base . '/products/(?P<uuid>[\S]+)',
-            [
-                [
-                    'methods'             => WP_REST_Server::CREATABLE,
-                    'callback'            => [ $this, 'get_product_by_uuid' ],
-                    'permission_callback' => '__return_true',
-                    'args'                => [
-                        'uuid' => [
-                            'description' => __( 'Product UUID.' ),
-                            'type'        => 'string',
-                            'required'    => true,
-                        ],
-                    ],
-                ],
-            ]
-        );
+		// Check, activate, or deactivate a license.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/license/(?P<uuid>[\S]+)/(?P<action>[\S]+)',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'handle_license_action' ],
+					'permission_callback' => '__return_true',
+					'args'                => [
+						'uuid'        => [
+							'description' => __( 'Product UUID.', 'licenser' ),
+							'type'        => 'string',
+							'required'    => true,
+						],
+						'action'      => [
+							'description' => __( 'Action.', 'licenser' ),
+							'type'        => 'string',
+							'required'    => true,
+							'enum'        => [
+								'check',
+								'activate',
+								'deactivate',
+							],
+						],
+						'license_key' => [
+							'description' => __( 'License Key.', 'licenser' ),
+							'type'        => 'string',
+							'required'    => false,
+						],
+					],
+				],
+			]
+		);
 
-        // Check, Activate, Deactivate license
-        register_rest_route(
-            $this->namespace,
-            '/' . $this->rest_base . '/license/(?P<uuid>[\S]+)/(?P<action>[\S]+)',
-            [
-                [
-                    'methods'             => WP_REST_Server::CREATABLE,
-                    'callback'            => function( $request ) {
-                        $uuid = $request->get_param( 'uuid' );
-                        $action = $request->get_param( 'action' );
-                        $license_key = $request->get_param( 'license_key' );
+		// Public release download route (license-authenticated).
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/products/download/(?P<uuid>[\S]+)',
+			[
+				[
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => [ $this, 'download_product' ],
+					'permission_callback' => '__return_true',
+					'args'                => [
+						'uuid'        => [
+							'description' => __( 'Product UUID.', 'licenser' ),
+							'type'        => 'string',
+							'required'    => true,
+						],
+						'license_key' => [
+							'description' => __( 'License Key.', 'licenser' ),
+							'type'        => 'string',
+							'required'    => false,
+						],
+					],
+				],
+			]
+		);
+	}
 
-                        // Get Product
-                        $product = Product::instance()->get( $uuid, [
-                            'inc_stable_release' => false,
-                            'inc_releases' => false,
-                            'inc_packages' => false,
-                            'get_by' => 'uuid',
-                            'columns' => [ 'status', 'id' ]
-                        ]);
-                        
-                        // Check if product exists
-                        if ( ! $product ) {
-                            return rest_ensure_response( [
-                                'success' => false,
-                                'error' => __( 'Invalid Product ID.', 'licenser'),
-                            ] );
-                        }
+	/**
+	 * Handle public license `check`, `activate`, and `deactivate` actions.
+	 *
+	 * @param WP_REST_Request $request Full request object.
+	 * @return WP_REST_Response
+	 */
+	public function handle_license_action( $request ) {
+		$uuid        = sanitize_text_field( (string) $request->get_param( 'uuid' ) );
+		$action      = sanitize_key( (string) $request->get_param( 'action' ) );
+		$license_key = sanitize_text_field( (string) $request->get_param( 'license_key' ) );
 
-                        // Check if product is active
-                        if ( $product->status != 'active' ) {
-                            return [
-                                'success' => false,
-                                'error' => __( 'Product is not active.', 'licenser'),
-                            ];
-                        }
-                        
-                        // License Controller
-                        $license_controller = License_Controller::instance();
+		$product = Product::instance()->get(
+			$uuid,
+			[
+				'inc_stable_release' => false,
+				'inc_releases'       => false,
+				'inc_packages'       => false,
+				'get_by'             => 'uuid',
+				'columns'            => [ 'status', 'id' ],
+			]
+		);
 
-                        // Check action
-                        if ( $action == 'check' ) {
-                            $response = $license_controller->refresh( $license_key );
-                        } elseif ( $action == 'activate' ) {
-                            $response = $license_controller->activate( [
-                                'license_key' => $license_key,
-                                'url' => $request->get_param( 'url' ),
-                                'is_local' => $request->get_param( 'is_local' ),
-                                'client' => $request->get_param( 'client' ),
-                                'product_id' => $product->id,
-                            ] );
-                        } elseif ( $action == 'deactivate' ) {
-                            $response = $license_controller->deactivate( $request );
-                        }
+		if ( ! $product ) {
+			return rest_ensure_response(
+				[
+					'success' => false,
+					'error'   => __( 'Invalid Product ID.', 'licenser' ),
+				]
+			);
+		}
 
-                        // Check if response is error
-                        if( is_wp_error( $response ) ){
-                            $response = [
-                                'success' => false,
-                                'error' => $response->get_error_message(),
-                            ];
-                        }
+		if ( 'active' !== $product->status ) {
+			return rest_ensure_response(
+				[
+					'success' => false,
+					'error'   => __( 'Product is not active.', 'licenser' ),
+				]
+			);
+		}
 
-                        return rest_ensure_response( $response );
-                    },
-                    'permission_callback' => '__return_true',
-                    'args'                => [
-                        'uuid' => [
-                            'description' => __( 'Product UUID.' ),
-                            'type'        => 'string',
-                            'required'    => true,
-                        ],
-                        'action' => [
-                            'description' => __( 'Action.' ),
-                            'type'        => 'string',
-                            'required'    => true,
-                            'enum'        => [
-                                'check',
-                                'activate',
-                                'deactivate',
-                            ],
-                        ],
-                        'license_key' => [
-                            'description' => __( 'License Key.' ),
-                            'type'        => 'string',
-                            'required'    => false,
-                        ],
-                    ],
-                ],
-            ]
-        );
+		$license_controller = License_Controller::instance();
+		$response           = [
+			'success' => false,
+			'error'   => __( 'Invalid license action.', 'licenser' ),
+		];
 
-        // Download Product Route for Public
-        register_rest_route(
-            $this->namespace,
-            '/' . $this->rest_base . '/products/download/(?P<uuid>[\S]+)',
-            [
-                [
-                    'methods'             => WP_REST_Server::READABLE,
-                    'callback'            => [ $this, 'download_product' ],
-                    'permission_callback' => '__return_true',
-                    'args'                => [
-                        'uuid' => [
-                            'description' => __( 'Product UUID.' ),
-                            'type'        => 'string',
-                            'required'    => true,
-                        ],
-                        'license_key' => [
-                            'description' => __( 'License Key.' ),
-                            'type'        => 'string',
-                            'required'    => false,
-                        ],
-                    ],
-                ],
-            ]
-        );
-        
-    }
+		if ( 'check' === $action ) {
+			$response = $license_controller->check_public(
+				[
+					'license_key' => $license_key,
+					'url'         => (string) $request->get_param( 'url' ),
+					'product_id'  => (int) $product->id,
+				]
+			);
+		} elseif ( 'activate' === $action ) {
+			$response = $license_controller->activate(
+				[
+					'license_key' => $license_key,
+					'url'         => (string) $request->get_param( 'url' ),
+					'is_local'    => (bool) $request->get_param( 'is_local' ),
+					'client'      => sanitize_text_field( (string) $request->get_param( 'client' ) ),
+					'product_id'  => (int) $product->id,
+				]
+			);
+		} elseif ( 'deactivate' === $action ) {
+			$response = $license_controller->deactivate(
+				[
+					'license_key' => $license_key,
+					'url'         => (string) $request->get_param( 'url' ),
+					'product_id'  => (int) $product->id,
+				]
+			);
+		}
 
-   
+		if ( is_wp_error( $response ) ) {
+			$response = [
+				'success' => false,
+				'error'   => $response->get_error_message(),
+			];
+		}
 
-    /**
-     * Get a single product by uuid
-     *
-     * @param WP_REST_Request $request Full data about the request.
-     *
-     * @return WP_Error|WP_REST_Response
-     */
-    public function get_product_by_uuid( $request ) {
+		return rest_ensure_response( $response );
+	}
 
-        $uuid = $request->get_param( 'uuid' );
+	/**
+	 * Get update and package details for a single product by UUID.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function get_product_by_uuid( $request ) {
+		$uuid = sanitize_text_field( (string) $request->get_param( 'uuid' ) );
 
-        $product = Product::instance()->get( $uuid, [
-            'inc_stable_release' => true,
-            'inc_releases' => false,
-            'inc_packages' => false,
-            'get_by' => 'uuid',
-        ]);
+		$product = Product::instance()->get(
+			$uuid,
+			[
+				'inc_stable_release' => true,
+				'inc_releases'       => false,
+				'inc_packages'       => false,
+				'get_by'             => 'uuid',
+			]
+		);
 
-        if ( ! $product ) {
-            return new WP_Error(
-                'not_found',
-                __( 'Invalid Product UUID.' ),
-                [ 'status' => 404 ]
-            );
-        }
+		if ( ! $product ) {
+			return new WP_Error(
+				'not_found',
+				__( 'Invalid Product UUID.', 'licenser' ),
+				[ 'status' => 404 ]
+			);
+		}
 
-        // Check product type
-        if( $product->product_type == 'plugin' ){
-            $response = $this->prepare_response_for_plugin( $product, $request );
-        } elseif( $product->product_type == 'theme' ){
-            $response = $this->prepare_response_for_theme( $product, $request );
-        }
-  
-        return rest_ensure_response( $response );
-    }
+		if ( 'theme' === $product->product_type ) {
+			$response = $this->prepare_response_for_theme( $product, $request );
+		} else {
+			$response = $this->prepare_response_for_plugin( $product, $request );
+		}
 
-    /**
-     * Prepare response for plugin
-     *
-     * @param WP_REST_Request $request Full data about the request.
-     *
-     * @return array
-     */
-    public function prepare_response_for_plugin( $product, $request ) {
+		return rest_ensure_response( $response );
+	}
 
-        $license_key = $request->get_param( 'license_key' );
-        $download_url = licenser_product_download_url( $product->uuid, $license_key );
-        if ( !empty( $license_key ) ) {
-            $download_url = add_query_arg( 'refurl', $request->get_param('url'), $download_url );
-        }
+	/**
+	 * Prepare WordPress updater payload for a plugin product.
+	 *
+	 * @param object          $product Product object.
+	 * @param WP_REST_Request $request Full request object.
+	 * @return array
+	 */
+	public function prepare_response_for_plugin( $product, $request ) {
+		$license_key  = sanitize_text_field( (string) $request->get_param( 'license_key' ) );
+		$download_url = licenser_product_download_url( $product->uuid, $license_key );
 
-        // TODO: Show all changelog
-        $changelog = isset( $product->stable_release ) && !empty( $product->stable_release ) ? '<h4>' . $product->stable_release->version . ' - ' . licenser_date( 'M d, Y', strtotime( $product->stable_release->release_date ) ) . '</h4>' . $product->stable_release->changelog : '';
+		if ( ! empty( $license_key ) ) {
+			$download_url = add_query_arg( 'refurl', esc_url_raw( (string) $request->get_param( 'url' ) ), $download_url );
+		}
 
-        $response = [
-            'id' => $product->uuid,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'plugin' => $product->slug,
-            'url' => $product->homepage_url,
-            'icons' => [
-                '1x' => $product->icon_url,
-                '2x' => $product->icon_url,
-            ],
-            'banners' => [
-                'low' => $product->banners['low'],
-                'high' => $product->banners['high'],
-            ],
-            'tested' => $product->tested,
-            'requires_php' => $product->requires_php,
-            'requires' => $product->requires,
-            'sections' => [
-                'description' => $product->description,
-                'changelog' => $changelog,
-            ],
-            'new_version' => isset( $product->stable_release->version ) ? $product->stable_release->version : '',
-            'last_updated' => isset( $product->stable_release->release_date ) ? $product->stable_release->release_date : '',
-            'package' => $download_url,
-            'download_link' => $download_url,
-            'author' => $product->author_name,
-        ];
+		$stable_release = ! empty( $product->stable_release ) ? $product->stable_release : null;
+		$changelog      = '';
 
+		if ( $stable_release && ! empty( $stable_release->version ) ) {
+			$release_ts = ! empty( $stable_release->release_date ) ? strtotime( (string) $stable_release->release_date ) : false;
+			$date_label = $release_ts ? licenser_date( 'M d, Y', $release_ts ) : '';
+			$changelog  = '<h4>' . esc_html( $stable_release->version ) . ( $date_label ? ' - ' . esc_html( $date_label ) : '' ) . '</h4>' . wp_kses_post( (string) $stable_release->changelog );
+		}
 
+		$banners = is_array( $product->banners ) ? $product->banners : [];
 
-        return $response;
-    }
+		return [
+			'id'            => $product->uuid,
+			'name'          => $product->name,
+			'slug'          => $product->slug,
+			'plugin'        => $product->slug,
+			'url'           => $product->homepage_url,
+			'icons'         => [
+				'1x' => $product->icon_url,
+				'2x' => $product->icon_url,
+			],
+			'banners'       => [
+				'low'  => isset( $banners['low'] ) ? $banners['low'] : '',
+				'high' => isset( $banners['high'] ) ? $banners['high'] : '',
+			],
+			'tested'        => $product->tested,
+			'requires_php'  => $product->requires_php,
+			'requires'      => $product->requires,
+			'sections'      => [
+				'description' => $product->description,
+				'changelog'   => $changelog,
+			],
+			'new_version'   => ( $stable_release && isset( $stable_release->version ) ) ? $stable_release->version : '',
+			'last_updated'  => ( $stable_release && isset( $stable_release->release_date ) ) ? $stable_release->release_date : '',
+			'package'       => $download_url,
+			'download_link' => $download_url,
+			'author'        => $product->author_name,
+		];
+	}
 
-    /**
-     * Prepare response for theme
-     *
-     * @param WP_REST_Request $request Full data about the request.
-     *
-     * @return array
-     */
-    public function prepare_response_for_theme( $product, $request ) {
+	/**
+	 * Prepare WordPress updater payload for a theme product.
+	 *
+	 * @param object          $product Product object.
+	 * @param WP_REST_Request $request Full request object.
+	 * @return array
+	 */
+	public function prepare_response_for_theme( $product, $request ) {
+		$license_key  = sanitize_text_field( (string) $request->get_param( 'license_key' ) );
+		$download_url = licenser_product_download_url( $product->uuid, $license_key );
 
-        $license_key = $request->get_param( 'license_key' );
-        $download_url = licenser_product_download_url( $product->uuid, $license_key );
-        if ( !empty( $license_key ) ) {
-            $download_url = add_query_arg( 'refurl', $request->get_param('url'), $download_url );
-        }
+		if ( ! empty( $license_key ) ) {
+			$download_url = add_query_arg( 'refurl', esc_url_raw( (string) $request->get_param( 'url' ) ), $download_url );
+		}
 
-        $response = [
-            'id' => $product->uuid,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'theme' => $product->slug,
-            'url' => $product->homepage_url,
-            'icons' => [
-                '1x' => $product->icon_url,
-                '2x' => $product->icon_url,
-            ],
-            'banners' => [
-                'low' => $product->banners['low'],
-                'high' => $product->banners['high'],
-            ],
-            'tested' => $product->tested,
-            'requires_php' => $product->requires_php,
-            'requires' => $product->requires,
-            'sections' => [
-                'description' => $product->description,
-                'changelog' => $product->stable_release->changelog,
-            ],
-            'new_version' => $product->stable_release->version,
-            'last_updated' => $product->stable_release->release_date,
-            'package' => $download_url,
-            'download_link' => $download_url,
-        ];
+		$stable_release = ! empty( $product->stable_release ) ? $product->stable_release : null;
+		$banners        = is_array( $product->banners ) ? $product->banners : [];
 
-        return $response;
-    }
+		return [
+			'id'            => $product->uuid,
+			'name'          => $product->name,
+			'slug'          => $product->slug,
+			'theme'         => $product->slug,
+			'url'           => $product->homepage_url,
+			'icons'         => [
+				'1x' => $product->icon_url,
+				'2x' => $product->icon_url,
+			],
+			'banners'       => [
+				'low'  => isset( $banners['low'] ) ? $banners['low'] : '',
+				'high' => isset( $banners['high'] ) ? $banners['high'] : '',
+			],
+			'tested'        => $product->tested,
+			'requires_php'  => $product->requires_php,
+			'requires'      => $product->requires,
+			'sections'      => [
+				'description' => $product->description,
+				'changelog'   => ( $stable_release && isset( $stable_release->changelog ) ) ? $stable_release->changelog : '',
+			],
+			'new_version'   => ( $stable_release && isset( $stable_release->version ) ) ? $stable_release->version : '',
+			'last_updated'  => ( $stable_release && isset( $stable_release->release_date ) ) ? $stable_release->release_date : '',
+			'package'       => $download_url,
+			'download_link' => $download_url,
+		];
+	}
 
-    /**
-     * Download a single item by uuid
-     *
-     * @param WP_REST_Request $request Full data about the request.
-     *
-     * @return WP_Error|WP_REST_Response
-     */
-    public function download_product( $request ) {
+	/**
+	 * Download a release archive for a product by UUID.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function download_product( $request ) {
+		$uuid        = sanitize_text_field( (string) $request->get_param( 'uuid' ) );
+		$license_key = sanitize_text_field( (string) $request->get_param( 'license_key' ) );
+		$refurl      = esc_url_raw( (string) $request->get_param( 'refurl' ) );
 
-        $uuid = $request->get_param( 'uuid' );
-        $license_key = $request->get_param( 'license_key' );
-        $refurl = $request->get_param( 'refurl' );
+		if ( empty( $license_key ) ) {
+			return new WP_Error(
+				'missing_license_key',
+				__( 'License key is required.', 'licenser' ),
+				[ 'status' => 400 ]
+			);
+		}
 
-        // Check if license key is provided
-        if ( empty( $license_key ) ) {
-            return new WP_Error(
-                'missing_license_key',
-                __( 'License key is required.' ),
-                [ 'status' => 400 ]
-            );
-        }
+		$product = Product::instance()->get(
+			$uuid,
+			[
+				'inc_stable_release' => true,
+				'inc_releases'       => false,
+				'inc_packages'       => false,
+				'get_by'             => 'uuid',
+			]
+		);
 
-        // Get Product
-        $product = Product::instance()->get( $uuid, [
-            'inc_stable_release' => true,
-            'inc_releases' => false,
-            'inc_packages' => false,
-            'get_by' => 'uuid', //
-        ]);
+		if ( ! $product ) {
+			return new WP_Error(
+				'not_found',
+				__( 'Invalid Product ID.', 'licenser' ),
+				[ 'status' => 404 ]
+			);
+		}
 
-        if ( ! $product ) {
-            return new WP_Error(
-                'not_found',
-                __( 'Invalid Product ID.' ),
-                [ 'status' => 404 ]
-            );
-        }
-
-        // Download
-        return Product_Controller::instance()->download( [
-            'product_id' => $product->id,
-            'license_key' => $license_key,
-            'ref_domain' => $refurl,
-            // 'version' => $product->stable_release->version,
-        ] );
-    }
-
+		return Product_Controller::instance()->download(
+			[
+				'product_id'  => (int) $product->id,
+				'license_key' => $license_key,
+				'ref_domain'  => $refurl,
+			]
+		);
+	}
 }

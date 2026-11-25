@@ -1,89 +1,178 @@
 <?php
+
 namespace Licenser\Models;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * License metadata model class.
+ */
 class License_Meta {
 
-    use \Licenser\Traits\SingletonTraitSelf;
+	use \Licenser\Traits\SingletonTraitSelf;
 
-    // Default Fields
-    public $default_fields = [
-        'license_id' => '',
-        'meta_key' => '',
-        'meta_value' => '',
-    ];
+	/**
+	 * Default fields.
+	 *
+	 * @var array
+	 */
+	public $default_fields = [
+		'license_id' => '',
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Column name in custom licenser_license_meta table.
+		'meta_key'   => '',
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Column name in custom licenser_license_meta table.
+		'meta_value' => '',
+	];
 
-    /**
-     * Get Meta Value
-     *
-     * @param int $license_id
-     * @param string $meta_key
-     * @return array
-     */
-    public function get_value( $license_id, $meta_key = '' ) {
-        global $wpdb;
+	/**
+	 * Get a single meta value for a license.
+	 *
+	 * @param int    $license_id License ID.
+	 * @param string $meta_key   Meta key.
+	 * @return string|null
+	 */
+	public function get_value( $license_id, $meta_key = '' ) {
+		global $wpdb;
 
-        $where = $wpdb->prepare( " WHERE license_id = %d", $license_id );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT meta_value FROM {$wpdb->licenser_license_meta} WHERE license_id = %d AND meta_key = %s LIMIT 1",
+				absint( $license_id ),
+				sanitize_text_field( $meta_key )
+			)
+		);
+	}
 
-        $where .= $wpdb->prepare( " AND meta_key = %s", $meta_key );
-       
-        return $wpdb->get_var( "SELECT meta_value FROM {$wpdb->licenser_license_meta} {$where}" );
-    }
+	/**
+	 * Get all metadata rows for a license.
+	 *
+	 * @param int $license_id License ID.
+	 * @return array
+	 */
+	public function get_all( $license_id ) {
+		global $wpdb;
 
-    /**
-     * Get Meta Values
-     *
-     * @param int $license_id
-     * @return array
-     */
-    public function get_all( $license_id ) {
-        global $wpdb;
-        return $wpdb->get_results( $wpdb->prepare( "SELECT id, meta_key, meta_value FROM {$wpdb->licenser_license_meta} WHERE license_id = %d", $license_id ) );
-    }
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, meta_key, meta_value FROM {$wpdb->licenser_license_meta} WHERE license_id = %d",
+				absint( $license_id )
+			)
+		);
+	}
 
-    /**
-     * Update Meta (Add if not exists)
-     *
-     * @param int $license_id
-     * @param array $data
-     * @return int
-     */
-    public function update( $license_id, $meta_key, $meta_value ) {
-        global $wpdb;
+	/**
+	 * Update a meta value (inserting if it does not exist).
+	 *
+	 * @param int    $license_id License ID.
+	 * @param string $meta_key   Meta key.
+	 * @param string $meta_value Meta value.
+	 * @return int|false
+	 */
+	public function update( $license_id, $meta_key, $meta_value ) {
+		global $wpdb;
 
-        // Check if exists
-        $exists = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->licenser_license_meta} WHERE license_id = %d AND meta_key = %s", $license_id, $meta_key ) );
+		$license_id = absint( $license_id );
+		$meta_key   = sanitize_text_field( $meta_key );
+		$meta_value = is_scalar( $meta_value ) ? sanitize_text_field( (string) $meta_value ) : wp_json_encode( $meta_value );
 
-        if( $exists ){
-            return $wpdb->update( $wpdb->licenser_license_meta, [ 'meta_value' => $meta_value ], [ 'license_id' => $license_id, 'meta_key' => $meta_key ] );
-        } else {
-            return $wpdb->insert( $wpdb->licenser_license_meta, [ 'license_id' => $license_id, 'meta_key' => $meta_key, 'meta_value' => $meta_value ] );
-        }
-    }
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$exists = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->licenser_license_meta} WHERE license_id = %d AND meta_key = %s",
+				$license_id,
+				$meta_key
+			)
+		);
 
-    /**
-     * Delete Meta
-     *
-     * @param int $license_id
-     * @param string $meta_key
-     * @return int
-     */
-    public function delete( $license_id, $meta_key ) {
-        global $wpdb;
+		if ( $exists > 0 ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			return $wpdb->update(
+				$wpdb->licenser_license_meta,
+				[
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Indexed custom table update.
+					'meta_value' => $meta_value,
+				],
+				[
+					'license_id' => $license_id,
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Indexed custom table WHERE clause.
+					'meta_key'   => $meta_key,
+				],
+				[ '%s' ],
+				[ '%d', '%s' ]
+			);
+		}
 
-        return $wpdb->delete( $wpdb->licenser_license_meta, [ 'license_id' => $license_id, 'meta_key' => $meta_key ] );
-    }
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		return $wpdb->insert(
+			$wpdb->licenser_license_meta,
+			[
+				'license_id' => $license_id,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Custom table insert.
+				'meta_key'   => $meta_key,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Custom table insert.
+				'meta_value' => $meta_value,
+			],
+			[ '%d', '%s', '%s' ]
+		);
+	}
 
-    /**
-     * Delete All Meta
-     *
-     * @param int $license_id
-     * @return int
-     */
-    public function delete_all( $license_id ) {
-        global $wpdb;
+	/**
+	 * Delete a single meta entry by license ID and key.
+	 *
+	 * @param int    $license_id License ID.
+	 * @param string $meta_key   Meta key.
+	 * @return int|false
+	 */
+	public function delete( $license_id, $meta_key ) {
+		global $wpdb;
 
-        return $wpdb->delete( $wpdb->licenser_license_meta, [ 'license_id' => $license_id ] );
-    }
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->delete(
+			$wpdb->licenser_license_meta,
+			[
+				'license_id' => absint( $license_id ),
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Indexed custom table DELETE.
+				'meta_key'   => sanitize_text_field( $meta_key ),
+			],
+			[ '%d', '%s' ]
+		);
+	}
 
+	/**
+	 * Delete a single meta row by its primary key ID.
+	 *
+	 * @param int $id Meta row ID.
+	 * @return int|false
+	 */
+	public function delete_by_id( $id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->delete(
+			$wpdb->licenser_license_meta,
+			[ 'id' => absint( $id ) ],
+			[ '%d' ]
+		);
+	}
+
+	/**
+	 * Delete all metadata for a license.
+	 *
+	 * @param int $license_id License ID.
+	 * @return int|false
+	 */
+	public function delete_all( $license_id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->delete(
+			$wpdb->licenser_license_meta,
+			[ 'license_id' => absint( $license_id ) ],
+			[ '%d' ]
+		);
+	}
 }

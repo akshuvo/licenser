@@ -1,23 +1,29 @@
 <?php
 /**
  * Singleton class trait.
+ *
+ * @package Licenser
  */
 
 namespace Licenser\Traits;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
- * Singleton trait.
+ * Singleton trait using `self`.
  */
 trait SingletonTraitSelf {
 	/**
 	 * The single instance of the class.
 	 *
-	 * @var object
+	 * @var object|null
 	 */
 	protected static $instance = null;
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @return void
 	 */
@@ -26,14 +32,15 @@ trait SingletonTraitSelf {
 	/**
 	 * Get class instance.
 	 *
-	 * @return object Instance.
+	 * @return static Instance.
 	 */
-    final public static function instance() {
-        if ( null === static::$instance ) {
-            static::$instance = new self();
-        }
-        return static::$instance;
-    }
+	final public static function instance() {
+		if ( null === static::$instance ) {
+			static::$instance = new self();
+		}
+
+		return static::$instance;
+	}
 
 	/**
 	 * Prevent cloning.
@@ -42,6 +49,8 @@ trait SingletonTraitSelf {
 
 	/**
 	 * Prevent unserializing.
+	 *
+	 * @return void
 	 */
 	final public function __wakeup() {
 		_doing_it_wrong( __FUNCTION__, esc_html__( 'Unserializing instances of this class is forbidden.', 'licenser' ), '1.0' );

@@ -1,156 +1,209 @@
-<?php 
+<?php
+
 namespace Licenser\Admin;
 
-use Licenser\Products;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
-if( !class_exists('WP_List_Table') ){
-	require_once ABSPATH .'wp-admin/includes/class-wp-list-table.php';
+use Licenser\Models\Product;
+
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
 
 /**
- *  
- * Product List Table Class
- * 
-*/
-class ProductsListTable extends \WP_List_Table{
+ * Products WP_List_Table implementation.
+ */
+class ProductsListTable extends \WP_List_Table {
 
-	function __construct(){
-		parent::__construct([
-			'singular' => "product",
-			'plural' => "products",
-			'ajax' => false
-		]);
+	/**
+	 * Initialize the list table.
+	 */
+	public function __construct() {
+		parent::__construct(
+			[
+				'singular' => 'product',
+				'plural'   => 'products',
+				'ajax'     => false,
+			]
+		);
 	}
 
-	// number of column
-	public function get_columns(){
+	/**
+	 * Define table columns.
+	 *
+	 * @return array
+	 */
+	public function get_columns() {
 		return [
-			'cb' => "<input type='checkbox'/>",
-			'name' => __('Product Name','lmfwppt'),
-			'slug' => __('Product Slug','lmfwppt'),
-			'dated' => __('Date','lmfwppt')
+			'cb'    => '<input type="checkbox" />',
+			'name'  => __( 'Product Name', 'licenser' ),
+			'slug'  => __( 'Product Slug', 'licenser' ),
+			'dated' => __( 'Date', 'licenser' ),
 		];
 	}
 
 	/**
-     * Get sortable columns
-     *
-     * @return array
-     */
-
-	// pagination and sortable use this code
-    function get_sortable_columns() {
-        $sortable_columns = [
-            'name' => [ 'name', true ],
-            'dated' => [ 'dated', true ],
-        ];
-
-        return $sortable_columns;
-    }
-    // pagination and sortable use this code
-
-	protected function column_default($item, $column_name){
-		switch ($column_name) {
-			case 'value':
-				# code...
-				break;
-			
-			default:
-				return isset($item->$column_name) ? $item->$column_name : '';
-		}
+	 * Define sortable columns.
+	 *
+	 * @return array
+	 */
+	public function get_sortable_columns() {
+		return [
+			'name'  => [ 'name', true ],
+			'dated' => [ 'dated', true ],
+		];
 	}
 
-	// Default column Customize
-	public function column_name($item){
-		$page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : "";
+	/**
+	 * Render default column cell output.
+	 *
+	 * @param object $item        Row object.
+	 * @param string $column_name Column slug.
+	 * @return string
+	 */
+	protected function column_default( $item, $column_name ) {
+		return isset( $item->$column_name ) ? esc_html( (string) $item->$column_name ) : '';
+	}
 
-		$actions = [];
-		$actions['edit']   = sprintf( '<a href="%s" title="%s">%s</a>', admin_url( 'admin.php?page='.$page.'&action=edit&id=' . $item->id ), $item->id, __( 'Edit', 'lmfwppt' ), __( 'Edit', 'lmfwppt' ) );
+	/**
+	 * Render the product name column with edit/delete row actions.
+	 *
+	 * @param object $item Row object.
+	 * @return string
+	 */
+	public function column_name( $item ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only current admin screen slug.
+		$page     = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'licenser-plugins';
+		$edit_url = admin_url( 'admin.php?page=' . $page . '&action=edit&id=' . absint( $item->id ) );
 
-        $actions['delete'] = sprintf( '<a href="#" class="licenser-delete-product" data-id="'.esc_attr( $item->id ).'">%s</a>', __( 'Delete', 'licenser' ) );
+		$actions           = [];
+		$actions['edit']   = sprintf(
+			'<a href="%1$s" title="%2$d">%3$s</a>',
+			esc_url( $edit_url ),
+			absint( $item->id ),
+			esc_html__( 'Edit', 'licenser' )
+		);
+		$actions['delete'] = sprintf(
+			'<a href="#" class="licenser-delete-product" data-id="%1$d">%2$s</a>',
+			absint( $item->id ),
+			esc_html__( 'Delete', 'licenser' )
+		);
 
 		return sprintf(
-			'<a href="%1$s"><strong>%2$s</strong></a> %3$s', admin_url('admin.php?page='.$page.'&action=edit&id=' . $item->id ), $item->name, $this->row_actions($actions)
+			'<a href="%1$s"><strong>%2$s</strong></a> %3$s',
+			esc_url( $edit_url ),
+			esc_html( (string) $item->name ),
+			$this->row_actions( $actions )
 		);
 	}
 
-	protected function column_cb($item){
+	/**
+	 * Render row selection checkbox.
+	 *
+	 * @param object $item Row object.
+	 * @return string
+	 */
+	protected function column_cb( $item ) {
 		return sprintf(
-			"<input name='product_id[]' type='checkbox' value='%d'/>", $item->id
+			'<input name="product_id[]" type="checkbox" value="%d" />',
+			absint( $item->id )
 		);
 	}
 
-	protected function column_dated($item){
-		return licenser_date('j F Y',strtotime($item->dated));
+	/**
+	 * Render the formatted creation date column.
+	 *
+	 * @param object $item Row object.
+	 * @return string
+	 */
+	protected function column_dated( $item ) {
+		$timestamp = ! empty( $item->dated ) ? strtotime( (string) $item->dated ) : false;
+		return $timestamp ? esc_html( licenser_date( 'j F Y', $timestamp ) ) : '';
 	}
 
-	public function prepare_items( $product_type = null ){
-
-		$column = $this->get_columns();
-		$hidden = [];
+	/**
+	 * Prepare items, sorting, and pagination arguments.
+	 *
+	 * @param string|null $product_type Product type filter (`plugin` or `theme`).
+	 * @return void
+	 */
+	public function prepare_items( $product_type = null ) {
+		$columns  = $this->get_columns();
+		$hidden   = [];
 		$sortable = $this->get_sortable_columns();
 
-		$this->_column_headers = [$column, $hidden, $sortable];
+		$this->_column_headers = [ $columns, $hidden, $sortable ];
 
-		//  pagination and sortable
-		 $per_page     = 20;
-         $current_page = $this->get_pagenum();
-         $offset = ( $current_page - 1 ) * $per_page;
+		$per_page     = 20;
+		$current_page = $this->get_pagenum();
+		$offset       = ( $current_page - 1 ) * $per_page;
 
-        $args = [
-            'number' => $per_page,
-            'offset' => $offset,
-            'product_type' => $product_type 
+		$args = [
+			'number'       => $per_page,
+			'offset'       => $offset,
+			'product_type' => $product_type ? sanitize_key( $product_type ) : 'plugin',
+		];
 
-        ];
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only WP_List_Table sorting params, allowlisted below.
+		if ( isset( $_REQUEST['orderby'] ) && isset( $_REQUEST['order'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['orderby'] = sanitize_key( wp_unslash( $_REQUEST['orderby'] ) );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$args['order'] = sanitize_key( wp_unslash( $_REQUEST['order'] ) );
+		}
 
-        if ( isset( $_REQUEST['orderby'] ) && isset( $_REQUEST['order'] ) ) {
-            $args['orderby'] = $_REQUEST['orderby'];
-            $args['order'] = $_REQUEST['order'];
-        }
+		$this->items = $this->get_product_list( $args );
 
-        $this->items = $this->get_product_list($args);
+		$total_items = Product::instance()->count(
+			[
+				'product_type' => $args['product_type'],
+			]
+		);
 
-		// $productObj = new Products();
-
-        // pagination and sortable
-		$this->set_pagination_args([
-			// 'total_items' => $productObj->product_count($product_type),
-			'total_items' => 0,
-            'per_page'    => $per_page,
-		]);
+		$this->set_pagination_args(
+			[
+				'total_items' => $total_items,
+				'per_page'    => $per_page,
+			]
+		);
 	}
 
-	// Function 
 	/**
-	 * Get the Product
+	 * Query products for the list table with strict ORDER BY allowlisting.
 	 *
-	 * @return Array
+	 * @param array $args Query arguments.
+	 * @return array
 	 */
-	function get_product_list( $args = [] ) {
-	    global $wpdb;
+	public function get_product_list( $args = [] ) {
+		global $wpdb;
 
-	    $defaults = [
-	        'number' => 20,
-	        'offset' => 0,
-	        'orderby' => 'id',
-	        'order' => 'DESC',
-	        'product_type' => 'plugin'
-	    ];
+		$defaults = [
+			'number'       => 20,
+			'offset'       => 0,
+			'orderby'      => 'id',
+			'order'        => 'DESC',
+			'product_type' => 'plugin',
+		];
 
-	    $args = wp_parse_args( $args, $defaults );
-		$product_table = licenser_table('products');
+		$args          = wp_parse_args( $args, $defaults );
+		$product_table = licenser_table( 'products' );
 
-	    $product_list = $wpdb->prepare(
-	            "SELECT * FROM {$product_table}
-	            WHERE product_type = %s ORDER BY {$args['orderby']} {$args['order']}
-	            LIMIT %d, %d",
-	            $args['product_type'], $args['offset'], $args['number'] 
-	    );
+		$allowed_orderby = [ 'id', 'name', 'slug', 'dated' ];
+		$orderby         = in_array( $args['orderby'], $allowed_orderby, true ) ? $args['orderby'] : 'id';
+		$order           = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
 
-	    $items = $wpdb->get_results( $product_list );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$items = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$product_table} WHERE product_type = %s ORDER BY {$orderby} {$order} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$args['product_type'],
+				absint( $args['offset'] ),
+				absint( $args['number'] )
+			)
+		);
 
-	    return $items;
+		return is_array( $items ) ? $items : [];
 	}
-
 }

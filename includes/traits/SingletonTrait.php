@@ -5,6 +5,10 @@
 
 namespace Licenser\Traits;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Singleton trait.
  */

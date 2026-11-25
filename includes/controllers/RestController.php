@@ -1,21 +1,22 @@
 <?php
+
 namespace Licenser\Controllers;
 
 use WP_REST_Controller;
-// use WP_REST_Server;
-// use WP_Error;
+use WP_REST_Request;
+use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Abstract Rest Controller Class
+ * Abstract REST Controller Class.
  *
- * @extends  WP_REST_Controller
+ * @extends WP_REST_Controller
  */
 abstract class RestController extends WP_REST_Controller {
-    
+
 	/**
 	 * Endpoint namespace.
 	 *
@@ -36,7 +37,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function get_item_permissions_check( $request ) {
+	public function get_item_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		return current_user_can( 'manage_options' );
 	}
 
@@ -46,7 +47,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function get_items_permissions_check( $request ) {
+	public function get_items_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		return current_user_can( 'manage_options' );
 	}
 
@@ -56,7 +57,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function create_item_permissions_check( $request ) {
+	public function create_item_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		return current_user_can( 'manage_options' );
 	}
 
@@ -66,7 +67,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function update_item_permissions_check( $request ) {
+	public function update_item_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		return current_user_can( 'manage_options' );
 	}
 
@@ -76,7 +77,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function delete_item_permissions_check( $request ) {
+	public function delete_item_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		return current_user_can( 'manage_options' );
 	}
 
@@ -86,8 +87,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function delete_items_permissions_check( $request ) {
+	public function delete_items_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		return current_user_can( 'manage_options' );
 	}
-
 }

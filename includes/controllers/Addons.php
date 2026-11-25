@@ -1,35 +1,47 @@
 <?php
+
 namespace Licenser\Controllers;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Addons loader controller.
+ */
 class Addons {
-    /**
-     * Singleton instance
-     *
-     * @var DB
-     */
-    private static $instance;
 
-    /**
-     * Initialize the class
-     */
-    private function __construct() {
+	/**
+	 * Singleton instance.
+	 *
+	 * @var self|null
+	 */
+	private static $instance = null;
 
-        // Load File
-        // require_once LICENSER_PATH . '/addons/wc-lite/wc-lite.php';
-        $wc_addons = new \Licenser\Addons\Wc_Lite();
-        
-    }
+	/**
+	 * Initialize built-in addons and allow Pro/external addons to register.
+	 */
+	private function __construct() {
+		new \Licenser\Addons\Wc_Lite();
 
-    /**
-     * Get the singleton instance
-     *
-     * @return DB
-     */
-    public static function instance() {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
+		/**
+		 * Fires after built-in Licenser addons are loaded.
+		 *
+		 * @param self $addons Addons controller instance.
+		 */
+		do_action( 'licenser_addons_register', $this );
+	}
 
-        return self::$instance;
-    }
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self
+	 */
+	public static function instance() {
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
 }

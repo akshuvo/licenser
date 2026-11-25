@@ -1,0 +1,135 @@
+# Integrations, REST API & Client SDK Contract
+
+## 1. REST API Surface (`licenser/v1`)
+
+All routes are registered in [`includes/Api.php`](../includes/Api.php) on `rest_api_init` under namespace `licenser/v1` (controllers in `includes/Api/` under `namespace Licenser\Api;`).
+
+### Public Endpoints (Unauthenticated — Customer Plugin/Theme SDKs)
+
+Handled by [`includes/Api/Public_Apis.php`](../includes/Api/Public_Apis.php) (`permission_callback => '__return_true'`).
+
+| Method & Route | Purpose | Key Request Params | Response Shape |
+|---|---|---|---|
+| `POST /wp-json/licenser/v1/public/products/{uuid}` | Update check & WP `plugins_api` info | `license_key`, `url`, `version`, `name`, `slug`, `basename`, `client` | WP update object: `id`, `name`, `slug`, `plugin`/`theme`, `url`, `icons` (`1x`,`2x`), `banners` (`low`,`high`), `tested`, `requires_php`, `requires`, `sections` (`description`,`changelog`), `new_version`, `last_updated`, `package`, `download_link`, `author` |
+| `POST /wp-json/licenser/v1/public/license/{uuid}/{action}` | `action` enum: `check`, `activate`, `deactivate` | `license_key`, `url`, `is_local`, `version`, `client` | `check`/`activate`: `{ success, status, remaining, activation_count, activation_limit, expiry_days, expiry_date, title }`<br>`deactivate`: `{ success: true, message }`<br>Error: `{ success: false, error }` |
+| `GET /wp-json/licenser/v1/public/products/download/{uuid}` | License-authenticated ZIP download for WP updater & customer portal | Query: `license_key` (required), `refurl` (optional calling site URL) | Streams local ZIP (`application/octet-stream`) or redirects validated external URL; returns `WP_Error` (HTTP `400`/`403`/`404`) on missing/invalid/expired/wrong-product license or missing file |
+
+> **Contract Stability:** `package` and `download_link` returned by `POST /public/products/{uuid}` point to `GET /public/products/download/{uuid}?license_key={key}&refurl={url}` (generated via `licenser_product_download_url()`). `expiry_days` is an integer for expiring licenses and `false` for lifetime licenses; `remaining` is always `>= 0` (`0` when `activation_limit === 0` unlimited). Changing query parameter names or JSON fields will break installed customer plugins.
+
+### Admin Endpoints (`manage_options` via `RestController`)
+
+| Method & Route | Controller | Behavior |
+|---|---|---|
+| `GET /licenser/v1/products` | `Api/Products.php` | Lists Licenser products (`per_page`, `page`, `product_type`, `status`, `inc_packages`) |
+| `POST /licenser/v1/products` | `Api/Products.php` | Creates/updates Licenser product, optional release, and packages; returns fresh product object |
+| `DELETE /licenser/v1/products/{id}` | `Api/Products.php` | Deletes product row and clears product transient caches |
+| `GET /licenser/v1/products/packages?product_id={id}` | `Api/Products.php` | Lists all packages for a product (used by License form & `Wc_Lite` product editor) |
+| `POST /licenser/v1/products/packages` | `Api/Products.php` | Creates/updates a package and returns the saved package object |
+| `DELETE /licenser/v1/products/packages/{id}` | `Api/Products.php` | Deletes a package by integer `id` and clears parent product cache |
+| `GET /licenser/v1/licenses` | `Api/Licenses.php` | Lists Licenser licenses (`per_page`, `page`, `product_id`, `source`, `inc_domains`) |
+| `GET /licenser/v1/licenses/{id}` | `Api/Licenses.php` | Returns a single license record (`404` if not found) |
+| `POST /licenser/v1/licenses` | `Api/Licenses.php` | Creates/updates a license; returns `License::get($id)` |
+| `POST /licenser/v1/licenses/generate-key` | `Api/Licenses.php` | Generates and returns a formatted license key string |
+| `DELETE /licenser/v1/licenses/{id}` | `Api/Licenses.php` | Deletes license row and cascades its domains & metadata |
+| `DELETE /licenser/v1/licenses/domains/{id}` | `Api/Licenses.php` | Deletes an activated domain row by integer `id` |
+| `DELETE /licenser/v1/licenses/meta/{id}` | `Api/Licenses.php` | Deletes a license meta row by integer `id` |
+| `GET /licenser/v1/settings` | `Api/Settings.php` | Returns saved Licenser settings array |
+| `POST /licenser/v1/settings` | `Api/Settings.php` | Sanitizes & saves settings to `licenser_settings` option; returns saved array |
+
+---
+
+## 2. `LicenserWP/client` SDK Contract
+
+Repository: `https://github.com/LicenserWP/client` (forked from Appsero Client; namespace `Licenser`, `Client::$version = '2.0.1'`).
+
+### Real-World Reference Consumer (`gridmaster-pro`)
+Inspected at `/Users/akshuvo/Local Sites/grid-master/app/public/wp-content/plugins/gridmaster-pro/gridmaster.php`:
+```php
+$client = new Licenser\Client(
+	'da399f0f-c005-4b5f-80b8-df3222e79169', // Product UUID in licenser_products
+	'Post Grid Master Pro',
+	__FILE__,
+	'https://portal.addonmaster.com'        // Note: NO trailing slash
+);
+$gm_license = $client->license();
+$gm_license->add_settings_page( [ 'type' => 'section' ] );
+$client->updater()->init( $client );
+```
+
+### How the Client SDK Calls This Server
+1. **Endpoint Construction (`Client::endpoint()`):** `$this->api_url . '/wp-json/licenser/v1/public'` -> `trailingslashit()`, filterable via `licenser_endpoint`. All requests use `wp_remote_post()` with `'client' => '2.0.1'` merged into the body. The SDK Generator (`templates/tools/tools.php`) emits `untrailingslashit( licenser_api_url() )` and `'type' => 'submenu'` to match `Client` and `License::admin_menu()`.
+2. **License Storage (`License`):**
+   - Stores option `licenser_{md5($slug)}_manage_license` containing: `key`, `status` (`'activate'` | `'deactivate'`), `remaining`, `activation_count`, `activation_limit`, `expiry_days`, `expiry_date`, `title`.
+   - Daily WP-Cron `{slug}_license_check_event` calls `POST /public/license/{uuid}/check`.
+   - On `check` response: if `$response['success']` is truthy -> marks local status `'activate'`; otherwise -> marks `'deactivate'` and `expiry_days = 0`.
+   - Legacy-migrated sites (migrated from `<slug>_key` without calling `/activate`) still pass `check` as long as the license is active, matches the product UUID, is not expired, and the domain isn't explicitly disabled.
+3. **Automatic Updates (`Updater`):**
+   - Hooks `pre_set_site_transient_update_plugins` + `plugins_api` (or `pre_set_site_transient_update_themes`).
+   - POSTs to `/public/products/{uuid}`, expects JSON with `slug` and `new_version`.
+   - Caches version object in transient `licenser_{md5($slug)}_version_info` for 3 hours (bypassed on `update-core.php`).
+   - WordPress downloads the ZIP directly from the returned `package` URL.
+4. **Insights (`Insights`, optional — not enabled in GridMaster Pro):**
+   - Sends opt-in weekly telemetry to route `track` and uninstall feedback routes. **Not implemented on the Licenser server yet.**
+
+---
+
+## 3. Portal Checkout-to-License Flow (WooCommerce + Paddle)
+
+On `portal.addonmaster.com` / `portal-addonmaster.local`:
+
+```text
+Customer Checkout (WooCommerce)
+  └─▶ wc-paddle-payment-gateway (Ppgw_Gateway::process_payment)
+        └─▶ Ppgw_API::get_pay_url_for_order() (Paddle Classic Pay Link API)
+              └─▶ Customer pays in Paddle overlay
+                    └─▶ Paddle webhook -> /index.php/wc-api/paddle_complete?order_id={id}
+                          └─▶ Ppgw_Gateway::on_paddle_payment_webhook_response()
+                                └─▶ Verifies RSA-SHA1 p_signature -> $order->payment_complete()
+                                      └─▶ Order status -> processing / completed
+                                            └─▶ Licenser Wc_Lite (woocommerce_order_status_changed, prio 150)
+                                                  └─▶ Order_Handler::generate_license($order_id)
+                                                        ├─▶ Creates row in licenser_licenses (source='wc', source_id=$order_id)
+                                                        ├─▶ Saves HPOS-safe order meta (license_generated_item_id/key_{item_id}, is_license_order)
+                                                        └─▶ Triggers WC customer_invoice email (includes license key + download link)
+```
+
+Portal child theme glue (`/Users/akshuvo/Local Sites/addonmaster-portal/app/public/wp-content/themes/addonmaster/functions.php`):
+- Injects Paddle card badges on checkout (`li.payment_method_paddle label`).
+- Captures `?coupon_code=` into WooCommerce session and auto-applies before cart table.
+- Rounds non-`fixed_cart` coupon discounts upward via `ceil()`.
+
+---
+
+## 4. WordPress Hooks & Extension Points
+
+### Filters in Licenser (Free)
+| Hook | Location | Purpose |
+|---|---|---|
+| `licenser_api_url` | `includes/functions.php` | Filter base URL used in download URLs & SDK Generator (defaults to `home_url('/')`) |
+| `licenser_product_types` | `includes/models/Product.php` | Add/modify product types (`plugin`, `theme`) |
+| `licenser_refresh_license_public_response` | `includes/controllers/License.php` | Modify public `check`/`activate` JSON payload (`$response, $license`) |
+| `licenser_should_enforce_domain_limit` | `includes/controllers/License.php` | Override domain limit enforcement (`$enforce, $license, $args`) — e.g., Pro local-domain exemption |
+| `licenser_sanitize_settings` | `includes/models/Settings.php` | Extend settings allowlist/sanitization (`$sanitized, $data`) |
+| `licenser_wclite_products_page_url` | `addons/Wc_Lite/Shortcode.php` | Filter "Browse products" button URL in empty My Account table |
+
+### Actions in Licenser (Free)
+| Hook | Location | Arguments |
+|---|---|---|
+| `licenser_loaded` | `licenser.php` | None — fires after core initialization (`licenser-pro` bootstrap entrypoint) |
+| `licenser_addons_register` | `includes/controllers/Addons.php` | `$addons` — register Pro/custom addons |
+| `licenser_product_saved` | `includes/models/Product.php` | `$product_id, $data` |
+| `licenser_license_created` | `includes/models/License.php` | `$license_id, $data` |
+| `licenser_license_updated` | `includes/models/License.php` | `$license_id, $data` |
+| `licenser_license_deleted` | `includes/models/License.php` | `$license_id` |
+| `licenser_license_activated` | `includes/controllers/License.php` | `$license, $args` |
+| `licenser_license_checked` | `includes/controllers/License.php` | `$license, $args` |
+| `licenser_license_deactivated` | `includes/controllers/License.php` | `$license, $url` |
+| `licenser_before_product_download` | `includes/controllers/Product.php` | `$release, $license, $args` |
+
+### Free ↔ `licenser-pro` Boundary Guidelines
+`licenser-pro` (`LicenserWP/licenser-pro`) is currently a bootstrap stub (`licenser-pro.php`, defines `LICENSER_PRO_*` constants). Free checks `defined('LICENSER_PRO_VERSION')` only for non-breaking UI indicators (`PRO` menu badge and Addons card).
+
+When developing `licenser-pro`:
+1. Hook into `licenser_loaded` (or check `class_exists('Licenser')` on `plugins_loaded`) and show a clean admin notice if Free is missing.
+2. Extend behavior via the actions/filters above rather than duplicating core classes or mutating Free schema unexpectedly.
+3. Prefix Pro-only tables/options with `licenser_pro_` so deactivating Pro leaves Free data intact.

@@ -1,155 +1,204 @@
 <?php
+
 namespace Licenser\Models;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+/**
+ * Product release model class.
+ */
 class ProductRelease {
 
-    use \Licenser\Traits\SingletonTraitSelf;
+	use \Licenser\Traits\SingletonTraitSelf;
 
-    /**
-     * Get Var
-     *
-     * @var int
-     */
-    public function get( $id, $args = [] ) {
-        $args = wp_parse_args( $args, [
-            'columns' => [],
-            'get_by' => '',
-            'version' => '',
-        ] );
+	/**
+	 * Allowed columns in the product_releases table.
+	 *
+	 * @var string[]
+	 */
+	const ALLOWED_COLUMNS = [
+		'id',
+		'product_id',
+		'version',
+		'changelog',
+		'file_name',
+		'download_link',
+		'release_date',
+	];
 
-        global $wpdb;
-        $columns = !empty( $args['columns'] ) ? implode( ',', $args['columns'] ) : '*';
+	/**
+	 * Sanitize a column list against allowed release columns.
+	 *
+	 * @param array|string $columns Requested columns.
+	 * @return string
+	 */
+	protected function sanitize_columns( $columns ) {
+		if ( empty( $columns ) || '*' === $columns ) {
+			return '*';
+		}
 
-        // Where
-        $where = ' 1=1 ';
+		if ( is_string( $columns ) ) {
+			$columns = explode( ',', $columns );
+		}
 
-        // Get By
-        if( $args['get_by'] == 'product_id' ){
-            $where .= $wpdb->prepare( " AND product_id = %d", $id );
-        } else {
-            $where .= $wpdb->prepare( " AND id = %d", $id );
-        }
+		$safe = [];
+		foreach ( (array) $columns as $column ) {
+			$column = trim( (string) $column );
+			if ( in_array( $column, self::ALLOWED_COLUMNS, true ) ) {
+				$safe[] = $column;
+			}
+		}
 
-        // Version
-        if( !empty( $args['version'] ) ){
-            $where .= $wpdb->prepare( " AND version = %s", $args['version'] );
-        }
+		return ! empty( $safe ) ? implode( ', ', $safe ) : '*';
+	}
 
-        // Order
-        $where .= " ORDER BY id DESC, release_date DESC";
+	/**
+	 * Get a single release by release ID or product ID.
+	 *
+	 * @param int   $id   Release ID or product ID.
+	 * @param array $args Query arguments.
+	 * @return object|null
+	 */
+	public function get( $id, $args = [] ) {
+		$args = wp_parse_args(
+			$args,
+			[
+				'columns' => [],
+				'get_by'  => '',
+				'version' => '',
+			]
+		);
 
-        return $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_product_releases} WHERE {$where} LIMIT 1" );
-    }
+		global $wpdb;
 
-    /**
-     * Get Stable Release
-     */
-    public function get_stable( $product_id ) {
-        global $wpdb;
+		$columns = $this->sanitize_columns( $args['columns'] );
+		$where   = '1=1';
 
-        $release = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT * FROM {$wpdb->licenser_product_releases} WHERE product_id = %d ORDER BY id DESC, release_date DESC LIMIT 1",
-                $product_id
-            )
-        );
+		if ( 'product_id' === $args['get_by'] ) {
+			$where .= $wpdb->prepare( ' AND product_id = %d', absint( $id ) );
+		} else {
+			$where .= $wpdb->prepare( ' AND id = %d', absint( $id ) );
+		}
 
-        return $release;
-    }
+		if ( ! empty( $args['version'] ) ) {
+			$where .= $wpdb->prepare( ' AND version = %s', sanitize_text_field( $args['version'] ) );
+		}
 
-    /**
-     * Get Product Releases
-     *
-     * @var int
-     */
-    public function get_all( $args = [] ) {
-        global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_product_releases} WHERE {$where} ORDER BY id DESC, release_date DESC LIMIT 1" );
+	}
 
-        $defaults = [
-            'number' => 20,
-            'offset' => 0,
-            'orderby' => 'id',
-            'order' => 'DESC',
-            'count_total' => true,
-            'product_id' => '',
-        ];
+	/**
+	 * Get the latest stable release for a product.
+	 *
+	 * @param int $product_id Product ID.
+	 * @return object|null
+	 */
+	public function get_stable( $product_id ) {
+		global $wpdb;
 
-        $args = wp_parse_args( $args, $defaults );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->licenser_product_releases} WHERE product_id = %d ORDER BY id DESC, release_date DESC LIMIT 1",
+				absint( $product_id )
+			)
+		);
+	}
 
-        $where = ' 1=1 ';
+	/**
+	 * Get all releases matching arguments.
+	 *
+	 * @param array $args Query arguments.
+	 * @return array
+	 */
+	public function get_all( $args = [] ) {
+		global $wpdb;
 
-        if( !empty( $args['product_id'] ) ){
-            $where .= $wpdb->prepare( " AND product_id = %d", $args['product_id'] );
-        }
+		$defaults = [
+			'number'      => 20,
+			'offset'      => 0,
+			'orderby'     => 'id',
+			'order'       => 'DESC',
+			'count_total' => true,
+			'product_id'  => '',
+		];
 
-        // Order
-        $where .= " ORDER BY {$args['orderby']} {$args['order']}";
+		$args  = wp_parse_args( $args, $defaults );
+		$where = '1=1';
 
-        // Limit
-        if( !empty( $args['number'] ) ){
-            $where .= $wpdb->prepare( " LIMIT %d, %d", $args['offset'], $args['number'] );
-        }
+		if ( ! empty( $args['product_id'] ) ) {
+			$where .= $wpdb->prepare( ' AND product_id = %d', absint( $args['product_id'] ) );
+		}
 
-        $items = $wpdb->get_results( "SELECT * FROM {$wpdb->licenser_product_releases} WHERE {$where}" );
+		$orderby = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
+		$order   = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
 
-        return $items;
-    }
+		$limit_sql = '';
+		if ( ! empty( $args['number'] ) && -1 !== (int) $args['number'] ) {
+			$limit_sql = $wpdb->prepare( ' LIMIT %d, %d', absint( $args['offset'] ), absint( $args['number'] ) );
+		}
 
-    /**
-     * Create Product Release
-     * 
-     * @param array $data
-     * @return int
-     */
-    public function create( $data ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return $wpdb->get_results( "SELECT * FROM {$wpdb->licenser_product_releases} WHERE {$where} ORDER BY {$orderby} {$order}{$limit_sql}" );
+	}
 
-        $data = wp_parse_args( $data, [
-            'product_id' => '',
-            'version' => '',
-            'changelog' => '',
-            'file_name' => '',
-            'download_link' => '',
-            'release_date' => '',
-        ] );
+	/**
+	 * Create or update a product release.
+	 *
+	 * @param array $data Release payload.
+	 * @return int Release ID.
+	 */
+	public function create( $data ) {
+		$data = wp_parse_args(
+			$data,
+			[
+				'product_id'    => 0,
+				'version'       => '',
+				'changelog'     => '',
+				'file_name'     => '',
+				'download_link' => '',
+				'release_date'  => '',
+			]
+		);
 
-        global $wpdb;
+		global $wpdb;
 
-        // Update
-        if( isset( $data['id'] ) && !empty( $data['id'] ) ){
-            $wpdb->update(
-                $wpdb->licenser_product_releases,
-                [
-                    'product_id' => intval( $data['product_id'] ),
-                    'version' => sanitize_text_field( $data['version'] ),
-                    'changelog' => wp_kses_post( $data['changelog'] ),
-                    'file_name' => sanitize_text_field( $data['file_name'] ),
-                    'download_link' => esc_url_raw( $data['download_link'] ),
-                    'release_date' => licenser_date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),
-                ],
-                [
-                    'id' => $data['id']
-                ]
-            );
+		$product_id   = absint( $data['product_id'] );
+		$release_ts   = ! empty( $data['release_date'] ) ? strtotime( (string) $data['release_date'] ) : false;
+		$release_date = $release_ts ? licenser_date( 'Y-m-d H:i:s', $release_ts ) : licenser_date( 'Y-m-d H:i:s' );
+		$file_name    = ! empty( $data['file_name'] ) ? sanitize_text_field( $data['file_name'] ) : basename( (string) $data['download_link'] );
 
-            $insert_id = $data['id'];
-        } else {
-            $wpdb->insert(
-                $wpdb->licenser_product_releases,
-                [
-                    'product_id' => intval( $data['product_id'] ),
-                    'version' => sanitize_text_field( $data['version'] ),
-                    'changelog' => wp_kses_post( $data['changelog'] ),
-                    'file_name' => !empty( $data['file_name'] ) ? sanitize_text_field( $data['file_name'] ) : basename( $data['download_link'] ),
-                    'download_link' => esc_url_raw( $data['download_link'] ),
-                    'release_date' => licenser_date( 'Y-m-d H:i:s', strtotime( $data['release_date'] ) ),
-                ] 
-            );
+		$record = [
+			'product_id'    => $product_id,
+			'version'       => sanitize_text_field( $data['version'] ),
+			'changelog'     => wp_kses_post( $data['changelog'] ),
+			'file_name'     => $file_name,
+			'download_link' => esc_url_raw( $data['download_link'] ),
+			'release_date'  => $release_date,
+		];
 
-            $insert_id = $wpdb->insert_id;
-        }
+		if ( ! empty( $data['id'] ) ) {
+			$insert_id = absint( $data['id'] );
 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->update(
+				$wpdb->licenser_product_releases,
+				$record,
+				[ 'id' => $insert_id ]
+			);
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->insert( $wpdb->licenser_product_releases, $record );
+			$insert_id = (int) $wpdb->insert_id;
+		}
 
-        return $insert_id;
-    }
+		if ( $product_id > 0 ) {
+			Product::instance()->clear_cache( $product_id );
+		}
+
+		return $insert_id;
+	}
 }

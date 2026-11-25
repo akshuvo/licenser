@@ -1,0 +1,11 @@
+.DS_Store
+.git
+.github
+.gitignore
+.distignore
+.phpcs.xml.dist
+AGENTS.md
+README.md
+docs
+composer.json
+composer.lock

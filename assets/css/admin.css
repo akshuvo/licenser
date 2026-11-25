@@ -548,3 +548,17 @@ body[class*="licenser"] .wrap {
 .licenser-sidenav li {
     margin: 0;
 }
+
+/* SDK Generator */
+.client_generator_response .CodeMirror {
+    height: 100%;
+    border: 1px solid #dbdbdb;
+}
+
+.licenser-code-text {
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-radius: 5px;
+    white-space: pre;
+    overflow-x: auto;
+}

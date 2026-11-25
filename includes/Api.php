@@ -1,54 +1,49 @@
 <?php
+
 namespace Licenser;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
- * Api class
+ * REST API bootstrapper class.
  */
 class Api {
-    /**
-     * Initialize the class
-     */
-    function __construct() {
-        $this->init();
-    }
 
-    /**
-     * Initialize the class
-     */
-    public function init() {
-        add_action( 'rest_api_init', [ $this, 'register_routes' ] );
-    }
-    
-    /**
-     * Register the routes for the objects of the controller.
-     */
-    public function register_routes() {
-        // API class mapping
-        $controllers = [
-            'products' => 'Products',
-            'licenses'  => 'Licenses',
-            'settings'  => 'Settings',
-            'public'    => 'Public_Apis',
-        ];
+	/**
+	 * Initialize the class.
+	 */
+	public function __construct() {
+		$this->init();
+	}
 
-        // // Load controller routes based on url
-        // $get_current_controller = explode( '/', $_SERVER['REQUEST_URI'] )[4];
+	/**
+	 * Hook REST route registration.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		add_action( 'rest_api_init', [ $this, 'register_routes' ] );
+	}
 
-        // if( isset( $controllers[ $get_current_controller ] ) ) {
-        //     $controller = $controllers[ $get_current_controller ];
-        //     $controller = __NAMESPACE__ . '\\Api\\' . $controller;
-        //     $controller = new $controller();
-        //     $controller->register_routes();
-        // }
+	/**
+	 * Register routes for all Licenser REST controllers.
+	 *
+	 * @return void
+	 */
+	public function register_routes() {
+		$controllers = [
+			'products' => 'Products',
+			'licenses' => 'Licenses',
+			'settings' => 'Settings',
+			'public'   => 'Public_Apis',
+		];
 
-
-        // Load all controller routes
-        foreach ( $controllers as $key => $controller ) {
-           
-            $controller = __NAMESPACE__ . '\\Api\\' . $controller;
-
-            $controller = new $controller();
-            $controller->register_routes();
-        }
-    }
+		foreach ( $controllers as $controller ) {
+			$class_name = __NAMESPACE__ . '\\Api\\' . $controller;
+			$instance   = new $class_name();
+			$instance->register_routes();
+		}
+	}
 }

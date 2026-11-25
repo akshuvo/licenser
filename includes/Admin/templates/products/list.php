@@ -1,80 +1,48 @@
 <?php
-// Get Page 
-$page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : null;
+/**
+ * Admin products list template.
+ *
+ * @package Licenser
+ */
 
-// Get Type
-$product_type = $page == 'licenser-themes' ? 'theme' : 'plugin';
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin page slug.
+$current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'licenser-plugins';
+$product_type = ( 'licenser-themes' === $current_page ) ? 'theme' : 'plugin';
+$type_label   = ( 'theme' === $product_type ) ? __( 'Theme', 'licenser' ) : __( 'Plugin', 'licenser' );
+$type_plural  = ( 'theme' === $product_type ) ? __( 'Themes', 'licenser' ) : __( 'Plugins', 'licenser' );
 ?>
-
 <div class="wrap">
-   <div class="licenser-root">
-    <!-- Header  -->
-    <div class="licenser-header">
-        <div class="licenser-header__title">
-            <h2>
-                <?php 
-                    /* translators: %s: Product Type */
-                    echo esc_html( sprintf( __('License Manager: %ss', 'licenser' ), $product_type )  ); 
-                ?>
-            </h2>
-        </div>
-        <a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-'.$product_type.'s&action=new' ) ); ?>" class="page-title-action"><?php echo esc_html( sprintf( __('Add New %s', 'licenser'), $product_type ) ); ?></a>
-    </div>
-    <!-- Header  -->
-    <!-- Content  -->
-    <div class="licenser-content">
-        <form action="" method="post">
-            <?php 
-                $table = new Licenser\Admin\ProductsListTable();
-                $table->prepare_items($product_type);
-                $table->display();
+	<div class="licenser-root">
+		<div class="licenser-header">
+			<div class="licenser-header__title">
+				<h2>
+					<?php
+					/* translators: %s: Product Type plural label (Plugins or Themes). */
+					echo esc_html( sprintf( __( 'License Manager: %s', 'licenser' ), $type_plural ) );
+					?>
+				</h2>
+			</div>
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-' . $product_type . 's&action=new' ) ); ?>" class="page-title-action">
+				<?php
+				/* translators: %s: Product Type label (Plugin or Theme). */
+				echo esc_html( sprintf( __( 'Add New %s', 'licenser' ), $type_label ) );
+				?>
+			</a>
+		</div>
 
-            ?>
-        </form>
-    </div>
-    <!-- Content  -->
-    </div>
+		<div class="licenser-content">
+			<div class="lmfwppt-notices"></div>
+			<form action="" method="post">
+				<?php
+				$table = new Licenser\Admin\ProductsListTable();
+				$table->prepare_items( $product_type );
+				$table->display();
+				?>
+			</form>
+		</div>
+	</div>
 </div>
-
-<script type="text/javascript">
-    jQuery(document).ready(function($){
-        // Remove Package
-        jQuery(document).on('click', '.licenser-delete-product', function(e, postBox){
-            let $this = jQuery(this);
-            let productId = $this.data('id');
-            let wrapper = $this.closest('tr');
-
-            // Return if no id
-            if( !productId ){
-                return;
-            }
-
-            // Confirm
-            if( !confirm('Are you sure you want to delete this product?') ){
-                return;
-            }
-            
-            // Remove from database
-            jQuery.ajax({
-                type: 'delete',
-                url: Licenser.rest_url + 'products/' + productId,
-                beforeSend: function(xhr) {
-                    // Nonce
-                    xhr.setRequestHeader( 'X-WP-Nonce', Licenser.nonce);
-
-                    // Add Opacity
-                    wrapper.css('opacity', '0.5');
-                },
-                success: function(data) {
-                    jQuery(document).trigger("lmfwppt_notice", ['Product Deleted Successfully.', 'success']);
-                    wrapper.remove();
-                },
-                error: function(data) {
-                    jQuery(document).trigger("lmfwppt_notice", ['Something went wrong. Try again.', 'error']);
-                },
-
-            });
-        });
-    });
-</script>
