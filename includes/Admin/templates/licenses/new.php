@@ -161,7 +161,8 @@ if ( $licenser_domain_limit > 0 && $licenser_active_domains_count >= $licenser_d
 		</div>
 
 		<div class="licenser-main">
-			<div class="licenser-notices"></div>
+			<hr class="wp-header-end" />
+			<div class="licenser-notices" aria-live="polite"></div>
 
 			<div class="licenser-split-layout">
 				<!-- Left Main Column -->

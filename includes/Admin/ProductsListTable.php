@@ -293,9 +293,14 @@ class ProductsListTable extends \WP_List_Table {
 	 * @return string
 	 */
 	protected function column_cb( $item ) {
+		$id    = absint( $item->id );
+		$label = ! empty( $item->name ) ? (string) $item->name : sprintf( '#%d', $id );
+
 		return sprintf(
-			'<input name="product_id[]" type="checkbox" value="%d" />',
-			absint( $item->id )
+			'<input id="cb-select-%1$d" name="product_id[]" type="checkbox" value="%1$d" aria-label="%2$s" />',
+			$id,
+			/* translators: %s: Product name. */
+			esc_attr( sprintf( __( 'Select %s', 'licenser' ), $label ) )
 		);
 	}
 

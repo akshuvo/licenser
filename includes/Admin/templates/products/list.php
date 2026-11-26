@@ -73,9 +73,10 @@ $licenser_add_url    = admin_url( 'admin.php?page=licenser-' . $licenser_product
 		</div>
 
 		<div class="licenser-main">
-			<div class="licenser-notices">
+			<hr class="wp-header-end" />
+			<div class="licenser-notices" aria-live="polite">
 				<?php if ( $licenser_bulk_msg && $licenser_bulk_done > 0 ) : ?>
-					<div class="notice notice-success is-dismissible">
+					<div class="notice notice-success is-dismissible inline">
 						<p>
 							<?php
 							if ( 'bulk_delete' === $licenser_bulk_msg ) {
@@ -96,20 +97,20 @@ $licenser_add_url    = admin_url( 'admin.php?page=licenser-' . $licenser_product
 
 			<?php if ( $licenser_count_all > 0 || $licenser_is_filters ) : ?>
 				<div class="licenser-filter-bar">
-					<div class="licenser-pills" role="tablist">
-						<a href="<?php echo esc_url( $licenser_base_url ); ?>" class="licenser-pill <?php echo 'all' === $licenser_status_filter ? 'is-active' : ''; ?>">
+					<nav class="licenser-pills" aria-label="<?php esc_attr_e( 'Filter products by status', 'licenser' ); ?>">
+						<a href="<?php echo esc_url( $licenser_base_url ); ?>" class="licenser-pill <?php echo 'all' === $licenser_status_filter ? 'is-active' : ''; ?>"<?php echo 'all' === $licenser_status_filter ? ' aria-current="page"' : ''; ?>>
 							<?php esc_html_e( 'All', 'licenser' ); ?>
 							<span class="licenser-pill__count"><?php echo esc_html( number_format_i18n( $licenser_count_all ) ); ?></span>
 						</a>
-						<a href="<?php echo esc_url( add_query_arg( 'product_status', 'active', $licenser_base_url ) ); ?>" class="licenser-pill <?php echo 'active' === $licenser_status_filter ? 'is-active' : ''; ?>">
+						<a href="<?php echo esc_url( add_query_arg( 'product_status', 'active', $licenser_base_url ) ); ?>" class="licenser-pill <?php echo 'active' === $licenser_status_filter ? 'is-active' : ''; ?>"<?php echo 'active' === $licenser_status_filter ? ' aria-current="page"' : ''; ?>>
 							<?php esc_html_e( 'Active', 'licenser' ); ?>
 							<span class="licenser-pill__count"><?php echo esc_html( number_format_i18n( $licenser_count_active ) ); ?></span>
 						</a>
-						<a href="<?php echo esc_url( add_query_arg( 'product_status', 'draft', $licenser_base_url ) ); ?>" class="licenser-pill <?php echo 'draft' === $licenser_status_filter ? 'is-active' : ''; ?>">
+						<a href="<?php echo esc_url( add_query_arg( 'product_status', 'draft', $licenser_base_url ) ); ?>" class="licenser-pill <?php echo 'draft' === $licenser_status_filter ? 'is-active' : ''; ?>"<?php echo 'draft' === $licenser_status_filter ? ' aria-current="page"' : ''; ?>>
 							<?php esc_html_e( 'Archived', 'licenser' ); ?>
 							<span class="licenser-pill__count"><?php echo esc_html( number_format_i18n( $licenser_count_draft ) ); ?></span>
 						</a>
-					</div>
+					</nav>
 
 					<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" class="licenser-toolbar-filters">
 						<input type="hidden" name="page" value="<?php echo esc_attr( $licenser_current_page ); ?>" />

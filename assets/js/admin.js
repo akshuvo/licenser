@@ -116,11 +116,17 @@ jQuery(function ($) {
 			return;
 		}
 		var variant = type || 'success';
+		var toastRole = variant === 'error' ? 'alert' : 'status';
+		var toastLive = variant === 'error' ? 'assertive' : 'polite';
 		var $toast = $(
 			'<div class="licenser-toast licenser-toast--' +
 				escapeHtml(variant) +
-				'" role="status">' +
-				'<span class="licenser-toast__dot"></span>' +
+				'" role="' +
+				toastRole +
+				'" aria-live="' +
+				toastLive +
+				'">' +
+				'<span class="licenser-toast__dot" aria-hidden="true"></span>' +
 				'<span class="licenser-toast__text"></span>' +
 				'<button type="button" class="licenser-toast__close" aria-label="Dismiss">&times;</button>' +
 				'</div>'
@@ -153,8 +159,10 @@ jQuery(function ($) {
 			return;
 		}
 		if ($host.length) {
-			var $notice = $('<div class="notice notice-alt is-dismissible"></div>')
-				.addClass('notice-' + (type || 'info'))
+			var kind = type || 'info';
+			var $notice = $('<div class="notice is-dismissible inline"></div>')
+				.addClass('notice-' + kind)
+				.attr('role', kind === 'error' ? 'alert' : 'status')
 				.append($('<p></p>').text(text));
 			$host.empty().append($notice);
 			$(document).trigger('wp-updates-notice-added');
@@ -173,9 +181,32 @@ jQuery(function ($) {
 	});
 
 	// -------------------------------------------------------------------------
-	// Accessible Confirmation Modal (Zero browser confirm()/alert())
+	// Accessible Confirmation Modal & Focus Trap (Zero browser confirm()/alert())
 	// -------------------------------------------------------------------------
 	var activeModalCleanup = null;
+
+	function handleModalFocusTrap(e, $modalRoot) {
+		if (e.key !== 'Tab') {
+			return;
+		}
+		var focusables = $modalRoot
+			.find('a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')
+			.filter(':visible');
+		if (!focusables.length) {
+			return;
+		}
+		var first = focusables[0];
+		var last = focusables[focusables.length - 1];
+		if (e.shiftKey) {
+			if (document.activeElement === first || !$modalRoot[0].contains(document.activeElement)) {
+				e.preventDefault();
+				last.focus();
+			}
+		} else if (document.activeElement === last || !$modalRoot[0].contains(document.activeElement)) {
+			e.preventDefault();
+			first.focus();
+		}
+	}
 
 	function closeModal() {
 		var $backdrop = $('#licenser-confirm-modal');
@@ -298,14 +329,18 @@ jQuery(function ($) {
 		$(document).on('keydown.licenserModal', function (e) {
 			if (e.key === 'Escape') {
 				closeModal();
+				return;
 			}
+			handleModalFocusTrap(e, $backdrop);
 		});
 
 		var $host = $('.licenser-app').first();
 		($host.length ? $host : $('body')).append($backdrop);
 		window.requestAnimationFrame(function () {
 			$backdrop.addClass('is-open');
-			$confirmBtn.trigger('focus');
+			// Focus Cancel safely on destructive dialogs to prevent accidental Enter confirmation.
+			var $initialFocus = opts.confirmVariant === 'danger-solid' ? $cancelBtn : $confirmBtn;
+			$initialFocus.trigger('focus');
 		});
 	}
 
@@ -394,18 +429,23 @@ jQuery(function ($) {
 	// -------------------------------------------------------------------------
 	// Accordions & Scroll-Spy Side Navigation
 	// -------------------------------------------------------------------------
+	function toggleItemCard($card) {
+		var isOpen = !$card.hasClass('is-open');
+		$card.toggleClass('is-open', isOpen);
+		$card.find('.licenser-item-toggle-btn').attr('aria-expanded', isOpen ? 'true' : 'false');
+	}
+
 	$(document).on('click', '.licenser-item-card__head', function (e) {
 		if ($(e.target).closest('input, button, a, .licenser-no-toggle').length) {
 			return;
 		}
-		var $card = $(this).closest('.licenser-item-card');
-		$card.toggleClass('is-open');
+		toggleItemCard($(this).closest('.licenser-item-card'));
 	});
 
 	$(document).on('click', '.licenser-item-toggle-btn', function (e) {
 		e.preventDefault();
 		e.stopPropagation();
-		$(this).closest('.licenser-item-card').toggleClass('is-open');
+		toggleItemCard($(this).closest('.licenser-item-card'));
 	});
 
 	var $sidenavLinks = $('.licenser-sidenav a[href^="#"]');
@@ -1082,33 +1122,46 @@ jQuery(function ($) {
 		});
 	});
 
-	// Bulk License Generator Modal
+	// Bulk License Generator Modal (with focus trap & focus restoration)
+	var bulkModalReturnFocus = null;
+
+	function closeBulkModal() {
+		var $modal = $('#licenser-bulk-modal');
+		$modal.removeClass('is-open');
+		$(document).off('keydown.licenserBulkModal');
+		if (bulkModalReturnFocus && typeof bulkModalReturnFocus.focus === 'function') {
+			bulkModalReturnFocus.focus();
+			bulkModalReturnFocus = null;
+		}
+	}
+
 	$(document).on('click', '.licenser-open-bulk-modal', function (e) {
 		e.preventDefault();
 		var $modal = $('#licenser-bulk-modal');
 		if (!$modal.length) {
 			return;
 		}
+		bulkModalReturnFocus = document.activeElement;
 		$modal.find('.licenser-bulk-results').attr('hidden', true);
 		$modal.find('.licenser-bulk-results__list').text('');
 		$modal.addClass('is-open');
+		window.setTimeout(function () {
+			$('#licenser-bulk-product').trigger('focus');
+		}, 30);
 		$(document).on('keydown.licenserBulkModal', function (ev) {
 			if (ev.key === 'Escape') {
-				$modal.removeClass('is-open');
-				$(document).off('keydown.licenserBulkModal');
+				closeBulkModal();
+				return;
 			}
+			handleModalFocusTrap(ev, $modal);
 		});
 	});
 
-	$(document).on('click', '#licenser-bulk-modal .licenser-modal-close', function () {
-		$('#licenser-bulk-modal').removeClass('is-open');
-		$(document).off('keydown.licenserBulkModal');
-	});
+	$(document).on('click', '#licenser-bulk-modal .licenser-modal-close', closeBulkModal);
 
 	$(document).on('click', '#licenser-bulk-modal', function (e) {
 		if (e.target === this) {
-			$(this).removeClass('is-open');
-			$(document).off('keydown.licenserBulkModal');
+			closeBulkModal();
 		}
 	});
 
@@ -1936,11 +1989,11 @@ jQuery(function ($) {
 	// -------------------------------------------------------------------------
 	// SDK Studio, Settings Tabs & Live API Diagnostics Tester
 	// -------------------------------------------------------------------------
-	$(document).on('click', '[data-licenser-tab]', function (e) {
-		e.preventDefault();
-		var $tab = $(this);
+	function activateTab($tab) {
 		var tab = $tab.attr('data-licenser-tab');
-		$('[data-licenser-tab]').removeClass('is-active').attr('aria-selected', 'false');
+		var $list = $tab.closest('[role="tablist"]');
+		var $tabs = $list.length ? $list.find('[data-licenser-tab]') : $('[data-licenser-tab]');
+		$tabs.removeClass('is-active').attr('aria-selected', 'false');
 		$tab.addClass('is-active').attr('aria-selected', 'true');
 		$('.licenser-tab-panel').removeClass('is-active');
 		$('#licenser-tab-' + tab).addClass('is-active');
@@ -1954,6 +2007,33 @@ jQuery(function ($) {
 				// Ignore URL API failures in restricted environments.
 			}
 		}
+	}
+
+	$(document).on('click', '[data-licenser-tab]', function (e) {
+		e.preventDefault();
+		activateTab($(this));
+	});
+
+	// WAI-ARIA keyboard navigation for tablists (ArrowLeft, ArrowRight, Home, End)
+	$(document).on('keydown', '[role="tablist"] [data-licenser-tab]', function (e) {
+		var $tabs = $(this).closest('[role="tablist"]').find('[data-licenser-tab]');
+		var idx = $tabs.index(this);
+		var nextIdx = -1;
+		if (e.key === 'ArrowRight') {
+			nextIdx = (idx + 1) % $tabs.length;
+		} else if (e.key === 'ArrowLeft') {
+			nextIdx = (idx - 1 + $tabs.length) % $tabs.length;
+		} else if (e.key === 'Home') {
+			nextIdx = 0;
+		} else if (e.key === 'End') {
+			nextIdx = $tabs.length - 1;
+		}
+		if (nextIdx >= 0) {
+			e.preventDefault();
+			var $target = $tabs.eq(nextIdx);
+			activateTab($target);
+			$target.trigger('focus');
+		}
 	});
 
 	var sdkCodeMirror = null;
@@ -1963,6 +2043,9 @@ jQuery(function ($) {
 		if (!$menuSelect.length) {
 			return;
 		}
+		var incLicensing = $('#inc-licensing').is(':checked');
+		$('.licenser-sdk-licensing-options').toggle(incLicensing);
+
 		var mode = $menuSelect.val();
 		var $hint = $('#licenser-sdk-mode-hint');
 		var hints = {
@@ -2000,8 +2083,8 @@ jQuery(function ($) {
 		var displayUuid = productId || 'YOUR-PRODUCT-UUID-HERE';
 		var stepHeading =
 			productType === 'theme'
-				? msg('sdk_step_theme', "Step 2: Add this snippet to your theme's functions.php file.")
-				: msg('sdk_step_plugin', 'Step 2: Add this snippet to your main plugin file.');
+				? msg('sdk_step_theme', 'functions.php')
+				: msg('sdk_step_plugin', 'your-plugin.php');
 
 		$('#licenser-sdk-step-heading').text(stepHeading);
 
@@ -2019,13 +2102,18 @@ jQuery(function ($) {
 			"\tif ( ! class_exists( 'Licenser\\\\Client' ) ) {\n" +
 			"\t\trequire_once __DIR__ . '/licenser/src/Client.php';\n" +
 			'\t}\n\n' +
-			"\t$client = new Licenser\\Client( '" +
+			"\t$client = new Licenser\\Client(\n" +
+			"\t\t'" +
 			escapeSingleQuote(displayUuid) +
-			"', '" +
+			"',\n" +
+			"\t\t'" +
 			escapeSingleQuote(productName) +
-			"', __FILE__, '" +
+			"',\n" +
+			'\t\t__FILE__,\n' +
+			"\t\t'" +
 			escapeSingleQuote(apiUrl) +
-			"' );\n";
+			"'\n" +
+			'\t);\n';
 
 		if (incLicensing) {
 			output += '\n\t// Activate license page and checker.\n\t$license = $client->license();\n';
@@ -2107,12 +2195,14 @@ jQuery(function ($) {
 		var productName = $('#select_product option:selected').text().trim();
 		if (!val) {
 			$('#licenser_page_title').val('');
-			$('#licenser_menu_title').val('');
+			$('#licenser_menu_title').val('License');
 			$('#licenser-sdk-uuid-badge').text('—');
+			$('#licenser-sdk-uuid-copy').attr('data-licenser-copy', '');
 		} else {
-			$('#licenser_page_title').val(productName + ' License Activation');
-			$('#licenser_menu_title').val(productName + ' License');
+			$('#licenser_page_title').val(productName + ' License');
+			$('#licenser_menu_title').val('License');
 			$('#licenser-sdk-uuid-badge').text(val);
+			$('#licenser-sdk-uuid-copy').attr('data-licenser-copy', val);
 		}
 		renderSdkCode();
 	});
@@ -2125,7 +2215,6 @@ jQuery(function ($) {
 	$(document).on('submit', '#sdk-generator-form', function (e) {
 		e.preventDefault();
 		renderSdkCode();
-		showToast('SDK snippet updated.', 'success');
 	});
 
 	if ($('#sdk-generator-form').length) {
@@ -2137,7 +2226,7 @@ jQuery(function ($) {
 	$(document).on('change', '#licenser-diag-action', function () {
 		var action = $(this).val();
 		var isWrite = action === 'activate' || action === 'deactivate';
-		$('#licenser-diag-write-warn').toggle(isWrite);
+		$('#licenser-diag-write-warn').prop('hidden', !isWrite);
 		$('#licenser-diag-url-wrap').toggle(action !== 'product');
 	});
 

@@ -94,7 +94,8 @@ $licenser_inactive_total = $licenser_stats['expired'] + $licenser_stats['inactiv
 		</div>
 
 		<div class="licenser-main">
-			<div class="licenser-notices"></div>
+			<hr class="wp-header-end" />
+			<div class="licenser-notices" aria-live="polite"></div>
 
 			<!-- 5-Card KPI Strip -->
 			<div class="licenser-kpi-grid">

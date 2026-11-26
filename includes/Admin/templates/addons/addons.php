@@ -35,7 +35,8 @@ $licenser_pro_active   = defined( 'LICENSER_PRO_VERSION' );
 		</div>
 
 		<div class="licenser-main">
-			<div class="licenser-notices"></div>
+			<hr class="wp-header-end" />
+			<div class="licenser-notices" aria-live="polite"></div>
 
 			<!-- Section 1: Store Integrations -->
 			<div class="licenser-section-header">
@@ -149,7 +150,7 @@ $licenser_pro_active   = defined( 'LICENSER_PRO_VERSION' );
 								<?php else : ?>
 									<span class="licenser-addon-toggle__label"><?php esc_html_e( 'Soon', 'licenser' ); ?></span>
 									<label class="licenser-switch licenser-switch--disabled">
-										<input type="checkbox" disabled aria-disabled="true" />
+										<input type="checkbox" disabled aria-disabled="true" aria-label="<?php /* translators: %s: Integration name. */ echo esc_attr( sprintf( __( '%s integration coming soon', 'licenser' ), $licenser_int_name ) ); ?>" />
 									</label>
 								<?php endif; ?>
 							</div>

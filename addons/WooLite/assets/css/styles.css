@@ -1,7 +1,7 @@
 /**
  * Licenser — Customer My Account License Portal Styles
  *
- * Lightweight, theme-friendly Cupertino-inspired responsive cards.
+ * Lightweight, theme-friendly Cupertino-inspired responsive cards with WCAG 2.1 AA contrast.
  */
 
 /* Hide redundant default WC Dashboard intro paragraphs when on ?wc_tab=license_manager */
@@ -11,7 +11,7 @@ body.licenser-account-tab-active .woocommerce-MyAccount-content > p {
 
 body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-active a {
 	font-weight: 600;
-	color: #0071e3;
+	color: #0066cc;
 }
 
 .licenser-portal,
@@ -19,9 +19,14 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	box-sizing: border-box;
 }
 
+.licenser-portal [hidden] {
+	display: none !important;
+}
+
 .licenser-portal {
 	font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-	color: #1d1d1f;
+	font-size: 14px;
+	color: #111827;
 	line-height: 1.5;
 }
 
@@ -30,32 +35,33 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	align-items: flex-start;
 	justify-content: space-between;
 	gap: 12px;
-	margin-bottom: 18px;
+	margin-bottom: 20px;
 	flex-wrap: wrap;
 }
 
 .licenser-portal__title {
 	margin: 0 0 4px;
-	font-size: 22px;
-	font-weight: 600;
+	font-size: 24px;
+	font-weight: 700;
 	letter-spacing: -0.02em;
-	color: #1d1d1f;
+	color: #111827;
 }
 
 .licenser-portal__subtitle {
 	margin: 0;
-	font-size: 13.5px;
-	color: #6e6e73;
+	font-size: 14px;
+	color: #4b5563;
 }
 
 .licenser-portal__count {
 	display: inline-flex;
 	align-items: center;
-	padding: 4px 12px;
+	padding: 5px 12px;
 	border-radius: 999px;
-	background: #f2f2f7;
-	color: #515154;
-	font-size: 12.5px;
+	background: #e4e7ee;
+	border: 1px solid #cfd5df;
+	color: #374151;
+	font-size: 13px;
 	font-weight: 600;
 	font-variant-numeric: tabular-nums;
 }
@@ -63,14 +69,14 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 .licenser-portal__list {
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
+	gap: 18px;
 }
 
 .licenser-portal-card {
 	background: #ffffff;
-	border: 1px solid rgba(0, 0, 0, 0.09);
+	border: 1px solid #cfd5df;
 	border-radius: 14px;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(0, 0, 0, 0.02);
+	box-shadow: 0 1px 3px rgba(15, 23, 42, 0.07), 0 4px 14px rgba(15, 23, 42, 0.04);
 	overflow: hidden;
 }
 
@@ -80,7 +86,7 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	justify-content: space-between;
 	gap: 12px;
 	padding: 18px 20px;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	border-bottom: 1px solid #dde1e8;
 	flex-wrap: wrap;
 }
 
@@ -92,11 +98,11 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 }
 
 .licenser-portal-card__icon {
-	width: 42px;
-	height: 42px;
+	width: 44px;
+	height: 44px;
 	border-radius: 10px;
 	object-fit: cover;
-	border: 1px solid rgba(0, 0, 0, 0.08);
+	border: 1px solid #cfd5df;
 	flex-shrink: 0;
 }
 
@@ -104,18 +110,18 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	background: linear-gradient(145deg, #ebf5ff, #eef2ff);
-	color: #0071e3;
+	background: #e6f0fc;
+	color: #0052a3;
 	font-weight: 700;
-	font-size: 16px;
+	font-size: 17px;
 }
 
 .licenser-portal-card__name {
 	margin: 0 0 4px;
-	font-size: 16px;
+	font-size: 17px;
 	font-weight: 600;
 	letter-spacing: -0.015em;
-	color: #1d1d1f;
+	color: #111827;
 }
 
 .licenser-portal-card__tags {
@@ -127,11 +133,12 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 
 .licenser-portal-pill {
 	display: inline-block;
-	padding: 2px 8px;
+	padding: 3px 9px;
 	border-radius: 999px;
-	background: #f2f2f7;
-	color: #515154;
-	font-size: 11.5px;
+	background: #e4e7ee;
+	border: 1px solid #cfd5df;
+	color: #374151;
+	font-size: 12.5px;
 	font-weight: 500;
 }
 
@@ -139,61 +146,65 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	padding: 4px 10px;
+	padding: 4px 11px;
 	border-radius: 999px;
-	font-size: 12px;
-	font-weight: 500;
-	background: #f2f2f7;
-	color: #52525b;
+	border: 1px solid #cbd5e1;
+	font-size: 13px;
+	font-weight: 600;
+	background: #e5e7eb;
+	color: #374151;
 	white-space: nowrap;
 }
 
 .licenser-portal-status__dot {
-	width: 6px;
-	height: 6px;
+	width: 7px;
+	height: 7px;
 	border-radius: 50%;
-	background: #8e8e93;
+	background: #6b7280;
 }
 
 .licenser-portal-status--active {
-	background: #e9f9ef;
-	color: #166534;
+	background: #dcfce7;
+	border-color: #86efac;
+	color: #14532d;
 }
 
 .licenser-portal-status--active .licenser-portal-status__dot {
-	background: #30d158;
+	background: #15803d;
 }
 
 .licenser-portal-status--expiring_soon {
-	background: #fff6e5;
-	color: #92400e;
+	background: #fef3c7;
+	border-color: #fcd34d;
+	color: #78350f;
 }
 
 .licenser-portal-status--expiring_soon .licenser-portal-status__dot {
-	background: #ff9f0a;
+	background: #b45309;
 }
 
 .licenser-portal-status--expired {
-	background: #fef2f2;
-	color: #b42318;
+	background: #fee2e2;
+	border-color: #fca5a5;
+	color: #991b1b;
 }
 
 .licenser-portal-status--expired .licenser-portal-status__dot {
-	background: #ff3b30;
+	background: #dc2626;
 }
 
 .licenser-portal-card__keybar {
 	padding: 14px 20px;
-	background: #fbfbfd;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	background: #f4f6f9;
+	border-bottom: 1px solid #dde1e8;
 }
 
 .licenser-portal-card__keylabel {
-	font-size: 11.5px;
+	font-size: 12px;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: #6e6e73;
+	color: #374151;
 	margin-bottom: 6px;
 }
 
@@ -202,17 +213,17 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	align-items: center;
 	justify-content: space-between;
 	gap: 10px;
-	padding: 8px 12px;
+	padding: 9px 12px;
 	border-radius: 10px;
 	background: #ffffff;
-	border: 1px solid #d2d2d7;
+	border: 1px solid #858b94;
 	flex-wrap: wrap;
 }
 
 .licenser-portal-card__key {
 	font-family: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-	font-size: 13px;
-	color: #1d1d1f;
+	font-size: 14px;
+	color: #111827;
 	background: transparent;
 	padding: 0;
 	word-break: break-all;
@@ -222,8 +233,8 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 12px;
-	padding: 14px 20px;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	padding: 16px 20px;
+	border-bottom: 1px solid #dde1e8;
 }
 
 .licenser-portal-meta-item {
@@ -233,14 +244,14 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 }
 
 .licenser-portal-meta-item__label {
-	font-size: 11.5px;
-	color: #6e6e73;
+	font-size: 12.5px;
+	color: #4b5563;
 }
 
 .licenser-portal-meta-item__value {
-	font-size: 13.5px;
+	font-size: 14.5px;
 	font-weight: 600;
-	color: #1d1d1f;
+	color: #111827;
 	font-variant-numeric: tabular-nums;
 }
 
@@ -254,8 +265,8 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 }
 
 .licenser-portal-note {
-	font-size: 12.5px;
-	color: #6e6e73;
+	font-size: 13.5px;
+	color: #4b5563;
 }
 
 .licenser-portal-btn {
@@ -263,9 +274,10 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	align-items: center;
 	justify-content: center;
 	gap: 6px;
-	padding: 8px 14px;
+	min-height: 38px;
+	padding: 8px 16px;
 	border-radius: 8px;
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	line-height: 1.2;
 	text-decoration: none;
@@ -274,85 +286,101 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
 }
 
+.licenser-portal-btn:focus-visible,
+.licenser-portal a:focus-visible {
+	outline: 2px solid #0066cc;
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.25);
+}
+
 .licenser-portal-btn--primary {
-	background: #0071e3;
+	background: #0066cc;
 	color: #ffffff;
 }
 
 .licenser-portal-btn--primary:hover {
-	background: #005bb5;
+	background: #004f9e;
 	color: #ffffff;
 }
 
 .licenser-portal-btn--secondary {
 	background: #ffffff;
-	color: #1d1d1f;
-	border-color: #d2d2d7;
+	color: #111827;
+	border-color: #858b94;
 }
 
 .licenser-portal-btn--secondary:hover {
-	background: #f5f5f7;
-	color: #1d1d1f;
+	background: #f4f6f9;
+	border-color: #50575e;
+	color: #111827;
 }
 
 .licenser-portal-btn--ghost {
-	background: #f2f2f7;
-	color: #1d1d1f;
-	padding: 5px 10px;
-	font-size: 12px;
+	background: #e4e7ee;
+	border-color: #cfd5df;
+	color: #111827;
+	min-height: 34px;
+	padding: 6px 12px;
+	font-size: 13px;
 }
 
 .licenser-portal-btn--ghost:hover {
-	background: #e5e5ea;
+	background: #d6dbe6;
 }
 
 .licenser-portal-btn--ghost.is-copied {
-	background: #e9f9ef;
-	color: #166534;
+	background: #dcfce7;
+	border-color: #86efac;
+	color: #14532d;
 }
 
 .licenser-portal-btn--danger-ghost {
-	background: transparent;
-	color: #b42318;
-	border-color: #f3c4c4;
-	padding: 5px 10px;
-	font-size: 12px;
+	background: #ffffff;
+	color: #991b1b;
+	border-color: #fca5a5;
+	min-height: 34px;
+	padding: 6px 12px;
+	font-size: 13px;
 }
 
 .licenser-portal-btn--danger-ghost:hover {
-	background: #fef2f2;
+	background: #fee2e2;
+	border-color: #dc2626;
 }
 
 .licenser-portal-btn--danger {
-	background: #d92d20;
+	background: #c81e1e;
 	color: #ffffff;
-	padding: 5px 10px;
-	font-size: 12px;
+	min-height: 34px;
+	padding: 6px 12px;
+	font-size: 13px;
 }
 
 .licenser-portal-btn--danger:hover {
-	background: #b42318;
+	background: #991b1b;
 }
 
 /* Collapsible Sites Panel */
 .licenser-portal-sites {
-	padding: 14px 20px 18px;
-	background: #fbfbfd;
-	border-top: 1px solid rgba(0, 0, 0, 0.06);
+	padding: 16px 20px 20px;
+	background: #f4f6f9;
+	border-top: 1px solid #dde1e8;
 }
 
 .licenser-portal-sites__notice {
-	padding: 9px 12px;
+	padding: 10px 14px;
 	margin-bottom: 12px;
 	border-radius: 8px;
-	font-size: 12.5px;
-	background: #e9f9ef;
-	color: #166534;
+	border: 1px solid #86efac;
+	font-size: 13.5px;
+	background: #dcfce7;
+	color: #14532d;
 }
 
 .licenser-portal-sites__notice.is-error {
-	background: #fef2f2;
-	color: #b42318;
+	background: #fee2e2;
+	border-color: #fca5a5;
+	color: #991b1b;
 }
 
 .licenser-portal-sites__list {
@@ -369,10 +397,10 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 	align-items: center;
 	justify-content: space-between;
 	gap: 10px;
-	padding: 10px 12px;
+	padding: 11px 14px;
 	border-radius: 10px;
 	background: #ffffff;
-	border: 1px solid rgba(0, 0, 0, 0.08);
+	border: 1px solid #cfd5df;
 	flex-wrap: wrap;
 }
 
@@ -385,8 +413,9 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 }
 
 .licenser-portal-site-row__domain {
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
+	color: #111827;
 	word-break: break-all;
 }
 
@@ -399,13 +428,13 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 
 .licenser-portal-sites__empty {
 	margin: 0;
-	font-size: 13px;
-	color: #6e6e73;
+	font-size: 14px;
+	color: #4b5563;
 }
 
 .licenser-portal-empty {
 	background: #ffffff;
-	border: 1px solid rgba(0, 0, 0, 0.09);
+	border: 1px solid #cfd5df;
 	border-radius: 14px;
 	padding: 40px 24px;
 	text-align: center;
@@ -413,19 +442,37 @@ body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-activ
 
 .licenser-portal-empty h3 {
 	margin: 0 0 8px;
-	font-size: 17px;
+	font-size: 18px;
 	font-weight: 600;
+	color: #111827;
 }
 
 .licenser-portal-empty p {
 	margin: 0 auto 18px;
-	max-width: 420px;
-	font-size: 13.5px;
-	color: #6e6e73;
+	max-width: 440px;
+	font-size: 14px;
+	color: #4b5563;
 }
 
 @media (max-width: 640px) {
 	.licenser-portal-card__meta {
 		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.licenser-portal * {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+	}
+}
+
+@media (forced-colors: active) {
+	.licenser-portal-card,
+	.licenser-portal-card__keybox,
+	.licenser-portal-site-row,
+	.licenser-portal-status,
+	.licenser-portal-pill {
+		border: 1px solid CanvasText;
 	}
 }

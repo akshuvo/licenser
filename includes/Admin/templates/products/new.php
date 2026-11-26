@@ -99,7 +99,8 @@ $licenser_stable_ver          = ! empty( $licenser_releases[0]->version ) ? (str
 		</div>
 
 		<div class="licenser-main">
-			<div class="licenser-notices"></div>
+			<hr class="wp-header-end" />
+			<div class="licenser-notices" aria-live="polite"></div>
 
 			<div class="licenser-editor-layout">
 				<!-- Sticky Side Navigation + Product Summary -->
@@ -289,7 +290,7 @@ $licenser_stable_ver          = ! empty( $licenser_releases[0]->version ) ? (str
 													<button type="button" class="licenser-icon-btn licenser-icon-btn--danger licenser-delete-release-btn" data-id="<?php echo esc_attr( (string) absint( $licenser_rel->id ) ); ?>" data-version="<?php echo esc_attr( (string) $licenser_rel->version ); ?>" title="<?php esc_attr_e( 'Delete Release', 'licenser' ); ?>" aria-label="<?php esc_attr_e( 'Delete Release', 'licenser' ); ?>">
 														<span class="dashicons dashicons-trash"></span>
 													</button>
-													<button type="button" class="licenser-icon-btn licenser-item-toggle-btn" aria-label="<?php esc_attr_e( 'Toggle Release Details', 'licenser' ); ?>">
+													<button type="button" class="licenser-icon-btn licenser-item-toggle-btn" aria-expanded="<?php echo $licenser_rel_is_stable ? 'true' : 'false'; ?>" aria-label="<?php esc_attr_e( 'Toggle Release Details', 'licenser' ); ?>">
 														<span class="dashicons dashicons-arrow-down-alt2 licenser-item-card__chevron"></span>
 													</button>
 												</div>
@@ -306,7 +307,7 @@ $licenser_stable_ver          = ! empty( $licenser_releases[0]->version ) ? (str
 															<a href="<?php echo esc_url( (string) $licenser_rel->download_link ); ?>" target="_blank" rel="noopener noreferrer" class="licenser-link-more">
 																<?php esc_html_e( 'Open Archive', 'licenser' ); ?> <span class="dashicons dashicons-external"></span>
 															</a>
-															<button type="button" class="licenser-icon-btn licenser-copy-btn" data-licenser-copy="<?php echo esc_attr( (string) $licenser_rel->download_link ); ?>" title="<?php esc_attr_e( 'Copy Download URL', 'licenser' ); ?>">
+															<button type="button" class="licenser-icon-btn licenser-copy-btn" data-licenser-copy="<?php echo esc_attr( (string) $licenser_rel->download_link ); ?>" title="<?php esc_attr_e( 'Copy Download URL', 'licenser' ); ?>" aria-label="<?php esc_attr_e( 'Copy Download URL', 'licenser' ); ?>">
 																<span class="dashicons dashicons-admin-page"></span>
 															</button>
 														</div>
@@ -493,14 +494,14 @@ $licenser_stable_ver          = ! empty( $licenser_releases[0]->version ) ? (str
 		<input type="hidden" name="license_packages[{{{data.field_id}}}][id]" value="{{{data.id}}}" class="license-package-id" />
 		<div class="licenser-item-card__head">
 			<div class="licenser-item-card__head-main">
-				<input type="text" class="licenser-no-toggle licenser-package-name licenser-item-card__title-input" name="license_packages[{{{data.field_id}}}][label]" placeholder="<?php esc_attr_e( 'e.g. 1 Year • 5 Sites', 'licenser' ); ?>" value="{{{data.label}}}" required />
+				<input type="text" class="licenser-no-toggle licenser-package-name licenser-item-card__title-input" name="license_packages[{{{data.field_id}}}][label]" placeholder="<?php esc_attr_e( 'e.g. 1 Year • 5 Sites', 'licenser' ); ?>" aria-label="<?php esc_attr_e( 'License package name', 'licenser' ); ?>" value="{{{data.label}}}" required />
 				<span class="licenser-badge licenser-badge--accent licenser-pkg-summary">{{{data.summary}}}</span>
 			</div>
 			<div class="licenser-item-card__actions">
 				<button type="button" class="licenser-icon-btn licenser-icon-btn--danger licenser-remove-package-btn" title="<?php esc_attr_e( 'Remove Package', 'licenser' ); ?>" aria-label="<?php esc_attr_e( 'Remove Package', 'licenser' ); ?>">
 					<span class="dashicons dashicons-trash"></span>
 				</button>
-				<button type="button" class="licenser-icon-btn licenser-item-toggle-btn" aria-label="<?php esc_attr_e( 'Expand Package Settings', 'licenser' ); ?>">
+				<button type="button" class="licenser-icon-btn licenser-item-toggle-btn" aria-expanded="false" aria-label="<?php esc_attr_e( 'Expand Package Settings', 'licenser' ); ?>">
 					<span class="dashicons dashicons-arrow-down-alt2 licenser-item-card__chevron"></span>
 				</button>
 			</div>

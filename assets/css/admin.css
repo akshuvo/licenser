@@ -11,63 +11,70 @@
 .licenser-app,
 .licenser-modal-backdrop,
 .licenser-toast-stack {
-	--lic-bg: #f5f5f7;
+	--lic-bg: #eceef2;
 	--lic-surface: #ffffff;
-	--lic-surface-subtle: #fbfbfd;
-	--lic-surface-muted: #f2f2f7;
-	--lic-surface-glass: rgba(255, 255, 255, 0.84);
-	--lic-border: rgba(0, 0, 0, 0.08);
-	--lic-border-strong: #d2d2d7;
-	--lic-divider: rgba(0, 0, 0, 0.06);
+	--lic-surface-subtle: #f4f6f9;
+	--lic-surface-muted: #e4e7ee;
+	--lic-surface-glass: rgba(255, 255, 255, 0.92);
+	--lic-border: #cfd5df;
+	--lic-border-strong: #858b94;
+	--lic-border-hover: #50575e;
+	--lic-divider: #dde1e8;
 
-	--lic-text: #1d1d1f;
-	--lic-text-secondary: #515154;
-	--lic-text-muted: #6e6e73;
+	--lic-text: #111827;
+	--lic-text-secondary: #374151;
+	--lic-text-muted: #4b5563;
+	--lic-placeholder: #59616e;
 
-	--lic-accent: var(--wp-admin-theme-color, #0071e3);
-	--lic-accent-hover: var(--wp-admin-theme-color-darker-10, #005bb5);
-	--lic-accent-soft: rgba(0, 113, 227, 0.1);
-	--lic-accent-ring: rgba(0, 113, 227, 0.22);
+	--lic-accent: var(--wp-admin-theme-color, #0066cc);
+	--lic-accent-hover: var(--wp-admin-theme-color-darker-10, #004f9e);
+	--lic-accent-soft: #e6f0fc;
+	--lic-accent-ring: rgba(0, 102, 204, 0.28);
 
-	--lic-success-bg: #e9f9ef;
-	--lic-success-text: #166534;
-	--lic-success-dot: #30d158;
+	--lic-success-bg: #dcfce7;
+	--lic-success-border: #86efac;
+	--lic-success-text: #14532d;
+	--lic-success-dot: #15803d;
 
-	--lic-warning-bg: #fff6e5;
-	--lic-warning-text: #92400e;
-	--lic-warning-dot: #ff9f0a;
+	--lic-warning-bg: #fef3c7;
+	--lic-warning-border: #fcd34d;
+	--lic-warning-text: #78350f;
+	--lic-warning-dot: #b45309;
 
-	--lic-danger-bg: #fef2f2;
-	--lic-danger-text: #b42318;
-	--lic-danger-dot: #ff3b30;
-	--lic-danger-solid: #d92d20;
+	--lic-danger-bg: #fee2e2;
+	--lic-danger-border: #fca5a5;
+	--lic-danger-text: #991b1b;
+	--lic-danger-dot: #dc2626;
+	--lic-danger-solid: #c81e1e;
 
-	--lic-purple-bg: #f5f0ff;
-	--lic-purple-text: #6d28d9;
-	--lic-purple-dot: #af52de;
+	--lic-purple-bg: #ede9fe;
+	--lic-purple-border: #c4b5fd;
+	--lic-purple-text: #5b21b6;
+	--lic-purple-dot: #7c3aed;
 
-	--lic-neutral-bg: #f2f2f7;
-	--lic-neutral-text: #52525b;
-	--lic-neutral-dot: #8e8e93;
+	--lic-neutral-bg: #e5e7eb;
+	--lic-neutral-border: #cbd5e1;
+	--lic-neutral-text: #374151;
+	--lic-neutral-dot: #6b7280;
 
 	--lic-radius-sm: 8px;
 	--lic-radius-md: 12px;
 	--lic-radius-lg: 16px;
 	--lic-radius-pill: 999px;
 
-	--lic-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-	--lic-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
-	--lic-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
-	--lic-shadow-modal: 0 24px 64px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.06);
+	--lic-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+	--lic-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.07), 0 4px 12px rgba(15, 23, 42, 0.04);
+	--lic-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.05);
+	--lic-shadow-modal: 0 24px 64px rgba(15, 23, 42, 0.28), 0 0 0 1px rgba(15, 23, 42, 0.12);
 
-	--lic-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
+	--lic-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
 	--lic-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 	--lic-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
 	font-family: var(--lic-font);
+	font-size: 14px;
+	line-height: 1.5;
 	color: var(--lic-text);
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
 }
 
 .licenser-app {
@@ -88,7 +95,7 @@
 
 body[class*="licenser"] #wpcontent {
 	padding-left: 0;
-	background: #f5f5f7;
+	background: #eceef2;
 }
 
 body[class*="licenser"] #wpbody-content {
@@ -100,7 +107,7 @@ body[class*="licenser"] .wrap.licenser-wrap {
 }
 
 body[class*="licenser"] #wpfooter {
-	background: #f5f5f7;
+	background: #eceef2;
 	border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -181,7 +188,7 @@ body[class*="licenser"] #wpfooter {
 	padding: 6px 10px;
 	border-radius: var(--lic-radius-sm);
 	color: var(--lic-text-secondary);
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	text-decoration: none;
 	background: rgba(0, 0, 0, 0.04);
@@ -226,7 +233,7 @@ body[class*="licenser"] #wpfooter {
 	border-radius: var(--lic-radius-pill);
 	background: var(--lic-surface-muted);
 	color: var(--lic-text-muted);
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: 600;
 	font-variant-numeric: tabular-nums;
 }
@@ -253,17 +260,103 @@ body[class*="licenser"] #wpfooter {
 	max-width: 980px;
 }
 
-.licenser-notices:not(:empty) {
-	margin-bottom: 18px;
+.licenser-main hr.wp-header-end {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	height: 0;
+	visibility: hidden;
+	overflow: hidden;
 }
 
-.licenser-app .licenser-notices .notice {
-	margin: 0 0 12px;
+.licenser-app .licenser-notices .notice,
+.licenser-app .licenser-main > .notice,
+.licenser-app .licenser-main > .updated,
+.licenser-app .licenser-main > .error {
+	position: relative;
+	display: block;
+	margin: 0 0 18px;
 	border-radius: var(--lic-radius-md);
 	border: 1px solid var(--lic-border);
 	border-left-width: 4px;
+	background: var(--lic-surface);
+	color: var(--lic-text);
 	box-shadow: var(--lic-shadow-xs);
-	padding: 10px 14px;
+	padding: 12px 16px;
+}
+
+.licenser-app .licenser-notices .notice.is-dismissible,
+.licenser-app .licenser-main > .notice.is-dismissible {
+	padding-right: 44px;
+}
+
+.licenser-app .licenser-notices .notice p,
+.licenser-app .licenser-main > .notice p {
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.45;
+}
+
+.licenser-app .licenser-notices .notice-success,
+.licenser-app .licenser-main > .notice-success {
+	background: var(--lic-success-bg);
+	border-color: var(--lic-success-border);
+	border-left-color: var(--lic-success-dot);
+	color: var(--lic-success-text);
+}
+
+.licenser-app .licenser-notices .notice-error,
+.licenser-app .licenser-main > .notice-error {
+	background: var(--lic-danger-bg);
+	border-color: var(--lic-danger-border);
+	border-left-color: var(--lic-danger-dot);
+	color: var(--lic-danger-text);
+}
+
+.licenser-app .licenser-notices .notice-warning,
+.licenser-app .licenser-main > .notice-warning {
+	background: var(--lic-warning-bg);
+	border-color: var(--lic-warning-border);
+	border-left-color: var(--lic-warning-dot);
+	color: var(--lic-warning-text);
+}
+
+.licenser-app .licenser-notices .notice-info,
+.licenser-app .licenser-main > .notice-info {
+	background: var(--lic-accent-soft);
+	border-color: #93c5fd;
+	border-left-color: var(--lic-accent);
+	color: #1e40af;
+}
+
+.licenser-app .licenser-notices .notice-dismiss,
+.licenser-app .licenser-main > .notice .notice-dismiss {
+	top: 50%;
+	right: 6px;
+	transform: translateY(-50%);
+	padding: 8px;
+	border-radius: 6px;
+	color: inherit;
+}
+
+.licenser-app .licenser-notices .notice-dismiss::before,
+.licenser-app .licenser-main > .notice .notice-dismiss::before {
+	color: currentColor;
+	opacity: 0.72;
+}
+
+.licenser-app .licenser-notices .notice-dismiss:hover::before,
+.licenser-app .licenser-main > .notice .notice-dismiss:hover::before {
+	opacity: 1;
+}
+
+.licenser-app .licenser-notices .notice-dismiss:focus-visible,
+.licenser-app .licenser-main > .notice .notice-dismiss:focus-visible {
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -275,11 +368,11 @@ body[class*="licenser"] #wpfooter {
 	align-items: center;
 	justify-content: center;
 	gap: 6px;
-	height: 36px;
+	min-height: 38px;
 	padding: 0 14px;
 	border-radius: var(--lic-radius-sm);
 	font-family: var(--lic-font);
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	line-height: 1;
 	text-decoration: none;
@@ -297,8 +390,9 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-app .licenser-btn:focus-visible {
-	outline: none;
-	box-shadow: 0 0 0 3px var(--lic-accent-ring);
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
 }
 
 .licenser-app .licenser-btn:disabled,
@@ -328,7 +422,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-app .licenser-btn--secondary:hover {
 	background: var(--lic-surface-subtle);
-	border-color: #b8b8bf;
+	border-color: var(--lic-border-hover);
 	color: var(--lic-text);
 }
 
@@ -345,12 +439,12 @@ body[class*="licenser"] #wpfooter {
 .licenser-app .licenser-btn--danger {
 	background: var(--lic-surface);
 	color: var(--lic-danger-text);
-	border-color: #f3c4c4;
+	border-color: var(--lic-danger-border);
 }
 
 .licenser-app .licenser-btn--danger:hover {
 	background: var(--lic-danger-bg);
-	border-color: #e69b9b;
+	border-color: var(--lic-danger-dot);
 	color: var(--lic-danger-text);
 }
 
@@ -361,14 +455,14 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-app .licenser-btn--danger-solid:hover {
-	background: #b42318;
+	background: #991b1b;
 	color: #ffffff;
 }
 
 .licenser-app .licenser-btn--sm {
-	height: 30px;
-	padding: 0 10px;
-	font-size: 12px;
+	min-height: 34px;
+	padding: 0 12px;
+	font-size: 13px;
 	border-radius: 7px;
 }
 
@@ -383,10 +477,10 @@ body[class*="licenser"] #wpfooter {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 30px;
-	height: 30px;
+	width: 34px;
+	height: 34px;
 	padding: 0;
-	border: 1px solid var(--lic-border);
+	border: 1px solid var(--lic-border-strong);
 	border-radius: 7px;
 	background: var(--lic-surface);
 	color: var(--lic-text-secondary);
@@ -410,19 +504,20 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-app .licenser-icon-btn:focus-visible {
-	outline: none;
-	box-shadow: 0 0 0 3px var(--lic-accent-ring);
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
 }
 
 .licenser-app .licenser-icon-btn--danger:hover {
 	background: var(--lic-danger-bg);
-	border-color: #f3c4c4;
+	border-color: var(--lic-danger-border);
 	color: var(--lic-danger-text);
 }
 
 .licenser-app .licenser-copy-btn.is-copied {
 	background: var(--lic-success-bg);
-	border-color: #a7e4be;
+	border-color: var(--lic-success-border);
 	color: var(--lic-success-text);
 }
 
@@ -434,11 +529,12 @@ body[class*="licenser"] #wpfooter {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	padding: 3px 10px;
+	padding: 4px 10px;
 	border-radius: var(--lic-radius-pill);
-	font-size: 12px;
-	font-weight: 500;
-	line-height: 1.4;
+	border: 1px solid var(--lic-neutral-border);
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.35;
 	white-space: nowrap;
 	background: var(--lic-neutral-bg);
 	color: var(--lic-neutral-text);
@@ -454,6 +550,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-badge--active {
 	background: var(--lic-success-bg);
+	border-color: var(--lic-success-border);
 	color: var(--lic-success-text);
 }
 
@@ -464,6 +561,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-badge--warning {
 	background: var(--lic-warning-bg);
+	border-color: var(--lic-warning-border);
 	color: var(--lic-warning-text);
 }
 
@@ -473,6 +571,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-badge--expired {
 	background: var(--lic-danger-bg);
+	border-color: var(--lic-danger-border);
 	color: var(--lic-danger-text);
 }
 
@@ -487,6 +586,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-badge--lifetime {
 	background: var(--lic-purple-bg);
+	border-color: var(--lic-purple-border);
 	color: var(--lic-purple-text);
 }
 
@@ -496,16 +596,18 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-badge--accent {
 	background: var(--lic-accent-soft);
-	color: var(--lic-accent);
+	border-color: #93c5fd;
+	color: #1e40af;
 }
 
 .licenser-badge--post {
-	background: #166534;
+	background: #14532d;
+	border-color: #14532d;
 	color: #ffffff;
 	font-family: var(--lic-mono);
-	font-size: 11px;
+	font-size: 13px;
 	letter-spacing: 0.04em;
-	padding: 3px 8px;
+	padding: 3px 9px;
 }
 
 .licenser-code-pill {
@@ -513,9 +615,9 @@ body[class*="licenser"] #wpfooter {
 	padding: 4px 9px;
 	border-radius: 6px;
 	background: var(--lic-surface-muted);
-	border: 1px solid rgba(0, 0, 0, 0.05);
+	border: 1px solid var(--lic-border);
 	font-family: var(--lic-mono);
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--lic-text);
 	line-height: 1.35;
 	white-space: nowrap;
@@ -539,7 +641,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-meter-label {
-	font-size: 12.5px;
+	font-size: 13.5px;
 	font-weight: 500;
 	color: var(--lic-text);
 	font-variant-numeric: tabular-nums;
@@ -624,7 +726,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-card__subtitle {
 	margin: 0;
-	font-size: 12.5px;
+	font-size: 13.5px;
 	color: var(--lic-text-muted);
 }
 
@@ -650,7 +752,7 @@ body[class*="licenser"] #wpfooter {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	font-size: 12.5px;
+	font-size: 13.5px;
 	font-weight: 500;
 	color: var(--lic-accent);
 	text-decoration: none;
@@ -693,8 +795,9 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-kpi-card:focus-visible {
-	outline: none;
-	box-shadow: 0 0 0 3px var(--lic-accent-ring);
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
 }
 
 .licenser-kpi-card__top {
@@ -705,7 +808,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-kpi-card__label {
-	font-size: 12.5px;
+	font-size: 13.5px;
 	font-weight: 500;
 	color: var(--lic-text-muted);
 	line-height: 1.3;
@@ -762,7 +865,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-kpi-card__meta {
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--lic-text-muted);
 	line-height: 1.35;
 }
@@ -782,7 +885,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-mini-table th {
 	text-align: left;
-	font-size: 11.5px;
+	font-size: 12.5px;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
@@ -794,10 +897,14 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-mini-table td {
 	padding: 12px 16px;
-	font-size: 13px;
+	font-size: 14px;
 	color: var(--lic-text);
 	border-bottom: 1px solid var(--lic-divider);
 	vertical-align: middle;
+}
+
+.licenser-mini-table td.licenser-tabular {
+	white-space: nowrap;
 }
 
 .licenser-mini-table tbody tr:last-child td {
@@ -835,7 +942,7 @@ body[class*="licenser"] #wpfooter {
 	background: var(--lic-surface-subtle);
 	color: var(--lic-text);
 	text-decoration: none;
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	transition: background 0.15s var(--lic-ease), border-color 0.15s var(--lic-ease), transform 0.15s var(--lic-ease);
 }
@@ -875,7 +982,7 @@ body[class*="licenser"] #wpfooter {
 	gap: 12px;
 	padding: 11px 0;
 	border-bottom: 1px solid var(--lic-divider);
-	font-size: 13px;
+	font-size: 14px;
 }
 
 .licenser-status-row:first-child {
@@ -921,7 +1028,7 @@ body[class*="licenser"] #wpfooter {
 	gap: 6px;
 	padding: 6px 12px;
 	border-radius: 7px;
-	font-size: 12.5px;
+	font-size: 13.5px;
 	font-weight: 500;
 	color: var(--lic-text-secondary);
 	text-decoration: none;
@@ -942,7 +1049,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-pill__count {
-	font-size: 11px;
+	font-size: 12px;
 	font-weight: 600;
 	padding: 1px 6px;
 	border-radius: var(--lic-radius-pill);
@@ -972,7 +1079,7 @@ body[class*="licenser"] #wpfooter {
 	border: 1px solid var(--lic-border-strong);
 	background: var(--lic-surface);
 	color: var(--lic-text);
-	font-size: 13px;
+	font-size: 14px;
 	box-shadow: var(--lic-shadow-xs);
 }
 
@@ -985,7 +1092,7 @@ body[class*="licenser"] #wpfooter {
 	appearance: none;
 	-webkit-appearance: none;
 	background-color: var(--lic-surface);
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none' stroke='%236e6e73' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none' stroke='%23374151' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 10px center;
 	background-size: 16px 16px;
@@ -997,9 +1104,10 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-toolbar-filters select:focus,
 .licenser-toolbar-filters input:focus {
-	outline: none;
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 1px;
 	border-color: var(--lic-accent);
-	box-shadow: 0 0 0 3px var(--lic-accent-ring);
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
 }
 
 /* Skinned WP_List_Table inside Card */
@@ -1046,11 +1154,11 @@ body[class*="licenser"] #wpfooter {
 	padding: 0 30px 0 10px;
 	border-radius: 7px;
 	border: 1px solid var(--lic-border-strong);
-	font-size: 12.5px;
+	font-size: 13.5px;
 	appearance: none;
 	-webkit-appearance: none;
 	background-color: var(--lic-surface);
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none' stroke='%236e6e73' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none' stroke='%23374151' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 8px center;
 	background-size: 16px 16px;
@@ -1068,12 +1176,12 @@ body[class*="licenser"] #wpfooter {
 	height: 32px;
 	line-height: 30px;
 	border-radius: 7px;
-	font-size: 12.5px;
+	font-size: 13.5px;
 }
 
 .licenser-table-card .tablenav .tablenav-pages {
 	margin: 0;
-	font-size: 12.5px;
+	font-size: 13.5px;
 	color: var(--lic-text-muted);
 }
 
@@ -1090,16 +1198,16 @@ body[class*="licenser"] #wpfooter {
 	margin: 0;
 	background: var(--lic-surface);
 	width: 100%;
-	min-width: 820px;
+	min-width: 880px;
 }
 
 /* Balanced column proportions so primary columns never crush on smaller screens */
 .licenser-table-card .column-name {
-	width: 36%;
+	width: 34%;
 }
 
 .licenser-table-card .column-version {
-	width: 13%;
+	width: 15%;
 }
 
 .licenser-table-card .column-packages {
@@ -1147,17 +1255,26 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-table-card table.wp-list-table thead th,
-.licenser-table-card table.wp-list-table tfoot th {
+.licenser-table-card table.wp-list-table thead td.check-column,
+.licenser-table-card table.wp-list-table tfoot th,
+.licenser-table-card table.wp-list-table tfoot td.check-column {
 	background: var(--lic-surface-subtle);
 	border-bottom: 1px solid var(--lic-divider);
 	border-top: 0;
-	font-size: 11.5px;
+	font-size: 12.5px;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
 	color: var(--lic-text-muted);
 	padding: 11px 12px;
 	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.licenser-table-card table.wp-list-table tfoot th,
+.licenser-table-card table.wp-list-table tfoot td.check-column {
+	border-top: 1px solid var(--lic-divider);
+	border-bottom: 0;
 }
 
 .licenser-table-card table.wp-list-table thead th a,
@@ -1167,11 +1284,13 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-table-card table.wp-list-table tbody td,
-.licenser-table-card table.wp-list-table tbody th.check-column {
+.licenser-table-card table.wp-list-table tbody th {
 	padding: 14px 12px;
 	vertical-align: middle;
 	border-bottom: 1px solid var(--lic-divider);
-	font-size: 13px;
+	font-size: 14px;
+	font-weight: 400;
+	text-align: left;
 	color: var(--lic-text);
 }
 
@@ -1188,7 +1307,7 @@ body[class*="licenser"] #wpfooter {
 	visibility: visible;
 	opacity: 0.82;
 	padding-top: 5px;
-	font-size: 12px;
+	font-size: 13px;
 	line-height: 1.5;
 	left: 0;
 	white-space: nowrap;
@@ -1200,9 +1319,33 @@ body[class*="licenser"] #wpfooter {
 	opacity: 1;
 }
 
-.licenser-table-card .check-column {
-	width: 36px;
-	padding-left: 16px !important;
+.licenser-table-card table.wp-list-table .check-column {
+	width: 44px;
+	min-width: 44px;
+	padding: 12px 8px 12px 16px !important;
+	vertical-align: middle !important;
+	text-align: left;
+}
+
+.licenser-table-card table.wp-list-table .check-column input[type="checkbox"] {
+	margin: 0 !important;
+	width: 18px;
+	height: 18px;
+	min-width: 18px;
+	border-radius: 5px;
+	border: 1.5px solid var(--lic-border-strong);
+	vertical-align: middle;
+	box-shadow: none;
+}
+
+.licenser-table-card table.wp-list-table .check-column input[type="checkbox"]:checked::before {
+	margin: -2px 0 0 -3px;
+}
+
+.licenser-table-card table.wp-list-table .check-column input[type="checkbox"]:focus-visible {
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
 }
 
 .licenser-table-card .licenser-row-delete {
@@ -1244,7 +1387,7 @@ body[class*="licenser"] #wpfooter {
 	align-items: center;
 	gap: 8px;
 	font-weight: 600;
-	font-size: 13.5px;
+	font-size: 14px;
 	color: var(--lic-text);
 	text-decoration: none;
 }
@@ -1256,7 +1399,7 @@ body[class*="licenser"] #wpfooter {
 .licenser-product-cell__slug {
 	display: block;
 	font-family: var(--lic-mono);
-	font-size: 11.5px;
+	font-size: 12.5px;
 	color: var(--lic-text-muted);
 	margin-top: 2px;
 }
@@ -1273,7 +1416,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-cell-secondary {
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--lic-text-muted);
 }
 
@@ -1285,7 +1428,7 @@ body[class*="licenser"] #wpfooter {
 	border-radius: var(--lic-radius-pill);
 	background: var(--lic-accent-soft);
 	color: var(--lic-accent);
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: 500;
 	text-decoration: none;
 	white-space: nowrap;
@@ -1348,7 +1491,7 @@ body[class*="licenser"] #wpfooter {
 .licenser-empty-state p {
 	margin: 0 auto 18px;
 	max-width: 420px;
-	font-size: 13.5px;
+	font-size: 14px;
 	color: var(--lic-text-muted);
 	line-height: 1.5;
 }
@@ -1400,7 +1543,7 @@ body[class*="licenser"] #wpfooter {
 	padding: 9px 12px;
 	border-radius: 10px;
 	color: var(--lic-text-secondary);
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	text-decoration: none;
 	transition: background 0.15s var(--lic-ease), color 0.15s var(--lic-ease);
@@ -1440,7 +1583,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-side-summary__title {
-	font-size: 11.5px;
+	font-size: 12.5px;
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
@@ -1471,7 +1614,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-side-stat__lbl {
 	display: block;
-	font-size: 11.5px;
+	font-size: 12.5px;
 	color: var(--lic-text-muted);
 	margin-top: 2px;
 }
@@ -1506,7 +1649,7 @@ body[class*="licenser"] #wpfooter {
 	align-items: center;
 	justify-content: space-between;
 	gap: 10px;
-	font-size: 13px;
+	font-size: 14px;
 }
 
 .licenser-snapshot-item__label {
@@ -1560,7 +1703,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-field > label,
 .licenser-field-label {
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	color: var(--lic-text);
 	line-height: 1.35;
@@ -1575,14 +1718,14 @@ body[class*="licenser"] #wpfooter {
 .licenser-field textarea {
 	width: 100%;
 	max-width: none;
-	height: 38px;
+	height: 40px;
 	padding: 0 12px;
 	border: 1px solid var(--lic-border-strong);
 	border-radius: var(--lic-radius-sm);
 	background: var(--lic-surface);
 	color: var(--lic-text);
 	font-family: var(--lic-font);
-	font-size: 13.5px;
+	font-size: 14px;
 	line-height: 1.4;
 	box-shadow: var(--lic-shadow-xs);
 	margin: 0;
@@ -1596,15 +1739,18 @@ body[class*="licenser"] #wpfooter {
 
 .wp-core-ui .licenser-app .licenser-field select,
 .wp-core-ui .licenser-modal .licenser-field select {
-	height: 38px;
-	min-height: 38px;
-	line-height: 36px;
+	height: 40px;
+	min-height: 40px;
+	line-height: 38px;
 	padding: 0 34px 0 12px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	appearance: none;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	background-color: var(--lic-surface);
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none' stroke='%236e6e73' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20' fill='none' stroke='%23374151' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 10px center;
 	background-size: 16px 16px;
@@ -1632,14 +1778,15 @@ body[class*="licenser"] #wpfooter {
 .licenser-field input:focus,
 .licenser-field select:focus,
 .licenser-field textarea:focus {
-	outline: none;
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 1px;
 	border-color: var(--lic-accent);
-	box-shadow: 0 0 0 3px var(--lic-accent-ring);
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
 }
 
 .licenser-help {
 	margin: 0;
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--lic-text-muted);
 	line-height: 1.45;
 }
@@ -1656,7 +1803,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-input-group .licenser-btn {
-	height: 38px;
+	min-height: 40px;
 	flex-shrink: 0;
 }
 
@@ -1674,7 +1821,7 @@ body[class*="licenser"] #wpfooter {
 	border: 1px solid var(--lic-border);
 	background: var(--lic-surface-subtle);
 	color: var(--lic-text-secondary);
-	font-size: 11.5px;
+	font-size: 12.5px;
 	font-weight: 500;
 	cursor: pointer;
 	transition: all 0.14s ease;
@@ -1693,53 +1840,55 @@ body[class*="licenser"] #wpfooter {
 	gap: 10px;
 	cursor: pointer;
 	user-select: none;
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	color: var(--lic-text);
 }
 
 .licenser-switch input[type="checkbox"] {
 	position: relative;
-	width: 40px;
-	height: 22px;
+	width: 44px;
+	height: 24px;
 	margin: 0;
-	border: 0;
+	border: 1px solid rgba(15, 23, 42, 0.18);
 	border-radius: 999px;
-	background: #d1d1d6;
+	background: #787e88;
 	appearance: none;
 	-webkit-appearance: none;
-	box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+	box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.16);
 	cursor: pointer;
 	flex-shrink: 0;
-	transition: background 0.2s var(--lic-ease);
+	transition: background 0.2s var(--lic-ease), border-color 0.2s var(--lic-ease);
 }
 
 .licenser-switch input[type="checkbox"]::before {
 	content: "";
 	position: absolute;
-	top: 2px;
-	left: 2px;
-	width: 18px;
-	height: 18px;
+	top: 1px;
+	left: 1px;
+	width: 20px;
+	height: 20px;
 	margin: 0;
 	border-radius: 50%;
 	background: #ffffff;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+	box-shadow: 0 1px 3px rgba(15, 23, 42, 0.28);
 	transition: transform 0.2s var(--lic-ease);
 }
 
 .licenser-switch input[type="checkbox"]:checked {
-	background: #30d158;
+	background: #19873d;
+	border-color: #14532d;
 }
 
 .licenser-switch input[type="checkbox"]:checked::before {
 	content: "";
-	transform: translateX(18px);
+	transform: translateX(20px);
 }
 
 .licenser-switch input[type="checkbox"]:focus-visible {
-	outline: none;
-	box-shadow: 0 0 0 3px var(--lic-accent-ring);
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
 }
 
 /* Media Thumbnail Previews (Icon & Banners) */
@@ -1785,7 +1934,7 @@ body[class*="licenser"] #wpfooter {
 	flex-direction: column;
 	align-items: center;
 	gap: 4px;
-	font-size: 11.5px;
+	font-size: 12.5px;
 	color: var(--lic-text-muted);
 	padding: 8px;
 	text-align: center;
@@ -1855,7 +2004,7 @@ body[class*="licenser"] #wpfooter {
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	font-size: 12.5px;
+	font-size: 13.5px;
 	color: var(--lic-text-muted);
 }
 
@@ -1891,7 +2040,7 @@ body[class*="licenser"] #wpfooter {
 	border-radius: var(--lic-radius-sm);
 	background: var(--lic-surface-subtle);
 	border: 1px solid var(--lic-divider);
-	font-size: 13px;
+	font-size: 14px;
 	line-height: 1.55;
 	white-space: pre-wrap;
 	color: var(--lic-text-secondary);
@@ -1938,13 +2087,14 @@ body[class*="licenser"] #wpfooter {
 	border: 1px solid var(--lic-border-strong);
 	border-radius: var(--lic-radius-sm);
 	background: var(--lic-surface);
-	font-size: 13px;
+	font-size: 14px;
 }
 
 .licenser-inline-add input[type="text"]:focus {
-	outline: none;
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 1px;
 	border-color: var(--lic-accent);
-	box-shadow: 0 0 0 3px var(--lic-accent-ring);
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
 }
 
 .licenser-domain-row,
@@ -1970,7 +2120,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-meta-row__main code.licenser-mono {
-	font-size: 12px;
+	font-size: 13px;
 	word-break: break-word;
 }
 
@@ -1981,7 +2131,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-domain-row__url {
 	font-weight: 500;
-	font-size: 13.5px;
+	font-size: 14px;
 	color: var(--lic-text);
 	word-break: break-all;
 }
@@ -1995,14 +2145,27 @@ body[class*="licenser"] #wpfooter {
 }
 
 /* -------------------------------------------------------------------------- */
-/* SDK Studio & API Diagnostics                                               */
+/* SDK Studio & API Diagnostics (Unified Dark Code Studio)                    */
 /* -------------------------------------------------------------------------- */
 
 .licenser-studio-grid {
 	display: grid;
-	grid-template-columns: minmax(300px, 370px) minmax(0, 1fr);
-	gap: 22px;
+	grid-template-columns: minmax(300px, 355px) minmax(0, 1fr);
+	gap: 24px;
 	align-items: start;
+}
+
+.licenser-studio-type-row {
+	display: grid;
+	grid-template-columns: 108px minmax(0, 1fr);
+	gap: 12px;
+}
+
+.licenser-studio-workspace {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	min-width: 0;
 }
 
 .licenser-tab-panel {
@@ -2013,35 +2176,278 @@ body[class*="licenser"] #wpfooter {
 	display: block;
 }
 
-.licenser-mode-hint {
+/* Left Inspector Groups */
+.licenser-studio-sections {
+	padding: 0 !important;
+}
+
+.licenser-studio-group {
+	padding: 18px 22px;
+	border-bottom: 1px solid var(--lic-divider);
+}
+
+.licenser-studio-group:last-child {
+	border-bottom: 0;
+}
+
+.licenser-studio-group__label {
+	display: block;
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--lic-text-muted);
+	margin-bottom: 12px;
+}
+
+.licenser-uuid-chip {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-top: 12px;
+	padding: 6px 8px 6px 12px;
+	border-radius: var(--lic-radius-sm);
+	background: var(--lic-surface-subtle);
+	border: 1px solid var(--lic-border);
+}
+
+.licenser-uuid-chip__label {
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--lic-text-muted);
+	flex-shrink: 0;
+}
+
+.licenser-uuid-chip__value {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-family: var(--lic-mono);
+	font-size: 12.5px;
+	color: var(--lic-text);
+	background: transparent;
+	padding: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.licenser-module-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.licenser-module-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
 	padding: 11px 13px;
 	border-radius: 10px;
-	background: var(--lic-accent-soft);
-	color: var(--lic-text-secondary);
+	background: var(--lic-surface-subtle);
+	border: 1px solid var(--lic-divider);
+}
+
+.licenser-module-row__text {
+	min-width: 0;
+}
+
+.licenser-module-row__text strong {
+	display: block;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--lic-text);
+	line-height: 1.3;
+}
+
+.licenser-module-row__text span {
+	display: block;
 	font-size: 12.5px;
-	line-height: 1.5;
-	margin-top: 8px;
+	color: var(--lic-text-muted);
+	line-height: 1.35;
+	margin-top: 2px;
+}
+
+.licenser-live-dot {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--lic-success-text);
+}
+
+.licenser-live-dot .licenser-badge__dot {
+	width: 7px;
+	height: 7px;
+	background: var(--lic-success-dot);
+	box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.18);
+}
+
+.licenser-callout-warn {
+	padding: 11px 14px;
+	margin: 14px 0;
+	border-radius: 10px;
+	background: var(--lic-warning-bg);
+	border: 1px solid var(--lic-warning-border);
+	color: var(--lic-warning-text);
+	font-size: 13.5px;
+	line-height: 1.45;
+}
+
+/* Step 1: Compact Terminal Install Card */
+.licenser-install-card {
+	padding: 18px 20px;
+	margin-bottom: 0;
+}
+
+.licenser-install-card__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.licenser-step-heading {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.licenser-step-heading h2 {
+	margin: 0;
+	font-size: 15.5px;
+	font-weight: 600;
+	color: var(--lic-text);
+	line-height: 1.3;
+}
+
+.licenser-step-heading p {
+	margin: 2px 0 0;
+	font-size: 13px;
+	color: var(--lic-text-muted);
+	line-height: 1.35;
+}
+
+.licenser-step-num {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: var(--lic-accent);
+	color: #ffffff;
+	font-size: 12.5px;
+	font-weight: 700;
+	flex-shrink: 0;
+	font-variant-numeric: tabular-nums;
+}
+
+.licenser-step-num--dark {
+	width: 20px;
+	height: 20px;
+	font-size: 12px;
+	background: rgba(96, 165, 250, 0.22);
+	color: #93c5fd;
+	border: 1px solid rgba(147, 197, 253, 0.35);
+}
+
+.licenser-terminal-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 9px 10px 9px 14px;
+	border-radius: 10px;
+	background: #11151d;
+	border: 1px solid #263042;
+	color: #e2e8f0;
+}
+
+.licenser-terminal-bar__cmd {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+	overflow-x: auto;
+}
+
+.licenser-terminal-bar__prompt {
+	font-family: var(--lic-mono);
+	font-size: 13px;
+	color: #86efac;
+	user-select: none;
+	flex-shrink: 0;
+}
+
+.licenser-terminal-bar code {
+	background: transparent;
+	padding: 0;
+	font-family: var(--lic-mono);
+	font-size: 12.5px;
+	color: #f1f5f9;
+	white-space: nowrap;
+}
+
+.licenser-studio-details {
+	margin-top: 10px;
+}
+
+.licenser-studio-details summary {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--lic-text-muted);
+	cursor: pointer;
+	user-select: none;
+	display: list-item;
+	list-style-position: inside;
+}
+
+.licenser-studio-details summary:hover {
+	color: var(--lic-text);
+}
+
+.licenser-studio-details summary:focus-visible {
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+/* Step 2: Unified Xcode-Inspired Dark Code Window */
+.licenser-code-window {
+	background: #11151d;
+	border: 1px solid #263042;
+	border-radius: var(--lic-radius-lg);
+	box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14), 0 2px 6px rgba(15, 23, 42, 0.08);
+	overflow: hidden;
 }
 
 .licenser-code-chrome {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 10px;
-	padding: 11px 16px;
-	background: #1d1d1f;
-	color: #f5f5f7;
+	gap: 12px;
+	padding: 12px 16px;
+	background: #1a202e;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	color: #f1f5f9;
 }
 
 .licenser-code-chrome__left {
 	display: flex;
 	align-items: center;
 	gap: 10px;
+	min-width: 0;
 }
 
 .licenser-window-dots {
 	display: inline-flex;
 	gap: 6px;
+	flex-shrink: 0;
 }
 
 .licenser-window-dots span {
@@ -2063,47 +2469,180 @@ body[class*="licenser"] #wpfooter {
 	background: #27c93f;
 }
 
-.licenser-code-chrome__file {
-	font-family: var(--lic-mono);
-	font-size: 12px;
-	color: #a1a1a6;
+.licenser-code-chrome__label {
+	font-size: 13px;
+	color: #94a3b8;
+	white-space: nowrap;
 }
 
-.licenser-code-viewer .CodeMirror {
-	height: auto;
-	min-height: 360px;
-	max-height: 540px;
+.licenser-code-chrome__file {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 9px;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.1);
 	font-family: var(--lic-mono);
 	font-size: 12.5px;
-	line-height: 1.55;
+	color: #f8fafc;
+	white-space: nowrap;
+}
+
+.licenser-app .licenser-dark-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-height: 32px;
+	padding: 0 12px;
+	border-radius: 7px;
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.18);
+	color: #f8fafc;
+	font-family: var(--lic-font);
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.licenser-app .licenser-dark-btn .dashicons {
+	font-size: 15px;
+	width: 15px;
+	height: 15px;
+	line-height: 15px;
+}
+
+.licenser-app .licenser-dark-btn:hover {
+	background: rgba(255, 255, 255, 0.18);
+	border-color: rgba(255, 255, 255, 0.3);
+	color: #ffffff;
+}
+
+.licenser-app .licenser-dark-btn:focus-visible {
+	outline: 2px solid #93c5fd;
+	outline-offset: 2px;
+}
+
+.licenser-app .licenser-dark-btn.is-copied {
+	background: rgba(22, 163, 74, 0.25);
+	border-color: rgba(134, 239, 172, 0.45);
+	color: #bbf7d0;
+}
+
+/* Unified Dark CodeMirror Theme (beats wp-codemirror .cm-s-default, WCAG AA+ on #11151d) */
+.licenser-app .licenser-code-viewer .CodeMirror {
+	height: auto;
+	min-height: 340px;
+	font-family: var(--lic-mono);
+	font-size: 13px;
+	line-height: 1.65;
 	border: 0;
+	background: #11151d;
+	color: #e2e8f0;
+	padding: 12px 0;
+}
+
+.licenser-app .licenser-code-viewer .CodeMirror-gutters {
+	background: #11151d;
+	border-right: 1px solid rgba(255, 255, 255, 0.08);
+	padding-right: 6px;
+}
+
+.licenser-app .licenser-code-viewer .CodeMirror-linenumber {
+	color: #64748b;
+	padding: 0 10px 0 12px;
+	font-size: 12px;
+}
+
+.licenser-app .licenser-code-viewer .CodeMirror-lines {
+	padding: 4px 14px;
+}
+
+.licenser-app .licenser-code-viewer .CodeMirror-activeline-background {
+	background: transparent;
+}
+
+.licenser-app .licenser-code-viewer .CodeMirror-selected {
+	background: rgba(96, 165, 250, 0.28) !important;
+}
+
+.licenser-app .licenser-code-viewer .CodeMirror-cursor {
+	border-left-color: #93c5fd;
+}
+
+.licenser-app .licenser-code-viewer .cm-s-default .cm-meta,
+.licenser-app .licenser-code-viewer .cm-s-default .cm-tag {
+	color: #f87171;
+}
+
+.licenser-app .licenser-code-viewer .cm-s-default .cm-keyword {
+	color: #c084fc;
+}
+
+.licenser-app .licenser-code-viewer .cm-s-default .cm-def,
+.licenser-app .licenser-code-viewer .cm-s-default .cm-builtin {
+	color: #fde68a;
+}
+
+.licenser-app .licenser-code-viewer .cm-s-default .cm-variable,
+.licenser-app .licenser-code-viewer .cm-s-default .cm-variable-2,
+.licenser-app .licenser-code-viewer .cm-s-default .cm-variable-3 {
+	color: #7dd3fc;
+}
+
+.licenser-app .licenser-code-viewer .cm-s-default .cm-property {
+	color: #93c5fd;
+}
+
+.licenser-app .licenser-code-viewer .cm-s-default .cm-string,
+.licenser-app .licenser-code-viewer .cm-s-default .cm-string-2 {
+	color: #86efac;
+}
+
+.licenser-app .licenser-code-viewer .cm-s-default .cm-number,
+.licenser-app .licenser-code-viewer .cm-s-default .cm-atom {
+	color: #fdba74;
+}
+
+.licenser-app .licenser-code-viewer .cm-s-default .cm-comment {
+	color: #94a3b8;
+	font-style: italic;
+}
+
+.licenser-app .licenser-code-viewer .cm-s-default .cm-operator,
+.licenser-app .licenser-code-viewer .cm-s-default .cm-punctuation,
+.licenser-app .licenser-code-viewer .cm-s-default .cm-bracket {
+	color: #cbd5e1;
 }
 
 .licenser-pre-block {
 	position: relative;
-	background: #f5f5f7;
+	background: var(--lic-surface-subtle);
 	border: 1px solid var(--lic-border);
 	border-radius: 10px;
 	padding: 12px 14px;
 	font-family: var(--lic-mono);
-	font-size: 12px;
+	font-size: 13px;
 	line-height: 1.55;
 	white-space: pre;
 	overflow-x: auto;
-	margin: 10px 0 14px;
+	margin: 10px 0 0;
 	color: var(--lic-text);
 }
 
 .licenser-json-output {
 	margin: 0;
-	padding: 16px;
-	background: #161618;
-	color: #e5e5ea;
+	padding: 18px 20px;
+	background: #11151d;
+	color: #e2e8f0;
 	font-family: var(--lic-mono);
-	font-size: 12.5px;
-	line-height: 1.6;
-	min-height: 260px;
-	max-height: 460px;
+	font-size: 13px;
+	line-height: 1.65;
+	min-height: 300px;
+	max-height: 480px;
 	overflow: auto;
 	white-space: pre-wrap;
 	word-break: break-word;
@@ -2115,9 +2654,18 @@ body[class*="licenser"] #wpfooter {
 	gap: 8px;
 	flex-wrap: wrap;
 	padding: 12px 16px;
-	background: var(--lic-surface-subtle);
-	border-bottom: 1px solid var(--lic-divider);
+	background: #161b26;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+	font-size: 13px;
+}
+
+.licenser-diag-meta code,
+.licenser-diag-meta .licenser-muted {
+	background: transparent;
+	color: #cbd5e1;
+	padding: 0;
 	font-size: 12.5px;
+	word-break: break-all;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -2145,7 +2693,7 @@ body[class*="licenser"] #wpfooter {
 .licenser-setting-row__info label,
 .licenser-setting-row__title {
 	display: block;
-	font-size: 13.5px;
+	font-size: 14px;
 	font-weight: 600;
 	color: var(--lic-text);
 	margin-bottom: 3px;
@@ -2153,7 +2701,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-setting-row__desc {
 	margin: 0;
-	font-size: 12.5px;
+	font-size: 13.5px;
 	color: var(--lic-text-muted);
 	line-height: 1.45;
 }
@@ -2184,7 +2732,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-radio-card:hover {
-	border-color: #9e9ea6;
+	border-color: var(--lic-border-hover);
 }
 
 .licenser-radio-card.is-selected,
@@ -2195,13 +2743,13 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-radio-card__title {
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 600;
 	color: var(--lic-text);
 }
 
 .licenser-radio-card__desc {
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--lic-text-muted);
 	line-height: 1.4;
 }
@@ -2213,7 +2761,7 @@ body[class*="licenser"] #wpfooter {
 	gap: 12px;
 	padding: 14px 16px;
 	border-radius: var(--lic-radius-md);
-	background: linear-gradient(135deg, #f8fafc, #f2f4f8);
+	background: var(--lic-surface-subtle);
 	border: 1px solid var(--lic-border);
 	flex-wrap: wrap;
 }
@@ -2246,14 +2794,14 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-toggle-item__text strong {
 	display: block;
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 600;
 	color: var(--lic-text);
 }
 
 .licenser-toggle-item__text span {
 	display: block;
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--lic-text-muted);
 	margin-top: 2px;
 	line-height: 1.4;
@@ -2278,7 +2826,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-section-header p {
 	margin: 0;
-	font-size: 13px;
+	font-size: 14px;
 	color: var(--lic-text-muted);
 	line-height: 1.45;
 }
@@ -2352,7 +2900,7 @@ body[class*="licenser"] #wpfooter {
 
 .licenser-addon-card p {
 	margin: 0 0 14px;
-	font-size: 13px;
+	font-size: 14px;
 	color: var(--lic-text-muted);
 	line-height: 1.5;
 }
@@ -2370,7 +2918,7 @@ body[class*="licenser"] #wpfooter {
 	display: flex;
 	align-items: center;
 	gap: 7px;
-	font-size: 12.5px;
+	font-size: 13.5px;
 	color: var(--lic-text-secondary);
 	margin: 0;
 }
@@ -2399,7 +2947,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-addon-card__meta {
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--lic-text-muted);
 }
 
@@ -2410,7 +2958,7 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-addon-toggle__label {
-	font-size: 12.5px;
+	font-size: 13.5px;
 	font-weight: 500;
 	color: var(--lic-text-secondary);
 }
@@ -2441,13 +2989,13 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-inline-callout__text strong {
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 600;
 	color: var(--lic-text);
 }
 
 .licenser-inline-callout__text span {
-	font-size: 12.5px;
+	font-size: 13.5px;
 	color: var(--lic-text-muted);
 	line-height: 1.45;
 }
@@ -2505,12 +3053,13 @@ body[class*="licenser"] #wpfooter {
 	padding: 20px;
 	opacity: 0;
 	visibility: hidden;
-	transition: opacity 0.18s ease, visibility 0.18s ease;
+	transition: opacity 0.18s ease, visibility 0s linear 0.18s;
 }
 
 .licenser-modal-backdrop.is-open {
 	opacity: 1;
 	visibility: visible;
+	transition: opacity 0.18s ease, visibility 0s linear 0s;
 }
 
 .licenser-modal {
@@ -2562,7 +3111,7 @@ body[class*="licenser"] #wpfooter {
 .licenser-modal__body {
 	padding: 20px 22px;
 	overflow-y: auto;
-	font-size: 13.5px;
+	font-size: 14px;
 	color: var(--lic-text-secondary);
 	line-height: 1.55;
 }
@@ -2583,7 +3132,7 @@ body[class*="licenser"] #wpfooter {
 	align-items: center;
 	gap: 8px;
 	margin-top: 12px;
-	font-size: 13px;
+	font-size: 14px;
 	color: var(--lic-text);
 	cursor: pointer;
 }
@@ -2611,7 +3160,7 @@ body[class*="licenser"] #wpfooter {
 	padding: 10px 14px;
 	background: var(--lic-surface-subtle);
 	font-family: var(--lic-mono);
-	font-size: 12.5px;
+	font-size: 13.5px;
 	line-height: 1.7;
 	margin: 0;
 	white-space: pre;
@@ -2641,7 +3190,7 @@ body[class*="licenser"] #wpfooter {
 	-webkit-backdrop-filter: blur(14px);
 	color: #ffffff;
 	font-family: var(--lic-font);
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: 500;
 	box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
 	pointer-events: auto;
@@ -2659,7 +3208,7 @@ body[class*="licenser"] #wpfooter {
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
-	background: #30d158;
+	background: #19873d;
 	flex-shrink: 0;
 }
 
@@ -2814,6 +3363,25 @@ body[class*="licenser"] #wpfooter {
 	.licenser-table-card table.wp-list-table .row-actions {
 		white-space: normal;
 	}
+
+	.licenser-table-card table.wp-list-table .check-column {
+		width: 46px;
+		min-width: 46px;
+		padding: 12px 8px 12px 14px !important;
+	}
+
+	.licenser-table-card table.wp-list-table .check-column input[type="checkbox"] {
+		width: 20px;
+		height: 20px;
+		min-width: 20px;
+		margin: 0 !important;
+	}
+
+	.licenser-table-card table.wp-list-table .check-column input[type="checkbox"]:checked::before {
+		width: 24px;
+		height: 24px;
+		margin: -3px 0 0 -4px;
+	}
 }
 
 @media (max-width: 600px) {
@@ -2832,5 +3400,95 @@ body[class*="licenser"] #wpfooter {
 		right: 14px;
 		bottom: 14px;
 		max-width: none;
+	}
+}
+
+/* -------------------------------------------------------------------------- */
+/* Accessibility: Placeholders, Focus Rings, Reduced Motion & High Contrast   */
+/* -------------------------------------------------------------------------- */
+
+.licenser-app input::placeholder,
+.licenser-app textarea::placeholder,
+.licenser-modal input::placeholder,
+.licenser-modal textarea::placeholder {
+	color: var(--lic-placeholder);
+	opacity: 1;
+}
+
+.licenser-app .licenser-pill:focus-visible,
+.licenser-app .licenser-sidenav a:focus-visible,
+.licenser-app .licenser-quick-tile:focus-visible,
+.licenser-app .licenser-preset-btn:focus-visible,
+.licenser-app .licenser-link-more:focus-visible,
+.licenser-app .licenser-row-link:focus-visible,
+.licenser-app .licenser-source-link:focus-visible,
+.licenser-app .licenser-back-link:focus-visible,
+.licenser-toast__close:focus-visible {
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
+}
+
+.licenser-radio-card:has(input:focus-visible) {
+	outline: 2px solid var(--lic-accent);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 4px var(--lic-accent-ring);
+}
+
+.licenser-code-chrome,
+.licenser-json-output,
+.licenser-toast {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.licenser-app *,
+	.licenser-modal-backdrop,
+	.licenser-modal-backdrop *,
+	.licenser-toast-stack * {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	.licenser-kpi-card:hover,
+	.licenser-addon-card:hover,
+	.licenser-quick-tile:hover {
+		transform: none;
+	}
+}
+
+@media (forced-colors: active) {
+	.licenser-card,
+	.licenser-kpi-card,
+	.licenser-addon-card,
+	.licenser-table-card,
+	.licenser-modal,
+	.licenser-badge,
+	.licenser-pill,
+	.licenser-radio-card,
+	.licenser-toggle-item {
+		border: 1px solid CanvasText;
+	}
+
+	.licenser-pill.is-active,
+	.licenser-radio-card:has(input:checked),
+	.licenser-sidenav a.is-active {
+		border: 2px solid Highlight;
+	}
+
+	.licenser-switch input[type="checkbox"] {
+		border: 2px solid ButtonText;
+	}
+
+	.licenser-switch input[type="checkbox"]::before {
+		background: ButtonText;
+	}
+
+	.licenser-switch input[type="checkbox"]:checked {
+		background: Highlight;
+		border-color: Highlight;
 	}
 }

@@ -58,21 +58,22 @@ if ( $licenser_wc_enabled ) {
 		</div>
 
 		<div class="licenser-main licenser-main--narrow">
-			<div class="licenser-notices"></div>
+			<hr class="wp-header-end" />
+			<div class="licenser-notices" aria-live="polite"></div>
 
 			<div class="licenser-settings-tabs-bar">
 				<div class="licenser-pills" role="tablist" aria-label="<?php esc_attr_e( 'Settings sections', 'licenser' ); ?>">
-					<button type="button" class="licenser-pill <?php echo 'general' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'general' === $licenser_active_tab ? 'true' : 'false'; ?>" data-licenser-tab="general" data-licenser-tab-sync="1">
-						<span class="dashicons dashicons-admin-network"></span>
+					<button type="button" id="licenser-tab-btn-general" class="licenser-pill <?php echo 'general' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tab" aria-controls="licenser-tab-general" aria-selected="<?php echo 'general' === $licenser_active_tab ? 'true' : 'false'; ?>" data-licenser-tab="general" data-licenser-tab-sync="1">
+						<span class="dashicons dashicons-admin-network" aria-hidden="true"></span>
 						<?php esc_html_e( 'General', 'licenser' ); ?>
 					</button>
-					<button type="button" class="licenser-pill <?php echo 'woocommerce' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'woocommerce' === $licenser_active_tab ? 'true' : 'false'; ?>" data-licenser-tab="woocommerce" data-licenser-tab-sync="1">
-						<span class="dashicons dashicons-cart"></span>
+					<button type="button" id="licenser-tab-btn-woocommerce" class="licenser-pill <?php echo 'woocommerce' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tab" aria-controls="licenser-tab-woocommerce" aria-selected="<?php echo 'woocommerce' === $licenser_active_tab ? 'true' : 'false'; ?>" data-licenser-tab="woocommerce" data-licenser-tab-sync="1">
+						<span class="dashicons dashicons-cart" aria-hidden="true"></span>
 						<?php esc_html_e( 'WooCommerce', 'licenser' ); ?>
 						<span class="licenser-tab__dot <?php echo esc_attr( $licenser_wc_dot_class ); ?>" id="licenser-wc-tab-dot" aria-hidden="true"></span>
 					</button>
-					<button type="button" class="licenser-pill <?php echo 'api' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tab" aria-selected="<?php echo 'api' === $licenser_active_tab ? 'true' : 'false'; ?>" data-licenser-tab="api" data-licenser-tab-sync="1">
-						<span class="dashicons dashicons-rest-api"></span>
+					<button type="button" id="licenser-tab-btn-api" class="licenser-pill <?php echo 'api' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tab" aria-controls="licenser-tab-api" aria-selected="<?php echo 'api' === $licenser_active_tab ? 'true' : 'false'; ?>" data-licenser-tab="api" data-licenser-tab-sync="1">
+						<span class="dashicons dashicons-rest-api" aria-hidden="true"></span>
 						<?php esc_html_e( 'API & Maintenance', 'licenser' ); ?>
 					</button>
 				</div>
@@ -80,7 +81,7 @@ if ( $licenser_wc_enabled ) {
 
 			<form action="" method="post" id="setting-add-form">
 				<!-- Tab 1: General (License Key Generation) -->
-				<div id="licenser-tab-general" class="licenser-tab-panel <?php echo 'general' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tabpanel">
+				<div id="licenser-tab-general" class="licenser-tab-panel <?php echo 'general' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tabpanel" aria-labelledby="licenser-tab-btn-general">
 					<div class="licenser-card">
 						<div class="licenser-card__header">
 							<div class="licenser-card__title-group">
@@ -158,7 +159,7 @@ if ( $licenser_wc_enabled ) {
 				</div>
 
 				<!-- Tab 2: WooCommerce Integration -->
-				<div id="licenser-tab-woocommerce" class="licenser-tab-panel <?php echo 'woocommerce' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tabpanel">
+				<div id="licenser-tab-woocommerce" class="licenser-tab-panel <?php echo 'woocommerce' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tabpanel" aria-labelledby="licenser-tab-btn-woocommerce">
 					<div class="licenser-card" id="licenser-section-woocommerce">
 						<div class="licenser-card__header">
 							<div class="licenser-card__title-group">
@@ -232,7 +233,7 @@ if ( $licenser_wc_enabled ) {
 											<span><?php esc_html_e( 'Customers can deactivate their own site activations directly inside My Account → License Manager.', 'licenser' ); ?></span>
 										</div>
 										<label class="licenser-switch">
-											<input name="allow_customer_domain_deactivation" type="checkbox" value="on" <?php checked( $licenser_self_deactivate, 'on' ); ?> />
+											<input name="allow_customer_domain_deactivation" id="allow_customer_domain_deactivation" type="checkbox" value="on" aria-label="<?php esc_attr_e( 'Allow Customer Self-Service Domain Deactivation', 'licenser' ); ?>" <?php checked( $licenser_self_deactivate, 'on' ); ?> />
 										</label>
 									</div>
 
@@ -242,7 +243,7 @@ if ( $licenser_wc_enabled ) {
 											<span><?php esc_html_e( 'Automatically set linked licenses to Inactive when an order is refunded or cancelled (re-activates if restored).', 'licenser' ); ?></span>
 										</div>
 										<label class="licenser-switch">
-											<input name="auto_suspend_on_refund" type="checkbox" value="on" <?php checked( $licenser_auto_suspend, 'on' ); ?> />
+											<input name="auto_suspend_on_refund" id="auto_suspend_on_refund" type="checkbox" value="on" aria-label="<?php esc_attr_e( 'Auto-Suspend Licenses on Refund or Cancel', 'licenser' ); ?>" <?php checked( $licenser_auto_suspend, 'on' ); ?> />
 										</label>
 									</div>
 								</div>
@@ -260,7 +261,7 @@ if ( $licenser_wc_enabled ) {
 											<span><?php esc_html_e( 'Do not show Product Type / Package summary rows beneath cart items.', 'licenser' ); ?></span>
 										</div>
 										<label class="licenser-switch">
-											<input name="hide_wclm_info_from_cart" type="checkbox" id="hide_cart_checkout" value="on" <?php checked( $licenser_hide_cart, 'on' ); ?> />
+											<input name="hide_wclm_info_from_cart" type="checkbox" id="hide_cart_checkout" value="on" aria-label="<?php esc_attr_e( 'Hide from Cart and Checkout', 'licenser' ); ?>" <?php checked( $licenser_hide_cart, 'on' ); ?> />
 										</label>
 									</div>
 
@@ -270,7 +271,7 @@ if ( $licenser_wc_enabled ) {
 											<span><?php esc_html_e( 'Do not append license key and download links to WooCommerce order emails.', 'licenser' ); ?></span>
 										</div>
 										<label class="licenser-switch">
-											<input name="hide_wclm_info_from_ordermeta" type="checkbox" id="hide_order_email" value="on" <?php checked( $licenser_hide_ordermeta, 'on' ); ?> />
+											<input name="hide_wclm_info_from_ordermeta" type="checkbox" id="hide_order_email" value="on" aria-label="<?php esc_attr_e( 'Hide from Order Emails and Order Meta', 'licenser' ); ?>" <?php checked( $licenser_hide_ordermeta, 'on' ); ?> />
 										</label>
 									</div>
 								</div>
@@ -290,7 +291,7 @@ if ( $licenser_wc_enabled ) {
 			</form>
 
 			<!-- Tab 3: Public API & Maintenance -->
-			<div id="licenser-tab-api" class="licenser-tab-panel <?php echo 'api' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tabpanel">
+			<div id="licenser-tab-api" class="licenser-tab-panel <?php echo 'api' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tabpanel" aria-labelledby="licenser-tab-btn-api">
 				<div class="licenser-card">
 					<div class="licenser-card__header">
 						<div class="licenser-card__title-group">

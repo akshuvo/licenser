@@ -295,9 +295,13 @@ class LicensesListTable extends \WP_List_Table {
 	 * @return string
 	 */
 	protected function column_cb( $item ) {
+		$id = absint( $item->id );
+
 		return sprintf(
-			'<input name="license_id[]" type="checkbox" value="%d" />',
-			absint( $item->id )
+			'<input id="cb-select-%1$d" name="license_id[]" type="checkbox" value="%1$d" aria-label="%2$s" />',
+			$id,
+			/* translators: %d: License ID. */
+			esc_attr( sprintf( __( 'Select license #%d', 'licenser' ), $id ) )
 		);
 	}
 

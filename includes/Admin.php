@@ -269,8 +269,8 @@ class Admin {
 					'deactivate'                  => __( 'Deactivate', 'licenser' ),
 					'stable'                      => __( 'Stable', 'licenser' ),
 					'previous'                    => __( 'Previous', 'licenser' ),
-					'sdk_step_plugin'             => __( 'Step 2: Add this snippet to your main plugin file.', 'licenser' ),
-					'sdk_step_theme'              => __( "Step 2: Add this snippet to your theme's functions.php file.", 'licenser' ),
+					'sdk_step_plugin'             => __( 'your-plugin.php', 'licenser' ),
+					'sdk_step_theme'              => __( 'functions.php', 'licenser' ),
 					'select_media_title'          => __( 'Select File', 'licenser' ),
 					'select_media_button'         => __( 'Use File', 'licenser' ),
 					'running_request'             => __( 'Running request...', 'licenser' ),
@@ -284,7 +284,9 @@ class Admin {
 				[
 					'type'       => 'php',
 					'codemirror' => [
-						'readOnly' => true,
+						'readOnly'        => true,
+						'lineWrapping'    => false,
+						'styleActiveLine' => false,
 					],
 				]
 			);

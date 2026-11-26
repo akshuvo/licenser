@@ -83,9 +83,10 @@ $licenser_export_url = wp_nonce_url(
 		</div>
 
 		<div class="licenser-main">
-			<div class="licenser-notices">
+			<hr class="wp-header-end" />
+			<div class="licenser-notices" aria-live="polite">
 				<?php if ( $licenser_bulk_msg && $licenser_bulk_done > 0 ) : ?>
-					<div class="notice notice-success is-dismissible">
+					<div class="notice notice-success is-dismissible inline">
 						<p>
 							<?php
 							if ( 'bulk_activate' === $licenser_bulk_msg ) {
@@ -106,31 +107,31 @@ $licenser_export_url = wp_nonce_url(
 
 			<!-- Status Filter Pills & Product/Search Toolbar -->
 			<div class="licenser-filter-bar">
-				<div class="licenser-pills" role="tablist">
+				<nav class="licenser-pills" aria-label="<?php esc_attr_e( 'Filter licenses by status', 'licenser' ); ?>">
 					<?php
 					$licenser_tab_base = $licenser_product_filter > 0 ? add_query_arg( 'product_id', $licenser_product_filter, $licenser_base_url ) : $licenser_base_url;
 					?>
-					<a href="<?php echo esc_url( $licenser_tab_base ); ?>" class="licenser-pill <?php echo '' === $licenser_status_filter ? 'is-active' : ''; ?>">
+					<a href="<?php echo esc_url( $licenser_tab_base ); ?>" class="licenser-pill <?php echo '' === $licenser_status_filter ? 'is-active' : ''; ?>"<?php echo '' === $licenser_status_filter ? ' aria-current="page"' : ''; ?>>
 						<?php esc_html_e( 'All', 'licenser' ); ?>
 						<span class="licenser-pill__count"><?php echo esc_html( number_format_i18n( $licenser_stats['total'] ) ); ?></span>
 					</a>
-					<a href="<?php echo esc_url( add_query_arg( 'license_status', 'active', $licenser_tab_base ) ); ?>" class="licenser-pill <?php echo 'active' === $licenser_status_filter ? 'is-active' : ''; ?>">
+					<a href="<?php echo esc_url( add_query_arg( 'license_status', 'active', $licenser_tab_base ) ); ?>" class="licenser-pill <?php echo 'active' === $licenser_status_filter ? 'is-active' : ''; ?>"<?php echo 'active' === $licenser_status_filter ? ' aria-current="page"' : ''; ?>>
 						<?php esc_html_e( 'Active', 'licenser' ); ?>
 						<span class="licenser-pill__count"><?php echo esc_html( number_format_i18n( $licenser_stats['active'] ) ); ?></span>
 					</a>
-					<a href="<?php echo esc_url( add_query_arg( 'license_status', 'expiring_soon', $licenser_tab_base ) ); ?>" class="licenser-pill <?php echo 'expiring_soon' === $licenser_status_filter ? 'is-active' : ''; ?>">
+					<a href="<?php echo esc_url( add_query_arg( 'license_status', 'expiring_soon', $licenser_tab_base ) ); ?>" class="licenser-pill <?php echo 'expiring_soon' === $licenser_status_filter ? 'is-active' : ''; ?>"<?php echo 'expiring_soon' === $licenser_status_filter ? ' aria-current="page"' : ''; ?>>
 						<?php esc_html_e( 'Expiring Soon', 'licenser' ); ?>
 						<span class="licenser-pill__count"><?php echo esc_html( number_format_i18n( $licenser_stats['expiring_soon'] ) ); ?></span>
 					</a>
-					<a href="<?php echo esc_url( add_query_arg( 'license_status', 'expired', $licenser_tab_base ) ); ?>" class="licenser-pill <?php echo 'expired' === $licenser_status_filter ? 'is-active' : ''; ?>">
+					<a href="<?php echo esc_url( add_query_arg( 'license_status', 'expired', $licenser_tab_base ) ); ?>" class="licenser-pill <?php echo 'expired' === $licenser_status_filter ? 'is-active' : ''; ?>"<?php echo 'expired' === $licenser_status_filter ? ' aria-current="page"' : ''; ?>>
 						<?php esc_html_e( 'Expired', 'licenser' ); ?>
 						<span class="licenser-pill__count"><?php echo esc_html( number_format_i18n( $licenser_stats['expired'] ) ); ?></span>
 					</a>
-					<a href="<?php echo esc_url( add_query_arg( 'license_status', 'inactive', $licenser_tab_base ) ); ?>" class="licenser-pill <?php echo 'inactive' === $licenser_status_filter ? 'is-active' : ''; ?>">
+					<a href="<?php echo esc_url( add_query_arg( 'license_status', 'inactive', $licenser_tab_base ) ); ?>" class="licenser-pill <?php echo 'inactive' === $licenser_status_filter ? 'is-active' : ''; ?>"<?php echo 'inactive' === $licenser_status_filter ? ' aria-current="page"' : ''; ?>>
 						<?php esc_html_e( 'Inactive', 'licenser' ); ?>
 						<span class="licenser-pill__count"><?php echo esc_html( number_format_i18n( $licenser_stats['inactive'] ) ); ?></span>
 					</a>
-				</div>
+				</nav>
 
 				<form method="get" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>" class="licenser-toolbar-filters">
 					<input type="hidden" name="page" value="licenser-licenses" />

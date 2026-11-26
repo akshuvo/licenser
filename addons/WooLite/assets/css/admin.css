@@ -2,14 +2,15 @@
  * Licenser WooCommerce Admin Styles (Product Data & Order Meta Box)
  *
  * Strictly scoped to Licenser containers on WooCommerce product & order screens.
+ * Contrast and typography aligned with WCAG 2.1 AA.
  */
 
 .licenser-wc-variation-box {
 	margin: 14px 0 8px !important;
 	padding: 0 !important;
-	border: 1px solid #dcdcde;
+	border: 1px solid #858b94;
 	border-radius: 10px;
-	background: #fbfbfd;
+	background: #f4f6f9;
 	overflow: hidden;
 	clear: both;
 }
@@ -19,17 +20,18 @@
 	align-items: center;
 	gap: 6px;
 	padding: 10px 14px;
-	background: #f5f5f7;
-	border-bottom: 1px solid #e5e5ea;
-	font-size: 12.5px;
-	color: #1d1d1f;
+	background: #e4e7ee;
+	border-bottom: 1px solid #cfd5df;
+	font-size: 13.5px;
+	font-weight: 600;
+	color: #111827;
 }
 
 .licenser-wc-variation-box__header .dashicons {
 	font-size: 16px;
 	width: 16px;
 	height: 16px;
-	color: var(--wp-admin-theme-color, #0071e3);
+	color: var(--wp-admin-theme-color, #0066cc);
 }
 
 .licenser-wc-variation-box .licenser-wc-options-group {
@@ -49,7 +51,9 @@
 	float: none;
 	margin: 0;
 	width: auto;
+	font-size: 13.5px;
 	font-weight: 600;
+	color: #111827;
 }
 
 .licenser-wc-variation-box .licenser-wc-check-row input[type="checkbox"] {
@@ -60,7 +64,8 @@
 	display: block;
 	width: 100%;
 	margin: 2px 0 0 !important;
-	color: #6e6e73;
+	font-size: 13px;
+	color: #4b5563;
 	font-style: normal;
 }
 
@@ -84,9 +89,9 @@
 .licenser-wc-variation-grid label {
 	display: block;
 	margin: 0 0 4px !important;
-	font-weight: 500;
-	font-size: 12px;
-	color: #515154;
+	font-weight: 600;
+	font-size: 13px;
+	color: #374151;
 }
 
 .licenser-wc-variation-grid select {
@@ -103,18 +108,18 @@
 
 .licenser-order-metabox__empty {
 	margin: 4px 0;
-	color: #6e6e73;
-	font-size: 12.5px;
+	color: #4b5563;
+	font-size: 13px;
 }
 
 .licenser-order-key-card {
-	border: 1px solid #dcdcde;
+	border: 1px solid #cfd5df;
 	border-radius: 10px;
-	background: #fbfbfd;
-	padding: 10px 12px;
+	background: #f4f6f9;
+	padding: 12px;
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: 8px;
 }
 
 .licenser-order-key-card__head {
@@ -122,13 +127,13 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
-	font-size: 12.5px;
-	color: #1d1d1f;
+	font-size: 13.5px;
+	color: #111827;
 }
 
 .licenser-order-key-card__pkg {
-	font-size: 11.5px;
-	color: #6e6e73;
+	font-size: 12.5px;
+	color: #4b5563;
 }
 
 .licenser-order-key-card__key {
@@ -137,15 +142,16 @@
 	justify-content: space-between;
 	gap: 6px;
 	background: #ffffff;
-	border: 1px solid #e5e5ea;
+	border: 1px solid #858b94;
 	border-radius: 6px;
-	padding: 5px 8px;
+	padding: 6px 9px;
 }
 
 .licenser-order-key-card__key code {
 	background: transparent;
 	padding: 0;
-	font-size: 11px;
+	font-size: 12.5px;
+	color: #111827;
 	word-break: break-all;
 }
 
@@ -154,37 +160,48 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
-	font-size: 11.5px;
-	color: #6e6e73;
-	padding-top: 4px;
-	border-top: 1px solid #ececef;
+	font-size: 12.5px;
+	color: #374151;
+	padding-top: 6px;
+	border-top: 1px solid #dde1e8;
 }
 
 .licenser-wc-badge {
 	display: inline-block;
-	padding: 2px 7px;
+	padding: 2px 8px;
 	border-radius: 999px;
-	font-size: 11px;
-	font-weight: 500;
+	border: 1px solid transparent;
+	font-size: 12px;
+	font-weight: 600;
 	line-height: 1.4;
 }
 
 .licenser-wc-badge--active {
-	background: #e9f9ef;
-	color: #166534;
+	background: #dcfce7;
+	border-color: #86efac;
+	color: #14532d;
 }
 
 .licenser-wc-badge--expiring_soon {
-	background: #fff6e5;
-	color: #92400e;
+	background: #fef3c7;
+	border-color: #fcd34d;
+	color: #78350f;
 }
 
 .licenser-wc-badge--expired {
-	background: #fef2f2;
-	color: #b42318;
+	background: #fee2e2;
+	border-color: #fca5a5;
+	color: #991b1b;
 }
 
 .licenser-wc-badge--inactive {
-	background: #f2f2f7;
-	color: #52525b;
+	background: #e5e7eb;
+	border-color: #cbd5e1;
+	color: #374151;
+}
+
+.licenser-order-metabox a:focus-visible,
+.licenser-order-metabox button:focus-visible {
+	outline: 2px solid var(--wp-admin-theme-color, #0066cc);
+	outline-offset: 2px;
 }

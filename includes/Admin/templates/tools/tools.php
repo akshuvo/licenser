@@ -43,7 +43,7 @@ if ( ! $licenser_default_product && ! empty( $licenser_products ) ) {
 $licenser_default_type     = $licenser_default_product ? (string) $licenser_default_product->product_type : 'plugin';
 $licenser_default_uuid     = $licenser_default_product ? (string) $licenser_default_product->uuid : '';
 $licenser_default_name     = $licenser_default_product ? (string) $licenser_default_product->name : '';
-$licenser_clone_cmd        = "cd your-plugin-or-theme\ngit clone https://github.com/LicenserWP/client.git licenser";
+$licenser_clone_cmd        = 'git clone https://github.com/LicenserWP/client.git licenser';
 $licenser_dir_tree         = "your-plugin-or-theme/\n└── licenser/\n    └── src/\n        ├── Client.php\n        ├── Insights.php\n        ├── License.php\n        └── Updater.php";
 $licenser_diag_placeholder = wp_json_encode(
 	[
@@ -61,17 +61,17 @@ $licenser_diag_placeholder = wp_json_encode(
 					<span class="dashicons dashicons-editor-code"></span>
 				</span>
 				<div class="licenser-topbar__heading">
-					<h1><?php esc_html_e( 'SDK Studio & API Diagnostics', 'licenser' ); ?></h1>
+					<h1><?php esc_html_e( 'SDK Studio', 'licenser' ); ?></h1>
 				</div>
 			</div>
 			<div class="licenser-topbar__actions">
-				<div class="licenser-pills" role="tablist">
-					<button type="button" class="licenser-pill <?php echo 'sdk' === $licenser_active_tab ? 'is-active' : ''; ?>" data-licenser-tab="sdk" role="tab" aria-selected="<?php echo 'sdk' === $licenser_active_tab ? 'true' : 'false'; ?>">
-						<span class="dashicons dashicons-editor-code"></span>
-						<?php esc_html_e( 'SDK Code Studio', 'licenser' ); ?>
+				<div class="licenser-pills" role="tablist" aria-label="<?php esc_attr_e( 'Developer tools', 'licenser' ); ?>">
+					<button type="button" id="licenser-tab-btn-sdk" class="licenser-pill <?php echo 'sdk' === $licenser_active_tab ? 'is-active' : ''; ?>" data-licenser-tab="sdk" data-licenser-tab-sync="1" role="tab" aria-controls="licenser-tab-sdk" aria-selected="<?php echo 'sdk' === $licenser_active_tab ? 'true' : 'false'; ?>">
+						<span class="dashicons dashicons-editor-code" aria-hidden="true"></span>
+						<?php esc_html_e( 'Code Studio', 'licenser' ); ?>
 					</button>
-					<button type="button" class="licenser-pill <?php echo 'diagnostics' === $licenser_active_tab ? 'is-active' : ''; ?>" data-licenser-tab="diagnostics" role="tab" aria-selected="<?php echo 'diagnostics' === $licenser_active_tab ? 'true' : 'false'; ?>">
-						<span class="dashicons dashicons-rest-api"></span>
+					<button type="button" id="licenser-tab-btn-diagnostics" class="licenser-pill <?php echo 'diagnostics' === $licenser_active_tab ? 'is-active' : ''; ?>" data-licenser-tab="diagnostics" data-licenser-tab-sync="1" role="tab" aria-controls="licenser-tab-diagnostics" aria-selected="<?php echo 'diagnostics' === $licenser_active_tab ? 'true' : 'false'; ?>">
+						<span class="dashicons dashicons-rest-api" aria-hidden="true"></span>
 						<?php esc_html_e( 'API Diagnostics', 'licenser' ); ?>
 					</button>
 				</div>
@@ -79,164 +79,199 @@ $licenser_diag_placeholder = wp_json_encode(
 		</div>
 
 		<div class="licenser-main">
-			<div class="licenser-notices"></div>
+			<hr class="wp-header-end" />
+			<div class="licenser-notices" aria-live="polite"></div>
 
 			<!-- Tab 1: SDK Code Studio -->
-			<div id="licenser-tab-sdk" class="licenser-tab-panel <?php echo 'sdk' === $licenser_active_tab ? 'is-active' : ''; ?>">
+			<div id="licenser-tab-sdk" class="licenser-tab-panel <?php echo 'sdk' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tabpanel" aria-labelledby="licenser-tab-btn-sdk">
 				<div class="licenser-studio-grid">
-					<!-- Left Panel: Generator Options -->
-					<form action="" method="post" id="sdk-generator-form" class="licenser-card">
+					<!-- Left Panel: Clean Configuration Inspector -->
+					<form action="" method="post" id="sdk-generator-form" class="licenser-card licenser-studio-inspector">
 						<div class="licenser-card__header">
 							<div class="licenser-card__title-group">
-								<h2><?php esc_html_e( 'Integration Options', 'licenser' ); ?></h2>
-								<p class="licenser-card__subtitle"><?php esc_html_e( 'Code updates live as you configure your product', 'licenser' ); ?></p>
+								<h2><?php esc_html_e( 'Configuration', 'licenser' ); ?></h2>
+								<p class="licenser-card__subtitle"><?php esc_html_e( 'Select your product and integration modules', 'licenser' ); ?></p>
 							</div>
 						</div>
-						<div class="licenser-card__body">
-							<div class="licenser-field">
-								<label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
-								<select name="product_type" id="product_type" required>
-									<?php foreach ( $licenser_product_model->get_types() as $licenser_type_key => $licenser_type_label ) : ?>
-										<option value="<?php echo esc_attr( $licenser_type_key ); ?>" <?php selected( $licenser_default_type, $licenser_type_key ); ?>><?php echo esc_html( $licenser_type_label ); ?></option>
-									<?php endforeach; ?>
-								</select>
-							</div>
 
-							<div class="licenser-field">
-								<label for="select_product"><?php esc_html_e( 'Select Product', 'licenser' ); ?></label>
-								<select id="select_product" name="select_product" required>
-									<option value="" class="blank"><?php esc_html_e( 'Select Product', 'licenser' ); ?></option>
-									<?php foreach ( $licenser_products as $licenser_product ) : ?>
-										<option value="<?php echo esc_attr( (string) $licenser_product->uuid ); ?>" class="<?php echo esc_attr( $licenser_product->product_type . '-opt' ); ?>" <?php selected( $licenser_default_uuid, (string) $licenser_product->uuid ); ?>><?php echo esc_html( (string) $licenser_product->name ); ?></option>
-									<?php endforeach; ?>
-								</select>
-								<p class="licenser-help">
-									<?php esc_html_e( 'Product UUID:', 'licenser' ); ?>
-									<code id="licenser-sdk-uuid-badge" class="licenser-mono"><?php echo $licenser_default_uuid ? esc_html( $licenser_default_uuid ) : '&mdash;'; ?></code>
-								</p>
-							</div>
-
-							<div class="licenser-field">
-								<label for="licenser_menu_select"><?php esc_html_e( 'License Page Output Mode', 'licenser' ); ?></label>
-								<select id="licenser_menu_select" name="menu_type" required>
-									<option value="submenu" selected><?php esc_html_e( 'Sub Menu (Under Existing Menu)', 'licenser' ); ?></option>
-									<option value="menu"><?php esc_html_e( 'Top-Level Admin Menu', 'licenser' ); ?></option>
-									<option value="options"><?php esc_html_e( 'WordPress Settings (Options)', 'licenser' ); ?></option>
-									<option value="section"><?php esc_html_e( 'Inline Section (Embed in Existing Page)', 'licenser' ); ?></option>
-								</select>
-								<div
-									id="licenser-sdk-mode-hint"
-									class="licenser-mode-hint"
-									data-hint-menu="<?php esc_attr_e( 'Registers a dedicated top-level menu item in the WordPress admin sidebar for license activation.', 'licenser' ); ?>"
-									data-hint-submenu="<?php esc_attr_e( 'Attaches the license activation screen beneath an existing parent menu slug (for example, your plugin menu or options-general.php).', 'licenser' ); ?>"
-									data-hint-options="<?php esc_attr_e( 'Places the license activation page neatly inside WordPress Settings (Options) without requiring a parent menu slug.', 'licenser' ); ?>"
-									data-hint-section="<?php esc_attr_e( 'Exposes a renderable license form section without creating a new admin menu — ideal when embedding inside your own settings tabs.', 'licenser' ); ?>"
-								></div>
-							</div>
-
-							<div class="licenser-field licenser-sdk-parent-slug-field">
-								<label for="licenser_parent_menu_slug"><?php esc_html_e( 'Parent Menu Slug', 'licenser' ); ?></label>
-								<input type="text" list="licenser_parent_slug_list" name="parent_slug" id="licenser_parent_menu_slug" value="options-general.php" placeholder="options-general.php" />
-								<datalist id="licenser_parent_slug_list">
-									<option value="index.php">
-									<option value="edit.php">
-									<option value="upload.php">
-									<option value="edit.php?post_type=page">
-									<option value="themes.php">
-									<option value="plugins.php">
-									<option value="tools.php">
-									<option value="options-general.php">
-								</datalist>
-							</div>
-
-							<div class="licenser-sdk-title-fields">
+						<div class="licenser-card__body licenser-studio-sections">
+							<!-- Group 1: Product -->
+							<div class="licenser-studio-group">
 								<div class="licenser-field">
-									<label for="licenser_page_title"><?php esc_html_e( 'Page Title', 'licenser' ); ?></label>
-									<input type="text" name="page_title" id="licenser_page_title" value="<?php echo esc_attr( $licenser_default_name ? $licenser_default_name . ' License Activation' : '' ); ?>" placeholder="<?php esc_attr_e( 'My Plugin License Activation', 'licenser' ); ?>" />
+									<label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
+									<select name="product_type" id="product_type" required>
+										<?php foreach ( $licenser_product_model->get_types() as $licenser_type_key => $licenser_type_label ) : ?>
+											<option value="<?php echo esc_attr( $licenser_type_key ); ?>" <?php selected( $licenser_default_type, $licenser_type_key ); ?>><?php echo esc_html( $licenser_type_label ); ?></option>
+										<?php endforeach; ?>
+									</select>
 								</div>
 
 								<div class="licenser-field">
-									<label for="licenser_menu_title"><?php esc_html_e( 'Menu Title', 'licenser' ); ?></label>
-									<input type="text" name="menu_title" id="licenser_menu_title" value="<?php echo esc_attr( $licenser_default_name ? $licenser_default_name . ' License' : '' ); ?>" placeholder="<?php esc_attr_e( 'License', 'licenser' ); ?>" />
+									<label for="select_product"><?php esc_html_e( 'Product', 'licenser' ); ?></label>
+									<select id="select_product" name="select_product" required>
+										<option value="" class="blank"><?php esc_html_e( 'Select Product', 'licenser' ); ?></option>
+										<?php foreach ( $licenser_products as $licenser_product ) : ?>
+											<option value="<?php echo esc_attr( (string) $licenser_product->uuid ); ?>" class="<?php echo esc_attr( $licenser_product->product_type . '-opt' ); ?>" <?php selected( $licenser_default_uuid, (string) $licenser_product->uuid ); ?>><?php echo esc_html( (string) $licenser_product->name ); ?></option>
+										<?php endforeach; ?>
+									</select>
+								</div>
+
+								<div class="licenser-uuid-chip">
+									<span class="licenser-uuid-chip__label"><?php esc_html_e( 'UUID', 'licenser' ); ?></span>
+									<code id="licenser-sdk-uuid-badge" class="licenser-uuid-chip__value"><?php echo $licenser_default_uuid ? esc_html( $licenser_default_uuid ) : '&mdash;'; ?></code>
+									<button type="button" id="licenser-sdk-uuid-copy" class="licenser-icon-btn licenser-copy-btn" data-licenser-copy="<?php echo esc_attr( $licenser_default_uuid ); ?>" title="<?php esc_attr_e( 'Copy Product UUID', 'licenser' ); ?>" aria-label="<?php esc_attr_e( 'Copy Product UUID', 'licenser' ); ?>">
+										<span class="dashicons dashicons-admin-page"></span>
+									</button>
 								</div>
 							</div>
 
-							<div class="licenser-field">
-								<span class="licenser-field-label"><?php esc_html_e( 'SDK Modules', 'licenser' ); ?></span>
-								<div class="licenser-toggle-stack">
-									<label class="licenser-switch">
-										<input type="checkbox" name="inc-licensing" id="inc-licensing" checked />
-										<span><?php esc_html_e( 'Include License Manager & Daily Checker', 'licenser' ); ?></span>
-									</label>
-									<label class="licenser-switch">
-										<input type="checkbox" name="inc-updater" id="inc-updater" checked />
-										<span><?php esc_html_e( 'Include Automatic WordPress Updater', 'licenser' ); ?></span>
-									</label>
-									<label class="licenser-switch">
-										<input type="checkbox" name="inc-insights" id="inc-insights" />
-										<span><?php esc_html_e( 'Include Optional Insights (Pro / Custom Handler)', 'licenser' ); ?></span>
-									</label>
+							<!-- Group 2: Modules -->
+							<div class="licenser-studio-group">
+								<span class="licenser-studio-group__label"><?php esc_html_e( 'Modules', 'licenser' ); ?></span>
+								<div class="licenser-module-list">
+									<div class="licenser-module-row">
+										<div class="licenser-module-row__text">
+											<strong><?php esc_html_e( 'License Manager', 'licenser' ); ?></strong>
+											<span><?php esc_html_e( 'Activation screen & daily cron check', 'licenser' ); ?></span>
+										</div>
+										<label class="licenser-switch">
+											<input type="checkbox" name="inc-licensing" id="inc-licensing" aria-label="<?php esc_attr_e( 'Include License Manager', 'licenser' ); ?>" checked />
+										</label>
+									</div>
+
+									<div class="licenser-module-row">
+										<div class="licenser-module-row__text">
+											<strong><?php esc_html_e( 'Auto Updater', 'licenser' ); ?></strong>
+											<span><?php esc_html_e( 'Native WordPress one-click updates', 'licenser' ); ?></span>
+										</div>
+										<label class="licenser-switch">
+											<input type="checkbox" name="inc-updater" id="inc-updater" aria-label="<?php esc_attr_e( 'Include Automatic WordPress Updater', 'licenser' ); ?>" checked />
+										</label>
+									</div>
+
+									<div class="licenser-module-row">
+										<div class="licenser-module-row__text">
+											<strong><?php esc_html_e( 'Usage Insights', 'licenser' ); ?></strong>
+											<span><?php esc_html_e( 'Optional Pro or custom telemetry handler', 'licenser' ); ?></span>
+										</div>
+										<label class="licenser-switch">
+											<input type="checkbox" name="inc-insights" id="inc-insights" aria-label="<?php esc_attr_e( 'Include Optional Insights', 'licenser' ); ?>" />
+										</label>
+									</div>
+								</div>
+							</div>
+
+							<!-- Group 3: License Screen Placement -->
+							<div class="licenser-studio-group licenser-sdk-licensing-options">
+								<span class="licenser-studio-group__label"><?php esc_html_e( 'License Screen', 'licenser' ); ?></span>
+
+								<div class="licenser-field">
+									<label for="licenser_menu_select"><?php esc_html_e( 'Placement', 'licenser' ); ?></label>
+									<select id="licenser_menu_select" name="menu_type" required>
+										<option value="submenu" selected><?php esc_html_e( 'Sub Menu', 'licenser' ); ?></option>
+										<option value="menu"><?php esc_html_e( 'Top-Level Menu', 'licenser' ); ?></option>
+										<option value="options"><?php esc_html_e( 'Settings (Options)', 'licenser' ); ?></option>
+										<option value="section"><?php esc_html_e( 'Inline Section', 'licenser' ); ?></option>
+									</select>
+									<p
+										id="licenser-sdk-mode-hint"
+										class="licenser-help"
+										data-hint-menu="<?php esc_attr_e( 'Adds a dedicated top-level sidebar menu item.', 'licenser' ); ?>"
+										data-hint-submenu="<?php esc_attr_e( 'Nested inside an existing menu such as Settings or your plugin menu.', 'licenser' ); ?>"
+										data-hint-options="<?php esc_attr_e( 'Placed neatly inside WordPress Settings (Options).', 'licenser' ); ?>"
+										data-hint-section="<?php esc_attr_e( 'Embeds cleanly inside your own settings page without a new menu.', 'licenser' ); ?>"
+									></p>
+								</div>
+
+								<div class="licenser-field licenser-sdk-parent-slug-field">
+									<label for="licenser_parent_menu_slug"><?php esc_html_e( 'Parent Slug', 'licenser' ); ?></label>
+									<input type="text" list="licenser_parent_slug_list" name="parent_slug" id="licenser_parent_menu_slug" class="licenser-mono" value="options-general.php" placeholder="options-general.php" />
+									<datalist id="licenser_parent_slug_list">
+										<option value="index.php">
+										<option value="edit.php">
+										<option value="upload.php">
+										<option value="edit.php?post_type=page">
+										<option value="themes.php">
+										<option value="plugins.php">
+										<option value="tools.php">
+										<option value="options-general.php">
+									</datalist>
+								</div>
+
+								<div class="licenser-form-grid licenser-form-grid--2 licenser-sdk-title-fields">
+									<div class="licenser-field">
+										<label for="licenser_menu_title"><?php esc_html_e( 'Menu Label', 'licenser' ); ?></label>
+										<input type="text" name="menu_title" id="licenser_menu_title" value="<?php esc_attr_e( 'License', 'licenser' ); ?>" placeholder="<?php esc_attr_e( 'License', 'licenser' ); ?>" />
+									</div>
+
+									<div class="licenser-field">
+										<label for="licenser_page_title"><?php esc_html_e( 'Page Heading', 'licenser' ); ?></label>
+										<input type="text" name="page_title" id="licenser_page_title" value="<?php echo esc_attr( $licenser_default_name ? $licenser_default_name . ' License' : __( 'License Activation', 'licenser' ) ); ?>" placeholder="<?php esc_attr_e( 'License Activation', 'licenser' ); ?>" />
+									</div>
 								</div>
 							</div>
 						</div>
+
 						<div class="licenser-card__footer">
-							<span class="licenser-help"><?php esc_html_e( 'Compatible with LicenserWP/client v2.0.1', 'licenser' ); ?></span>
-							<button type="submit" class="licenser-btn licenser-btn--primary licenser-btn--sm"><?php esc_html_e( 'Refresh Code', 'licenser' ); ?></button>
+							<span class="licenser-live-dot">
+								<span class="licenser-badge__dot" aria-hidden="true"></span>
+								<?php esc_html_e( 'Updates live', 'licenser' ); ?>
+							</span>
+							<span class="licenser-badge licenser-badge--inactive">Client v2.0.1</span>
 						</div>
 					</form>
 
-					<!-- Right Panel: Live PHP Code Output + Quick Setup Guide -->
-					<div>
-						<div class="licenser-card">
+					<!-- Right Panel: Step 1 Install Bar + Step 2 Unified Dark Code Studio -->
+					<div class="licenser-studio-workspace">
+						<!-- Step 1: Compact Terminal Install Bar -->
+						<div class="licenser-card licenser-install-card">
+							<div class="licenser-install-card__head">
+								<div class="licenser-step-heading">
+									<span class="licenser-step-num" aria-hidden="true">1</span>
+									<div>
+										<h2><?php esc_html_e( 'Bundle the Client SDK', 'licenser' ); ?></h2>
+										<p><?php esc_html_e( 'Run inside your plugin or theme directory, or download from GitHub.', 'licenser' ); ?></p>
+									</div>
+								</div>
+								<a href="https://github.com/LicenserWP/client" target="_blank" rel="noopener noreferrer" class="licenser-link-more">
+									<?php esc_html_e( 'GitHub', 'licenser' ); ?>
+									<span class="dashicons dashicons-external" aria-hidden="true"></span>
+								</a>
+							</div>
+
+							<div class="licenser-terminal-bar">
+								<div class="licenser-terminal-bar__cmd">
+									<span class="licenser-terminal-bar__prompt" aria-hidden="true">$</span>
+									<code><?php echo esc_html( $licenser_clone_cmd ); ?></code>
+								</div>
+								<button type="button" class="licenser-dark-btn licenser-copy-btn" data-licenser-copy="<?php echo esc_attr( $licenser_clone_cmd ); ?>">
+									<span class="dashicons dashicons-admin-page" aria-hidden="true"></span>
+									<span class="licenser-copy-label"><?php esc_html_e( 'Copy', 'licenser' ); ?></span>
+								</button>
+							</div>
+
+							<details class="licenser-studio-details">
+								<summary><?php esc_html_e( 'Expected folder structure', 'licenser' ); ?></summary>
+								<pre class="licenser-pre-block"><?php echo esc_html( $licenser_dir_tree ); ?></pre>
+							</details>
+						</div>
+
+						<!-- Step 2: Unified Dark Xcode Code Studio Window -->
+						<div class="licenser-code-window">
 							<div class="licenser-code-chrome">
 								<div class="licenser-code-chrome__left">
 									<span class="licenser-window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
-									<span class="licenser-code-chrome__file" id="licenser-sdk-step-heading"><?php esc_html_e( 'Step 2: Add this snippet to your main plugin file.', 'licenser' ); ?></span>
+									<span class="licenser-step-num licenser-step-num--dark" aria-hidden="true">2</span>
+									<span class="licenser-code-chrome__label"><?php esc_html_e( 'Paste into', 'licenser' ); ?></span>
+									<span class="licenser-code-chrome__file" id="licenser-sdk-step-heading"><?php echo 'theme' === $licenser_default_type ? esc_html__( 'functions.php', 'licenser' ) : esc_html__( 'your-plugin.php', 'licenser' ); ?></span>
 								</div>
-								<button type="button" id="licenser-copy-sdk-btn" class="licenser-btn licenser-btn--secondary licenser-btn--sm licenser-copy-btn" data-licenser-copy="">
-									<span class="dashicons dashicons-admin-page"></span>
-									<span class="licenser-copy-label"><?php esc_html_e( 'Copy PHP Code', 'licenser' ); ?></span>
+								<button type="button" id="licenser-copy-sdk-btn" class="licenser-dark-btn licenser-copy-btn" data-licenser-copy="">
+									<span class="dashicons dashicons-admin-page" aria-hidden="true"></span>
+									<span class="licenser-copy-label"><?php esc_html_e( 'Copy PHP', 'licenser' ); ?></span>
 								</button>
 							</div>
 							<div class="licenser-code-viewer">
-								<textarea id="licenser-sdk-code-output" readonly></textarea>
-							</div>
-						</div>
-
-						<div class="licenser-card">
-							<div class="licenser-card__header">
-								<div class="licenser-card__title-group">
-									<h2><?php esc_html_e( 'Step 1: Bundle the Licenser Client Library', 'licenser' ); ?></h2>
-									<p class="licenser-card__subtitle"><?php esc_html_e( 'Place the open-source client SDK inside your plugin or theme folder', 'licenser' ); ?></p>
-								</div>
-								<button type="button" class="licenser-btn licenser-btn--secondary licenser-btn--sm licenser-copy-btn" data-licenser-copy="<?php echo esc_attr( $licenser_clone_cmd ); ?>">
-									<span class="dashicons dashicons-admin-page"></span>
-									<span class="licenser-copy-label"><?php esc_html_e( 'Copy Command', 'licenser' ); ?></span>
-								</button>
-							</div>
-							<div class="licenser-card__body">
-								<pre class="licenser-pre-block"><?php echo esc_html( $licenser_clone_cmd ); ?></pre>
-								<p class="licenser-help">
-									<?php
-									echo wp_kses(
-										sprintf(
-											/* translators: 1: Link to GitHub repo, 2: Code-formatted folder name. */
-											__( 'Or download the library from %1$s and extract it inside your product root directory as %2$s:', 'licenser' ),
-											'<a href="https://github.com/LicenserWP/client" target="_blank" rel="noopener noreferrer">github.com/LicenserWP/client</a>',
-											'<code>licenser</code>'
-										),
-										[
-											'a'    => [
-												'href'   => [],
-												'target' => [],
-												'rel'    => [],
-											],
-											'code' => [],
-										]
-									);
-									?>
-								</p>
-								<pre class="licenser-pre-block"><?php echo esc_html( $licenser_dir_tree ); ?></pre>
+								<textarea id="licenser-sdk-code-output" aria-label="<?php esc_attr_e( 'Generated PHP SDK integration code', 'licenser' ); ?>" readonly></textarea>
 							</div>
 						</div>
 					</div>
@@ -244,13 +279,13 @@ $licenser_diag_placeholder = wp_json_encode(
 			</div>
 
 			<!-- Tab 2: Live API & License Diagnostics Tester -->
-			<div id="licenser-tab-diagnostics" class="licenser-tab-panel <?php echo 'diagnostics' === $licenser_active_tab ? 'is-active' : ''; ?>">
+			<div id="licenser-tab-diagnostics" class="licenser-tab-panel <?php echo 'diagnostics' === $licenser_active_tab ? 'is-active' : ''; ?>" role="tabpanel" aria-labelledby="licenser-tab-btn-diagnostics">
 				<div class="licenser-studio-grid">
 					<form id="licenser-diag-form" class="licenser-card">
 						<div class="licenser-card__header">
 							<div class="licenser-card__title-group">
-								<h2><?php esc_html_e( 'Live API Request Builder', 'licenser' ); ?></h2>
-								<p class="licenser-card__subtitle"><?php esc_html_e( 'Test public SDK routes directly without curl or Postman', 'licenser' ); ?></p>
+								<h2><?php esc_html_e( 'Request Builder', 'licenser' ); ?></h2>
+								<p class="licenser-card__subtitle"><?php esc_html_e( 'Test live public SDK routes directly from wp-admin', 'licenser' ); ?></p>
 							</div>
 						</div>
 						<div class="licenser-card__body">
@@ -264,11 +299,11 @@ $licenser_diag_placeholder = wp_json_encode(
 								</select>
 							</div>
 
-							<div id="licenser-diag-write-warn" class="licenser-mode-hint" style="display: none; background: #fff6e5; color: #92400e;">
+							<div id="licenser-diag-write-warn" class="licenser-callout-warn" hidden>
 								<?php esc_html_e( 'Heads up: Activate and Deactivate modify domain activation records on the supplied license key.', 'licenser' ); ?>
 							</div>
 
-							<div class="licenser-field" style="margin-top: 14px;">
+							<div class="licenser-field">
 								<label for="licenser-diag-product"><?php esc_html_e( 'Product', 'licenser' ); ?></label>
 								<select id="licenser-diag-product" required>
 									<option value=""><?php esc_html_e( 'Select Product', 'licenser' ); ?></option>
@@ -291,22 +326,22 @@ $licenser_diag_placeholder = wp_json_encode(
 							</div>
 						</div>
 						<div class="licenser-card__footer">
-							<span class="licenser-help"><?php esc_html_e( 'Calls live local /wp-json/licenser/v1/public', 'licenser' ); ?></span>
+							<span class="licenser-help"><?php esc_html_e( 'POST /wp-json/licenser/v1/public', 'licenser' ); ?></span>
 							<button type="submit" class="licenser-btn licenser-btn--primary">
-								<span class="dashicons dashicons-controls-play"></span>
-								<?php esc_html_e( 'Run Test Request', 'licenser' ); ?>
+								<span class="dashicons dashicons-controls-play" aria-hidden="true"></span>
+								<?php esc_html_e( 'Run Request', 'licenser' ); ?>
 							</button>
 						</div>
 					</form>
 
-					<div class="licenser-card">
+					<div class="licenser-code-window">
 						<div class="licenser-code-chrome">
 							<div class="licenser-code-chrome__left">
 								<span class="licenser-window-dots" aria-hidden="true"><span></span><span></span><span></span></span>
 								<span class="licenser-code-chrome__file"><?php esc_html_e( 'JSON Response Inspector', 'licenser' ); ?></span>
 							</div>
-							<button type="button" id="licenser-copy-diag-btn" class="licenser-btn licenser-btn--secondary licenser-btn--sm licenser-copy-btn" data-licenser-copy="">
-								<span class="dashicons dashicons-admin-page"></span>
+							<button type="button" id="licenser-copy-diag-btn" class="licenser-dark-btn licenser-copy-btn" data-licenser-copy="">
+								<span class="dashicons dashicons-admin-page" aria-hidden="true"></span>
 								<span class="licenser-copy-label"><?php esc_html_e( 'Copy JSON', 'licenser' ); ?></span>
 							</button>
 						</div>
