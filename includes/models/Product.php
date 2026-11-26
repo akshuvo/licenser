@@ -127,20 +127,28 @@ class Product {
 
 		global $wpdb;
 
-		$columns = $this->sanitize_columns( $args['columns'] );
-
-		if ( 'uuid' === $args['get_by'] ) {
-			$where = $wpdb->prepare( 'uuid = %s', (string) $id );
-		} else {
-			$where = $wpdb->prepare( 'id = %d', absint( $id ) );
-		}
-
+		$columns   = esc_sql( $this->sanitize_columns( $args['columns'] ) );
 		$cache_key = 'product_' . sanitize_key( (string) $id ) . '_' . md5( (string) wp_json_encode( $args ) );
 		$product   = $args['cache'] ? licenser_get_cache( $cache_key ) : false;
 
 		if ( false === $product ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			$product = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} LIMIT 1" );
+			if ( 'uuid' === $args['get_by'] ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$product = $wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT {$columns} FROM {$wpdb->licenser_products} WHERE uuid = %s LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+						(string) $id
+					)
+				);
+			} else {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$product = $wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT {$columns} FROM {$wpdb->licenser_products} WHERE id = %d LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+						absint( $id )
+					)
+				);
+			}
 
 			if ( empty( $product ) ) {
 				return false;
@@ -216,39 +224,54 @@ class Product {
 
 		$args = wp_parse_args( $args, $defaults );
 
-		$where = '1=1';
+		$has_name         = ! empty( $args['name'] ) ? 1 : 0;
+		$has_slug         = ! empty( $args['slug'] ) ? 1 : 0;
+		$has_uuid         = ! empty( $args['uuid'] ) ? 1 : 0;
+		$has_product_type = ! empty( $args['product_type'] ) ? 1 : 0;
+		$has_status       = ! empty( $args['status'] ) ? 1 : 0;
 
-		if ( ! empty( $args['name'] ) ) {
-			$where .= $wpdb->prepare( ' AND name = %s', $args['name'] );
-		}
+		$orderby      = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
+		$order        = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+		$order_by_sql = sanitize_sql_orderby( "{$orderby} {$order}" );
+		$columns      = esc_sql( $this->sanitize_columns( $args['columns'] ) );
 
-		if ( ! empty( $args['slug'] ) ) {
-			$where .= $wpdb->prepare( ' AND slug = %s', $args['slug'] );
-		}
-
-		if ( ! empty( $args['uuid'] ) ) {
-			$where .= $wpdb->prepare( ' AND uuid = %s', $args['uuid'] );
-		}
-
-		if ( ! empty( $args['product_type'] ) ) {
-			$where .= $wpdb->prepare( ' AND product_type = %s', $args['product_type'] );
-		}
-
-		if ( ! empty( $args['status'] ) ) {
-			$where .= $wpdb->prepare( ' AND status = %s', $args['status'] );
-		}
-
-		$orderby = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
-		$order   = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
-		$columns = $this->sanitize_columns( $args['columns'] );
-
-		$limit_sql = '';
 		if ( -1 !== (int) $args['number'] ) {
-			$limit_sql = $wpdb->prepare( ' LIMIT %d, %d', absint( $args['offset'] ), absint( $args['number'] ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$items = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT {$columns} FROM {$wpdb->licenser_products} WHERE ( 0 = %d OR name = %s ) AND ( 0 = %d OR slug = %s ) AND ( 0 = %d OR uuid = %s ) AND ( 0 = %d OR product_type = %s ) AND ( 0 = %d OR status = %s ) ORDER BY {$order_by_sql} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$has_name,
+					(string) $args['name'],
+					$has_slug,
+					(string) $args['slug'],
+					$has_uuid,
+					(string) $args['uuid'],
+					$has_product_type,
+					(string) $args['product_type'],
+					$has_status,
+					(string) $args['status'],
+					absint( $args['offset'] ),
+					absint( $args['number'] )
+				)
+			);
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$items = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT {$columns} FROM {$wpdb->licenser_products} WHERE ( 0 = %d OR name = %s ) AND ( 0 = %d OR slug = %s ) AND ( 0 = %d OR uuid = %s ) AND ( 0 = %d OR product_type = %s ) AND ( 0 = %d OR status = %s ) ORDER BY {$order_by_sql}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$has_name,
+					(string) $args['name'],
+					$has_slug,
+					(string) $args['slug'],
+					$has_uuid,
+					(string) $args['uuid'],
+					$has_product_type,
+					(string) $args['product_type'],
+					$has_status,
+					(string) $args['status']
+				)
+			);
 		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$items = $wpdb->get_results( "SELECT {$columns} FROM {$wpdb->licenser_products} WHERE {$where} ORDER BY {$orderby} {$order}{$limit_sql}" );
 
 		if ( empty( $items ) ) {
 			return false;
@@ -285,18 +308,19 @@ class Product {
 			]
 		);
 
-		$where = '1=1';
+		$has_product_type = ! empty( $args['product_type'] ) ? 1 : 0;
+		$has_status       = ! empty( $args['status'] ) ? 1 : 0;
 
-		if ( ! empty( $args['product_type'] ) ) {
-			$where .= $wpdb->prepare( ' AND product_type = %s', $args['product_type'] );
-		}
-
-		if ( ! empty( $args['status'] ) ) {
-			$where .= $wpdb->prepare( ' AND status = %s', $args['status'] );
-		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->licenser_products} WHERE {$where}" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->licenser_products} WHERE ( 0 = %d OR product_type = %s ) AND ( 0 = %d OR status = %s )",
+				$has_product_type,
+				(string) $args['product_type'],
+				$has_status,
+				(string) $args['status']
+			)
+		);
 	}
 
 	/**

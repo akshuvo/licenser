@@ -12,9 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$total_plugins  = Product::instance()->count( [ 'product_type' => 'plugin' ] );
-$total_themes   = Product::instance()->count( [ 'product_type' => 'theme' ] );
-$total_licenses = License::instance()->count();
+$licenser_total_plugins  = Product::instance()->count( [ 'product_type' => 'plugin' ] );
+$licenser_total_themes   = Product::instance()->count( [ 'product_type' => 'theme' ] );
+$licenser_total_licenses = License::instance()->count();
 ?>
 <div class="wrap">
 	<div class="licenser-root">
@@ -36,7 +36,7 @@ $total_licenses = License::instance()->count();
 							</div>
 						</div>
 						<div class="lmwppt-counter">
-							<h1><?php echo esc_html( (string) $total_plugins ); ?></h1>
+							<h1><?php echo esc_html( (string) $licenser_total_plugins ); ?></h1>
 						</div>
 					</div>
 				</a>
@@ -52,7 +52,7 @@ $total_licenses = License::instance()->count();
 							</div>
 						</div>
 						<div class="lmwppt-counter">
-							<h1><?php echo esc_html( (string) $total_themes ); ?></h1>
+							<h1><?php echo esc_html( (string) $licenser_total_themes ); ?></h1>
 						</div>
 					</div>
 				</a>
@@ -68,7 +68,7 @@ $total_licenses = License::instance()->count();
 							</div>
 						</div>
 						<div class="lmwppt-counter">
-							<h1><?php echo esc_html( (string) $total_licenses ); ?></h1>
+							<h1><?php echo esc_html( (string) $licenser_total_licenses ); ?></h1>
 						</div>
 					</div>
 				</a>

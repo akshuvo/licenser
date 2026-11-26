@@ -3,9 +3,11 @@
 .github
 .gitignore
 .distignore
-.phpcs.xml.dist
+.wordpress
+phpcs.xml
 AGENTS.md
 README.md
 docs
-composer.json
+scripts
+tests
 composer.lock

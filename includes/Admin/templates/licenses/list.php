@@ -22,9 +22,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<div class="lmfwppt-notices"></div>
 			<form action="" method="post">
 				<?php
-				$table = new Licenser\Admin\LicensesListTable();
-				$table->prepare_items();
-				$table->display();
+				$licenser_table = new Licenser\Admin\LicensesListTable();
+				$licenser_table->prepare_items();
+				$licenser_table->display();
 				?>
 			</form>
 		</div>

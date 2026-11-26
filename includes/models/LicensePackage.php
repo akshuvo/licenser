@@ -70,27 +70,41 @@ class LicensePackage {
 			'package_id'  => '',
 		];
 
-		$args  = wp_parse_args( $args, $defaults );
-		$where = '1=1';
+		$args        = wp_parse_args( $args, $defaults );
+		$has_product = ! empty( $args['product_id'] ) ? 1 : 0;
+		$product_id  = absint( $args['product_id'] );
+		$has_package = ! empty( $args['package_id'] ) ? 1 : 0;
+		$package_id  = sanitize_text_field( (string) $args['package_id'] );
 
-		if ( ! empty( $args['product_id'] ) ) {
-			$where .= $wpdb->prepare( ' AND product_id = %d', absint( $args['product_id'] ) );
-		}
+		$orderby      = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
+		$order        = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+		$order_by_sql = sanitize_sql_orderby( "{$orderby} {$order}" );
 
-		if ( ! empty( $args['package_id'] ) ) {
-			$where .= $wpdb->prepare( ' AND package_id = %s', sanitize_text_field( $args['package_id'] ) );
-		}
-
-		$orderby = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
-		$order   = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
-
-		$limit_sql = '';
 		if ( -1 !== (int) $args['number'] ) {
-			$limit_sql = $wpdb->prepare( ' LIMIT %d, %d', absint( $args['offset'] ), absint( $args['number'] ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$packages = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->licenser_license_packages} WHERE ( 0 = %d OR product_id = %d ) AND ( 0 = %d OR package_id = %s ) ORDER BY {$order_by_sql} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$has_product,
+					$product_id,
+					$has_package,
+					$package_id,
+					absint( $args['offset'] ),
+					absint( $args['number'] )
+				)
+			);
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$packages = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->licenser_license_packages} WHERE ( 0 = %d OR product_id = %d ) AND ( 0 = %d OR package_id = %s ) ORDER BY {$order_by_sql}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$has_product,
+					$product_id,
+					$has_package,
+					$package_id
+				)
+			);
 		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$packages = $wpdb->get_results( "SELECT * FROM {$wpdb->licenser_license_packages} WHERE {$where} ORDER BY {$orderby} {$order}{$limit_sql}" );
 
 		if ( empty( $packages ) ) {
 			return false;

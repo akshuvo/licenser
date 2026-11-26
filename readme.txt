@@ -46,6 +46,15 @@ Yes. Licenser includes a built-in WooCommerce Lite addon that supports both simp
 
 When uploading release ZIP files through the Licenser product editor media frame, files are stored inside `wp-content/uploads/license-manager/` and delivered through license-authenticated download endpoints.
 
+== Screenshots ==
+
+1. Overview dashboard showing total registered plugins, themes, and active licenses at a glance.
+2. Plugins and themes product catalog with slugs, dates, sorting, and quick edit/delete actions.
+3. Product editor for managing UUIDs, WordPress/PHP compatibility metadata, stable releases, license packages, icons/banners, and Public API URLs.
+4. Built-in SDK Generator producing ready-to-paste PHP client integration code for plugins and themes.
+5. License Manager settings for key prefixes, generation methods (Microtime, WP Password, UUID v4), character length, and WooCommerce visibility.
+6. Addons screen showing the built-in WooCommerce Lite integration and extension status.
+
 == Changelog ==
 
 = 1.0.8 =

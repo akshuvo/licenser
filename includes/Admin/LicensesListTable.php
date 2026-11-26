@@ -223,17 +223,16 @@ class LicensesListTable extends \WP_List_Table {
 			'order'   => 'DESC',
 		];
 
-		$args          = wp_parse_args( $args, $defaults );
-		$license_table = licenser_table( 'licenses' );
-
+		$args            = wp_parse_args( $args, $defaults );
 		$allowed_orderby = [ 'id', 'dated', 'end_date', 'status', 'product_id' ];
 		$orderby         = in_array( $args['orderby'], $allowed_orderby, true ) ? $args['orderby'] : 'id';
 		$order           = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+		$order_by_sql    = sanitize_sql_orderby( "{$orderby} {$order}" );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$items = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$license_table} ORDER BY {$orderby} {$order} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				"SELECT * FROM {$wpdb->licenser_licenses} ORDER BY {$order_by_sql} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				absint( $args['offset'] ),
 				absint( $args['number'] )
 			)

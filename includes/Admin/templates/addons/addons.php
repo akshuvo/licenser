@@ -9,8 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$wc_active  = class_exists( 'WooCommerce' );
-$pro_active = defined( 'LICENSER_PRO_VERSION' );
+$licenser_wc_active  = class_exists( 'WooCommerce' );
+$licenser_pro_active = defined( 'LICENSER_PRO_VERSION' );
 ?>
 <div class="wrap">
 	<div class="licenser-root">
@@ -35,7 +35,7 @@ $pro_active = defined( 'LICENSER_PRO_VERSION' );
 								<p><?php esc_html_e( 'Automatically generate and deliver license keys when customers purchase licensed simple or variable products in WooCommerce.', 'licenser' ); ?></p>
 							</div>
 							<div class="licenser-addon-card__footer">
-								<?php if ( $wc_active ) : ?>
+								<?php if ( $licenser_wc_active ) : ?>
 									<span class="lwp-tag lwp-tag-success"><?php esc_html_e( 'Active', 'licenser' ); ?></span>
 								<?php else : ?>
 									<span class="lwp-tag"><?php esc_html_e( 'Requires WooCommerce', 'licenser' ); ?></span>
@@ -51,7 +51,7 @@ $pro_active = defined( 'LICENSER_PRO_VERSION' );
 								<p><?php esc_html_e( 'Extend Licenser with advanced licensing workflows, customer self-service management, and premium eCommerce integrations.', 'licenser' ); ?></p>
 							</div>
 							<div class="licenser-addon-card__footer">
-								<?php if ( $pro_active ) : ?>
+								<?php if ( $licenser_pro_active ) : ?>
 									<span class="lwp-tag lwp-tag-success"><?php esc_html_e( 'Installed & Active', 'licenser' ); ?></span>
 								<?php else : ?>
 									<a href="https://addonmaster.com/" target="_blank" rel="noopener noreferrer" class="button button-primary"><?php esc_html_e( 'Learn More', 'licenser' ); ?></a>

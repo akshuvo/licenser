@@ -73,21 +73,31 @@ class ProductRelease {
 
 		global $wpdb;
 
-		$columns = $this->sanitize_columns( $args['columns'] );
-		$where   = '1=1';
+		$columns     = esc_sql( $this->sanitize_columns( $args['columns'] ) );
+		$has_version = ! empty( $args['version'] ) ? 1 : 0;
+		$version     = sanitize_text_field( (string) $args['version'] );
 
 		if ( 'product_id' === $args['get_by'] ) {
-			$where .= $wpdb->prepare( ' AND product_id = %d', absint( $id ) );
-		} else {
-			$where .= $wpdb->prepare( ' AND id = %d', absint( $id ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			return $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT {$columns} FROM {$wpdb->licenser_product_releases} WHERE product_id = %d AND ( 0 = %d OR version = %s ) ORDER BY id DESC, release_date DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					absint( $id ),
+					$has_version,
+					$version
+				)
+			);
 		}
 
-		if ( ! empty( $args['version'] ) ) {
-			$where .= $wpdb->prepare( ' AND version = %s', sanitize_text_field( $args['version'] ) );
-		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_product_releases} WHERE {$where} ORDER BY id DESC, release_date DESC LIMIT 1" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT {$columns} FROM {$wpdb->licenser_product_releases} WHERE id = %d AND ( 0 = %d OR version = %s ) ORDER BY id DESC, release_date DESC LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				absint( $id ),
+				$has_version,
+				$version
+			)
+		);
 	}
 
 	/**
@@ -126,23 +136,35 @@ class ProductRelease {
 			'product_id'  => '',
 		];
 
-		$args  = wp_parse_args( $args, $defaults );
-		$where = '1=1';
+		$args        = wp_parse_args( $args, $defaults );
+		$has_product = ! empty( $args['product_id'] ) ? 1 : 0;
+		$product_id  = absint( $args['product_id'] );
 
-		if ( ! empty( $args['product_id'] ) ) {
-			$where .= $wpdb->prepare( ' AND product_id = %d', absint( $args['product_id'] ) );
-		}
+		$orderby      = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
+		$order        = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+		$order_by_sql = sanitize_sql_orderby( "{$orderby} {$order}" );
 
-		$orderby = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
-		$order   = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
-
-		$limit_sql = '';
 		if ( ! empty( $args['number'] ) && -1 !== (int) $args['number'] ) {
-			$limit_sql = $wpdb->prepare( ' LIMIT %d, %d', absint( $args['offset'] ), absint( $args['number'] ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			return $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->licenser_product_releases} WHERE ( 0 = %d OR product_id = %d ) ORDER BY {$order_by_sql} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$has_product,
+					$product_id,
+					absint( $args['offset'] ),
+					absint( $args['number'] )
+				)
+			);
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return $wpdb->get_results( "SELECT * FROM {$wpdb->licenser_product_releases} WHERE {$where} ORDER BY {$orderby} {$order}{$limit_sql}" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->licenser_product_releases} WHERE ( 0 = %d OR product_id = %d ) ORDER BY {$order_by_sql}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$has_product,
+				$product_id
+			)
+		);
 	}
 
 	/**

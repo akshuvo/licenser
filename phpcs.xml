@@ -54,6 +54,5 @@
 				<element value="LICENSER"/>
 			</property>
 		</properties>
-		<exclude-pattern>*/includes/Admin/templates/*</exclude-pattern>
 	</rule>
 </ruleset>

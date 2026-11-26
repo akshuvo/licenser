@@ -108,16 +108,25 @@ class License {
 
 		global $wpdb;
 
-		$columns = $this->sanitize_columns( $args['columns'], self::ALLOWED_COLUMNS );
+		$columns = esc_sql( $this->sanitize_columns( $args['columns'], self::ALLOWED_COLUMNS ) );
 
 		if ( 'key' === $args['get_by'] ) {
-			$where = $wpdb->prepare( 'license_key = %s', (string) $id );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$license = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT {$columns} FROM {$wpdb->licenser_licenses} WHERE license_key = %s LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					(string) $id
+				)
+			);
 		} else {
-			$where = $wpdb->prepare( 'id = %d', absint( $id ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$license = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT {$columns} FROM {$wpdb->licenser_licenses} WHERE id = %d LIMIT 1", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					absint( $id )
+				)
+			);
 		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$license = $wpdb->get_row( "SELECT {$columns} FROM {$wpdb->licenser_licenses} WHERE {$where} LIMIT 1" );
 
 		if ( empty( $license ) ) {
 			return false;
@@ -154,23 +163,98 @@ class License {
 			'inc_domains'  => false,
 		];
 
-		$args  = wp_parse_args( $args, $defaults );
-		$where = $this->build_where_clause( $args );
+		$args = wp_parse_args( $args, $defaults );
 
-		if ( false === $where ) {
-			return false;
+		$is_source_id_array = ! empty( $args['source_id'] ) && is_array( $args['source_id'] );
+		$source_ids_csv     = '';
+		if ( $is_source_id_array ) {
+			$source_ids = array_values( array_filter( wp_parse_id_list( $args['source_id'] ) ) );
+			if ( empty( $source_ids ) ) {
+				return false;
+			}
+			$source_ids_csv = implode( ',', $source_ids );
 		}
 
-		$orderby = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
-		$order   = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+		$has_product_id   = ! empty( $args['product_id'] ) ? 1 : 0;
+		$has_package_id   = ! empty( $args['package_id'] ) ? 1 : 0;
+		$has_source       = ! empty( $args['source'] ) ? 1 : 0;
+		$has_source_id    = ( ! $is_source_id_array && ! empty( $args['source_id'] ) ) ? 1 : 0;
+		$has_source_list  = $is_source_id_array ? 1 : 0;
+		$has_status       = ( isset( $args['status'] ) && '' !== $args['status'] ) ? 1 : 0;
+		$has_license_key  = ! empty( $args['license_key'] ) ? 1 : 0;
+		$has_end_date     = ! empty( $args['end_date'] ) ? 1 : 0;
+		$end_date_val     = $has_end_date ? sanitize_text_field( (string) $args['end_date'] ) : '1970-01-01 00:00:00';
+		$has_is_lifetime  = ( isset( $args['is_lifetime'] ) && '' !== $args['is_lifetime'] ) ? 1 : 0;
+		$has_domain_limit = ( isset( $args['domain_limit'] ) && '' !== $args['domain_limit'] ) ? 1 : 0;
+		$has_dated        = ! empty( $args['dated'] ) ? 1 : 0;
+		$dated_val        = $has_dated ? sanitize_text_field( (string) $args['dated'] ) : '1970-01-01 00:00:00';
 
-		$limit_sql = '';
-		if ( -1 !== (int) $args['number'] ) {
-			$limit_sql = $wpdb->prepare( ' LIMIT %d, %d', absint( $args['offset'] ), absint( $args['number'] ) );
+		$orderby      = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
+		$order        = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+		$order_by_sql = sanitize_sql_orderby( "{$orderby} {$order}" );
+		$has_limit    = ( -1 !== (int) $args['number'] );
+
+		if ( $has_limit ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$licenses = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->licenser_licenses} WHERE ( 0 = %d OR product_id = %d ) AND ( 0 = %d OR package_id = %d ) AND ( 0 = %d OR source = %s ) AND ( 0 = %d OR source_id = %d ) AND ( 0 = %d OR FIND_IN_SET( source_id, %s ) > 0 ) AND ( 0 = %d OR status = %d ) AND ( 0 = %d OR license_key = %s ) AND ( 0 = %d OR end_date = %s ) AND ( 0 = %d OR is_lifetime = %d ) AND ( 0 = %d OR domain_limit = %d ) AND ( 0 = %d OR dated = %s ) ORDER BY {$order_by_sql} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$has_product_id,
+					absint( $args['product_id'] ),
+					$has_package_id,
+					absint( $args['package_id'] ),
+					$has_source,
+					sanitize_text_field( (string) $args['source'] ),
+					$has_source_id,
+					$is_source_id_array ? 0 : absint( $args['source_id'] ),
+					$has_source_list,
+					$source_ids_csv,
+					$has_status,
+					intval( $args['status'] ),
+					$has_license_key,
+					sanitize_text_field( (string) $args['license_key'] ),
+					$has_end_date,
+					$end_date_val,
+					$has_is_lifetime,
+					intval( $args['is_lifetime'] ),
+					$has_domain_limit,
+					intval( $args['domain_limit'] ),
+					$has_dated,
+					$dated_val,
+					absint( $args['offset'] ),
+					absint( $args['number'] )
+				)
+			);
+		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$licenses = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->licenser_licenses} WHERE ( 0 = %d OR product_id = %d ) AND ( 0 = %d OR package_id = %d ) AND ( 0 = %d OR source = %s ) AND ( 0 = %d OR source_id = %d ) AND ( 0 = %d OR FIND_IN_SET( source_id, %s ) > 0 ) AND ( 0 = %d OR status = %d ) AND ( 0 = %d OR license_key = %s ) AND ( 0 = %d OR end_date = %s ) AND ( 0 = %d OR is_lifetime = %d ) AND ( 0 = %d OR domain_limit = %d ) AND ( 0 = %d OR dated = %s ) ORDER BY {$order_by_sql}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$has_product_id,
+					absint( $args['product_id'] ),
+					$has_package_id,
+					absint( $args['package_id'] ),
+					$has_source,
+					sanitize_text_field( (string) $args['source'] ),
+					$has_source_id,
+					$is_source_id_array ? 0 : absint( $args['source_id'] ),
+					$has_source_list,
+					$source_ids_csv,
+					$has_status,
+					intval( $args['status'] ),
+					$has_license_key,
+					sanitize_text_field( (string) $args['license_key'] ),
+					$has_end_date,
+					$end_date_val,
+					$has_is_lifetime,
+					intval( $args['is_lifetime'] ),
+					$has_domain_limit,
+					intval( $args['domain_limit'] ),
+					$has_dated,
+					$dated_val
+				)
+			);
 		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$licenses = $wpdb->get_results( "SELECT * FROM {$wpdb->licenser_licenses} WHERE {$where} ORDER BY {$orderby} {$order}{$limit_sql}" );
 
 		if ( empty( $licenses ) ) {
 			return false;
@@ -199,77 +283,74 @@ class License {
 	public function count( $args = [] ) {
 		global $wpdb;
 
-		$where = $this->build_where_clause( $args );
-		if ( false === $where ) {
-			return 0;
-		}
+		$args = wp_parse_args(
+			$args,
+			[
+				'product_id'   => '',
+				'package_id'   => '',
+				'source'       => '',
+				'source_id'    => '',
+				'status'       => '',
+				'license_key'  => '',
+				'end_date'     => '',
+				'is_lifetime'  => '',
+				'domain_limit' => '',
+				'dated'        => '',
+			]
+		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->licenser_licenses} WHERE {$where}" );
-	}
-
-	/**
-	 * Build a prepared SQL WHERE fragment for license queries.
-	 *
-	 * @param array $args Filter arguments.
-	 * @return string|false SQL fragment or false if filter matches nothing.
-	 */
-	protected function build_where_clause( $args = [] ) {
-		global $wpdb;
-
-		$where = '1=1';
-
-		if ( ! empty( $args['product_id'] ) ) {
-			$where .= $wpdb->prepare( ' AND product_id = %d', absint( $args['product_id'] ) );
-		}
-
-		if ( ! empty( $args['package_id'] ) ) {
-			$where .= $wpdb->prepare( ' AND package_id = %d', absint( $args['package_id'] ) );
-		}
-
-		if ( ! empty( $args['source'] ) ) {
-			$where .= $wpdb->prepare( ' AND source = %s', sanitize_text_field( $args['source'] ) );
-		}
-
-		if ( ! empty( $args['source_id'] ) ) {
-			if ( is_array( $args['source_id'] ) ) {
-				$source_ids = array_values( array_filter( array_map( 'absint', $args['source_id'] ) ) );
-				if ( empty( $source_ids ) ) {
-					return false;
-				}
-				$placeholders = implode( ', ', array_fill( 0, count( $source_ids ), '%d' ) );
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-				$where .= $wpdb->prepare( " AND source_id IN ({$placeholders})", $source_ids );
-			} else {
-				$where .= $wpdb->prepare( ' AND source_id = %d', absint( $args['source_id'] ) );
+		$is_source_id_array = ! empty( $args['source_id'] ) && is_array( $args['source_id'] );
+		$source_ids_csv     = '';
+		if ( $is_source_id_array ) {
+			$source_ids = array_values( array_filter( wp_parse_id_list( $args['source_id'] ) ) );
+			if ( empty( $source_ids ) ) {
+				return 0;
 			}
+			$source_ids_csv = implode( ',', $source_ids );
 		}
 
-		if ( isset( $args['status'] ) && '' !== $args['status'] ) {
-			$where .= $wpdb->prepare( ' AND status = %d', intval( $args['status'] ) );
-		}
+		$has_product_id   = ! empty( $args['product_id'] ) ? 1 : 0;
+		$has_package_id   = ! empty( $args['package_id'] ) ? 1 : 0;
+		$has_source       = ! empty( $args['source'] ) ? 1 : 0;
+		$has_source_id    = ( ! $is_source_id_array && ! empty( $args['source_id'] ) ) ? 1 : 0;
+		$has_source_list  = $is_source_id_array ? 1 : 0;
+		$has_status       = ( isset( $args['status'] ) && '' !== $args['status'] ) ? 1 : 0;
+		$has_license_key  = ! empty( $args['license_key'] ) ? 1 : 0;
+		$has_end_date     = ! empty( $args['end_date'] ) ? 1 : 0;
+		$end_date_val     = $has_end_date ? sanitize_text_field( (string) $args['end_date'] ) : '1970-01-01 00:00:00';
+		$has_is_lifetime  = ( isset( $args['is_lifetime'] ) && '' !== $args['is_lifetime'] ) ? 1 : 0;
+		$has_domain_limit = ( isset( $args['domain_limit'] ) && '' !== $args['domain_limit'] ) ? 1 : 0;
+		$has_dated        = ! empty( $args['dated'] ) ? 1 : 0;
+		$dated_val        = $has_dated ? sanitize_text_field( (string) $args['dated'] ) : '1970-01-01 00:00:00';
 
-		if ( ! empty( $args['license_key'] ) ) {
-			$where .= $wpdb->prepare( ' AND license_key = %s', sanitize_text_field( $args['license_key'] ) );
-		}
-
-		if ( ! empty( $args['end_date'] ) ) {
-			$where .= $wpdb->prepare( ' AND end_date = %s', sanitize_text_field( $args['end_date'] ) );
-		}
-
-		if ( isset( $args['is_lifetime'] ) && '' !== $args['is_lifetime'] ) {
-			$where .= $wpdb->prepare( ' AND is_lifetime = %d', intval( $args['is_lifetime'] ) );
-		}
-
-		if ( isset( $args['domain_limit'] ) && '' !== $args['domain_limit'] ) {
-			$where .= $wpdb->prepare( ' AND domain_limit = %d', intval( $args['domain_limit'] ) );
-		}
-
-		if ( ! empty( $args['dated'] ) ) {
-			$where .= $wpdb->prepare( ' AND dated = %s', sanitize_text_field( $args['dated'] ) );
-		}
-
-		return $where;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->licenser_licenses} WHERE ( 0 = %d OR product_id = %d ) AND ( 0 = %d OR package_id = %d ) AND ( 0 = %d OR source = %s ) AND ( 0 = %d OR source_id = %d ) AND ( 0 = %d OR FIND_IN_SET( source_id, %s ) > 0 ) AND ( 0 = %d OR status = %d ) AND ( 0 = %d OR license_key = %s ) AND ( 0 = %d OR end_date = %s ) AND ( 0 = %d OR is_lifetime = %d ) AND ( 0 = %d OR domain_limit = %d ) AND ( 0 = %d OR dated = %s )",
+				$has_product_id,
+				absint( $args['product_id'] ),
+				$has_package_id,
+				absint( $args['package_id'] ),
+				$has_source,
+				sanitize_text_field( (string) $args['source'] ),
+				$has_source_id,
+				$is_source_id_array ? 0 : absint( $args['source_id'] ),
+				$has_source_list,
+				$source_ids_csv,
+				$has_status,
+				intval( $args['status'] ),
+				$has_license_key,
+				sanitize_text_field( (string) $args['license_key'] ),
+				$has_end_date,
+				$end_date_val,
+				$has_is_lifetime,
+				intval( $args['is_lifetime'] ),
+				$has_domain_limit,
+				intval( $args['domain_limit'] ),
+				$has_dated,
+				$dated_val
+			)
+		);
 	}
 
 	/**
@@ -450,34 +531,56 @@ class License {
 
 		global $wpdb;
 
-		$columns = $this->sanitize_columns( $args['columns'], self::ALLOWED_DOMAIN_COLUMNS );
-		$where   = '1=1';
-
-		if ( ! empty( $args['license_id'] ) ) {
-			$where .= $wpdb->prepare( ' AND license_id = %d', absint( $args['license_id'] ) );
-		} elseif ( $args['license_id_check'] ) {
+		if ( empty( $args['license_id'] ) && $args['license_id_check'] ) {
 			return $args['count_total'] ? 0 : false;
 		}
 
-		if ( '' !== $args['status'] && null !== $args['status'] ) {
-			$where .= $wpdb->prepare( ' AND status = %d', intval( $args['status'] ) );
-		}
+		$columns        = esc_sql( $this->sanitize_columns( $args['columns'], self::ALLOWED_DOMAIN_COLUMNS ) );
+		$has_license_id = ! empty( $args['license_id'] ) ? 1 : 0;
+		$has_status     = ( '' !== $args['status'] && null !== $args['status'] ) ? 1 : 0;
 
 		if ( $args['count_total'] ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-			return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->licenser_license_domains} WHERE {$where}" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			return (int) $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COUNT(*) FROM {$wpdb->licenser_license_domains} WHERE ( 0 = %d OR license_id = %d ) AND ( 0 = %d OR status = %d )",
+					$has_license_id,
+					absint( $args['license_id'] ),
+					$has_status,
+					intval( $args['status'] )
+				)
+			);
 		}
 
-		$orderby = in_array( $args['orderby'], self::ALLOWED_DOMAIN_COLUMNS, true ) ? $args['orderby'] : 'id';
-		$order   = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+		$orderby      = in_array( $args['orderby'], self::ALLOWED_DOMAIN_COLUMNS, true ) ? $args['orderby'] : 'id';
+		$order        = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
+		$order_by_sql = sanitize_sql_orderby( "{$orderby} {$order}" );
 
-		$limit_sql = '';
 		if ( -1 !== (int) $args['number'] ) {
-			$limit_sql = $wpdb->prepare( ' LIMIT %d, %d', absint( $args['offset'] ), absint( $args['number'] ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			return $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT {$columns} FROM {$wpdb->licenser_license_domains} WHERE ( 0 = %d OR license_id = %d ) AND ( 0 = %d OR status = %d ) ORDER BY {$order_by_sql} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					$has_license_id,
+					absint( $args['license_id'] ),
+					$has_status,
+					intval( $args['status'] ),
+					absint( $args['offset'] ),
+					absint( $args['number'] )
+				)
+			);
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return $wpdb->get_results( "SELECT {$columns} FROM {$wpdb->licenser_license_domains} WHERE {$where} ORDER BY {$orderby} {$order}{$limit_sql}" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT {$columns} FROM {$wpdb->licenser_license_domains} WHERE ( 0 = %d OR license_id = %d ) AND ( 0 = %d OR status = %d ) ORDER BY {$order_by_sql}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$has_license_id,
+				absint( $args['license_id'] ),
+				$has_status,
+				intval( $args['status'] )
+			)
+		);
 	}
 
 	/**
@@ -545,14 +648,24 @@ class License {
 			return null;
 		}
 
-		$where = $wpdb->prepare( 'domain = %s', $clean_domain );
-
 		if ( ! empty( $license_id ) ) {
-			$where .= $wpdb->prepare( ' AND license_id = %d', absint( $license_id ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			return $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT * FROM {$wpdb->licenser_license_domains} WHERE domain = %s AND license_id = %d LIMIT 1",
+					$clean_domain,
+					absint( $license_id )
+				)
+			);
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		return $wpdb->get_row( "SELECT * FROM {$wpdb->licenser_license_domains} WHERE {$where} LIMIT 1" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->licenser_license_domains} WHERE domain = %s LIMIT 1",
+				$clean_domain
+			)
+		);
 	}
 
 	/**

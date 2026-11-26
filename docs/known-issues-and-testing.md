@@ -6,7 +6,12 @@
 
 ## 1. Resolved in Phase 1–2 Stabilization & WP.org Prep (2026-11-26)
 
-- **Tooling & Coding Standards:** Installed PHPCS `3.13.6` + WPCS `3.4.1` globally in `$HOME/.config/composer`, added [`.phpcs.xml.dist`](../.phpcs.xml.dist), and brought `licenser/` from **6,716 errors / 853 warnings** down to **0 errors / 0 warnings** across all 35 PHP files.
+- **Tooling & Coding Standards:** Installed PHPCS `3.13.6` + WPCS `3.4.1` globally in `$HOME/.config/composer`, added [`phpcs.xml`](../phpcs.xml) (renamed from `.phpcs.xml.dist` so WordPress Plugin Check reports 0 hidden/application errors on local checkouts), and brought `licenser/` from **6,716 errors / 853 warnings** down to **0 errors / 0 warnings** across all 36 first-party PHP files.
+- **WordPress.org Plugin Check (PCP) & Auto-Deploy Readiness:**
+  - Resolved all Plugin Check warnings across templates (prefixed all template variables with `$licenser_` for `PrefixAllGlobals`) and DB models/list tables (`$wpdb->licenser_*`, `sanitize_sql_orderby()`, pure prepared `FIND_IN_SET` / static `WHERE` clauses with MySQL 8 strict-mode `DATETIME` defaults).
+  - Kept `composer.json` included in release packages alongside `vendor/autoload.php` per `File_Type_Check::look_for_composer_files`.
+  - Added WordPress.org branding & listing assets under `.wordpress/` (`icon.svg`, `icon-256x256.png`, `icon-128x128.png`, `banner-1544x500.png`, `banner-772x250.png`, and 6 PII-free `screenshot-1.png`–`screenshot-6.png`) and synced `== Screenshots ==` in [`readme.txt`](../readme.txt).
+  - Added GridMaster-style deterministic WP.org GitHub Actions auto-deploy workflow ([`.github/workflows/wporg.yml`](../.github/workflows/wporg.yml), [`scripts/release.py`](../scripts/release.py), [`scripts/lint_package.py`](../scripts/lint_package.py), [`scripts/smoke_test.py`](../scripts/smoke_test.py), [`tests/smoke.php`](../tests/smoke.php), [`tests/test_release.py`](../tests/test_release.py)).
 - **WordPress.org Plugin Repository Readiness:**
   - Added `if ( ! defined( 'ABSPATH' ) ) { exit; }` direct-access guards to every first-party PHP file.
   - Eliminated all inline `<script>` and `<style>` tags across PHP templates by consolidating admin JS into [`assets/js/admin.js`](../assets/js/admin.js), moving SDK Generator CSS into [`assets/css/admin.css`](../assets/css/admin.css), and replacing `<script type="text/html">` with HTML5 `<template>` tags.
@@ -52,16 +57,28 @@ find . -type f -name '*.js' -not -path './.git/*' -not -path './vendor/*' -exec 
 
 # 3. WordPress Coding Standards (WPCS 3.4.1 / PHPCS 3.13.6)
 "$HOME/.config/composer/vendor/bin/phpcs" --report=full --report=summary
+
+# 4. Release pipeline boundary unit tests (disposable Git + SVN)
+python3 -B -m unittest discover -s tests -p 'test_release.py' -v
+
+# 5. WordPress Plugin Check (PCP) via LocalWP MySQL socket
+php -d mysqli.default_socket="/Users/akshuvo/Library/Application Support/Local/run/vq5NUpMTM/mysql/mysqld.sock" \
+  "$(which wp)" --path="/Users/akshuvo/Local Sites/addonmaster-portal/app/public" \
+  --url="http://portal-addonmaster.local" plugin check licenser --include-experimental
 ```
 
 ---
 
 ## 4. Verification Record (2026-11-26)
 
-### Static & WP.org Compliance Checks
-- `php -l` across all 35 first-party PHP files: **PASS** (0 errors).
+### Static, Plugin Check & WP.org Release Packaging Checks
+- `php -l` across all 36 first-party PHP files (including `tests/smoke.php`): **PASS** (0 errors).
 - `node --check` across all first-party JS files: **PASS** (0 errors).
-- `phpcs` with `.phpcs.xml.dist`: **PASS** (`0` errors, `0` warnings).
+- `phpcs` with [`phpcs.xml`](../phpcs.xml): **PASS** (`0` errors, `0` warnings).
+- **WordPress Plugin Check (`tools.php?page=plugin-check&plugin=licenser%2Flicenser.php`):**
+  - Live WP Admin UI & CLI on local checkout: **0 errors**, **0 PHP/JS/CSS/readme warnings** (only the 4 repo-only files `.gitignore`, `.distignore`, `.github`, `AGENTS.md`, which are excluded from production builds).
+  - Built production release package (`scripts/release.py build` -> `licenser.zip`): **0 errors, 0 warnings** on Plugin Check (`--include-experimental`), 0 dev/asset leaks, `composer.json` + `vendor/autoload.php` verified intact.
+- `tests/test_release.py` (15 disposable Git/SVN boundary tests including `.wordpress/` listing asset staging, MIME types, initial launch null-baseline support, immutable tags, and reproducible ZIP hashes): **15/15 PASS**.
 - WP.org static checks: **0** PHP files missing `ABSPATH` guard, **0** inline `<script>`/`<style>` tags in PHP templates, **0** `console.log()` in JS, **0** `.DS_Store` files, **0** diffs in `vendor/`.
 
 ### Browser QA on `http://portal-addonmaster.local/` (Post-Migration)

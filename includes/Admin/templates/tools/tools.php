@@ -11,8 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$product_model = Product::instance();
-$products      = $product_model->get_all(
+$licenser_product_model = Product::instance();
+$licenser_products      = $licenser_product_model->get_all(
 	[
 		'status'       => 'active',
 		'number'       => -1,
@@ -20,7 +20,7 @@ $products      = $product_model->get_all(
 		'columns'      => 'name, product_type, uuid',
 	]
 );
-$products      = is_array( $products ) ? $products : [];
+$licenser_products      = is_array( $licenser_products ) ? $licenser_products : [];
 ?>
 <div class="wrap">
 	<div class="licenser-root">
@@ -38,8 +38,8 @@ $products      = is_array( $products ) ? $products : [];
 							<label for="product_type"><?php esc_html_e( 'Product Type', 'licenser' ); ?></label>
 							<select name="product_type" class="product_type" id="product_type" required>
 								<option value=""><?php esc_html_e( 'Select Product Type', 'licenser' ); ?></option>
-								<?php foreach ( $product_model->get_types() as $key => $value ) : ?>
-									<option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $value ); ?></option>
+								<?php foreach ( $licenser_product_model->get_types() as $licenser_type_key => $licenser_type_label ) : ?>
+									<option value="<?php echo esc_attr( $licenser_type_key ); ?>"><?php echo esc_html( $licenser_type_label ); ?></option>
 								<?php endforeach; ?>
 							</select>
 						</div>
@@ -48,8 +48,8 @@ $products      = is_array( $products ) ? $products : [];
 							<label for="select_product"><?php esc_html_e( 'Select Product', 'licenser' ); ?></label>
 							<select id="select_product" name="select_product" class="select_product products_list" required>
 								<option value="" class="blank"><?php esc_html_e( 'Select Product', 'licenser' ); ?></option>
-								<?php foreach ( $products as $product ) : ?>
-									<option value="<?php echo esc_attr( $product->uuid ); ?>" class="<?php echo esc_attr( $product->product_type . '-opt' ); ?>"><?php echo esc_html( $product->name ); ?></option>
+								<?php foreach ( $licenser_products as $licenser_product ) : ?>
+									<option value="<?php echo esc_attr( $licenser_product->uuid ); ?>" class="<?php echo esc_attr( $licenser_product->product_type . '-opt' ); ?>"><?php echo esc_html( $licenser_product->name ); ?></option>
 								<?php endforeach; ?>
 							</select>
 						</div>

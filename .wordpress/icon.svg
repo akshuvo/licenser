@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <style>
+    @keyframes sparkPulse {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      50%      { transform: scale(1.1) rotate(12deg); opacity: 0.94; }
+    }
+    .spark {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: sparkPulse 3.6s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .spark { animation: none; }
+    }
+  </style>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="256" y2="256" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="55%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="128" y1="0" x2="128" y2="148" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="158" y1="40" x2="216" y2="98" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+    <filter id="sh" x="-18%" y="-18%" width="136%" height="146%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#0B1023" flood-opacity="0.28"/>
+    </filter>
+    <mask id="shield-key-mask">
+      <rect width="256" height="256" fill="#000000"/>
+      <path d="M128 42 C131 42 134 43 137 44.5 L188 64 C194 66.3 198 72 198 78.5 V125 C198 167 170 198 133.5 212.5 C130 213.9 126 213.9 122.5 212.5 C86 198 58 167 58 125 V78.5 C58 72 62 66.3 68 64 L119 44.5 C122 43 125 42 128 42 Z" fill="#FFFFFF"/>
+      <!-- Punch out negative-space spark halo -->
+      <path d="M188 33 C191.5 57.5 196.5 62.5 221 66 C196.5 69.5 191.5 74.5 188 99 C184.5 74.5 179.5 69.5 155 66 C179.5 62.5 184.5 57.5 188 33 Z" fill="#000000" stroke="#000000" stroke-width="10" stroke-linejoin="round"/>
+      <!-- Punch out license key -->
+      <circle cx="128" cy="107" r="27" fill="#000000"/>
+      <rect x="118.5" y="128" width="19" height="54" rx="5" fill="#000000"/>
+      <rect x="134" y="147" width="14" height="10" rx="3" fill="#000000"/>
+      <rect x="134" y="164" width="20" height="10" rx="3" fill="#000000"/>
+      <!-- Restore inner key bow ring -->
+      <circle cx="128" cy="107" r="12" fill="#FFFFFF"/>
+    </mask>
+  </defs>
+  <rect width="256" height="256" rx="58" fill="url(#bg)"/>
+  <rect width="256" height="256" rx="58" fill="url(#sheen)"/>
+  <g filter="url(#sh)">
+    <rect width="256" height="256" fill="#FFFFFF" mask="url(#shield-key-mask)"/>
+    <path class="spark" d="M188 36 C190.8 57.8 195.2 62.2 217 65 C195.2 67.8 190.8 72.2 188 94 C185.2 72.2 180.8 67.8 159 65 C180.8 62.2 185.2 57.8 188 36 Z" fill="url(#gold)"/>
+  </g>
+</svg>
