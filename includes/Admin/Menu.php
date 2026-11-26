@@ -60,7 +60,7 @@ class Menu {
 		$themes_hook   = add_submenu_page( $parent_slug, __( 'Themes - Licenser', 'licenser' ), __( 'Themes', 'licenser' ), $capability, $parent_slug . '-themes', [ $this, 'themes_page' ] );
 		$licenses_hook = add_submenu_page( $parent_slug, __( 'Licenses - Licenser', 'licenser' ), __( 'Licenses', 'licenser' ), $capability, $parent_slug . '-licenses', [ $this, 'licenses_page' ] );
 		add_submenu_page( $parent_slug, __( 'Settings - Licenser', 'licenser' ), __( 'Settings', 'licenser' ), $capability, 'licenser-settings', [ $this, 'settings_page' ] );
-		add_submenu_page( $parent_slug, __( 'SDK Generator - Licenser', 'licenser' ), __( 'SDK Generator', 'licenser' ), $capability, 'licenser-sdk-generator', [ $this, 'sdk_generator_page' ] );
+		add_submenu_page( $parent_slug, __( 'SDK Studio - Licenser', 'licenser' ), __( 'SDK Studio', 'licenser' ), $capability, 'licenser-sdk-generator', [ $this, 'sdk_generator_page' ] );
 		add_submenu_page( $parent_slug, __( 'Addons - Licenser', 'licenser' ), __( 'Addons', 'licenser' ), $capability, 'licenser-addons', [ $this, 'addons_page' ] );
 
 		add_action( 'admin_head-' . $hook, [ $this, 'enqueue_assets' ] );
