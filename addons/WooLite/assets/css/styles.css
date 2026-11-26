@@ -1,0 +1,431 @@
+/**
+ * Licenser — Customer My Account License Portal Styles
+ *
+ * Lightweight, theme-friendly Cupertino-inspired responsive cards.
+ */
+
+/* Hide redundant default WC Dashboard intro paragraphs when on ?wc_tab=license_manager */
+body.licenser-account-tab-active .woocommerce-MyAccount-content > p {
+	display: none;
+}
+
+body.licenser-account-tab-active .woocommerce-MyAccount-navigation-link.is-active a {
+	font-weight: 600;
+	color: #0071e3;
+}
+
+.licenser-portal,
+.licenser-portal * {
+	box-sizing: border-box;
+}
+
+.licenser-portal {
+	font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+	color: #1d1d1f;
+	line-height: 1.5;
+}
+
+.licenser-portal__header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 18px;
+	flex-wrap: wrap;
+}
+
+.licenser-portal__title {
+	margin: 0 0 4px;
+	font-size: 22px;
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: #1d1d1f;
+}
+
+.licenser-portal__subtitle {
+	margin: 0;
+	font-size: 13.5px;
+	color: #6e6e73;
+}
+
+.licenser-portal__count {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 12px;
+	border-radius: 999px;
+	background: #f2f2f7;
+	color: #515154;
+	font-size: 12.5px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.licenser-portal__list {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.licenser-portal-card {
+	background: #ffffff;
+	border: 1px solid rgba(0, 0, 0, 0.09);
+	border-radius: 14px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 14px rgba(0, 0, 0, 0.02);
+	overflow: hidden;
+}
+
+.licenser-portal-card__top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 18px 20px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+	flex-wrap: wrap;
+}
+
+.licenser-portal-card__brand {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+}
+
+.licenser-portal-card__icon {
+	width: 42px;
+	height: 42px;
+	border-radius: 10px;
+	object-fit: cover;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	flex-shrink: 0;
+}
+
+.licenser-portal-card__icon--monogram {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(145deg, #ebf5ff, #eef2ff);
+	color: #0071e3;
+	font-weight: 700;
+	font-size: 16px;
+}
+
+.licenser-portal-card__name {
+	margin: 0 0 4px;
+	font-size: 16px;
+	font-weight: 600;
+	letter-spacing: -0.015em;
+	color: #1d1d1f;
+}
+
+.licenser-portal-card__tags {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.licenser-portal-pill {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: #f2f2f7;
+	color: #515154;
+	font-size: 11.5px;
+	font-weight: 500;
+}
+
+.licenser-portal-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 500;
+	background: #f2f2f7;
+	color: #52525b;
+	white-space: nowrap;
+}
+
+.licenser-portal-status__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #8e8e93;
+}
+
+.licenser-portal-status--active {
+	background: #e9f9ef;
+	color: #166534;
+}
+
+.licenser-portal-status--active .licenser-portal-status__dot {
+	background: #30d158;
+}
+
+.licenser-portal-status--expiring_soon {
+	background: #fff6e5;
+	color: #92400e;
+}
+
+.licenser-portal-status--expiring_soon .licenser-portal-status__dot {
+	background: #ff9f0a;
+}
+
+.licenser-portal-status--expired {
+	background: #fef2f2;
+	color: #b42318;
+}
+
+.licenser-portal-status--expired .licenser-portal-status__dot {
+	background: #ff3b30;
+}
+
+.licenser-portal-card__keybar {
+	padding: 14px 20px;
+	background: #fbfbfd;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.licenser-portal-card__keylabel {
+	font-size: 11.5px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #6e6e73;
+	margin-bottom: 6px;
+}
+
+.licenser-portal-card__keybox {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 8px 12px;
+	border-radius: 10px;
+	background: #ffffff;
+	border: 1px solid #d2d2d7;
+	flex-wrap: wrap;
+}
+
+.licenser-portal-card__key {
+	font-family: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-size: 13px;
+	color: #1d1d1f;
+	background: transparent;
+	padding: 0;
+	word-break: break-all;
+}
+
+.licenser-portal-card__meta {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+	padding: 14px 20px;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.licenser-portal-meta-item {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.licenser-portal-meta-item__label {
+	font-size: 11.5px;
+	color: #6e6e73;
+}
+
+.licenser-portal-meta-item__value {
+	font-size: 13.5px;
+	font-weight: 600;
+	color: #1d1d1f;
+	font-variant-numeric: tabular-nums;
+}
+
+.licenser-portal-card__actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 14px 20px;
+	flex-wrap: wrap;
+}
+
+.licenser-portal-note {
+	font-size: 12.5px;
+	color: #6e6e73;
+}
+
+.licenser-portal-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 8px 14px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.2;
+	text-decoration: none;
+	cursor: pointer;
+	border: 1px solid transparent;
+	transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.licenser-portal-btn--primary {
+	background: #0071e3;
+	color: #ffffff;
+}
+
+.licenser-portal-btn--primary:hover {
+	background: #005bb5;
+	color: #ffffff;
+}
+
+.licenser-portal-btn--secondary {
+	background: #ffffff;
+	color: #1d1d1f;
+	border-color: #d2d2d7;
+}
+
+.licenser-portal-btn--secondary:hover {
+	background: #f5f5f7;
+	color: #1d1d1f;
+}
+
+.licenser-portal-btn--ghost {
+	background: #f2f2f7;
+	color: #1d1d1f;
+	padding: 5px 10px;
+	font-size: 12px;
+}
+
+.licenser-portal-btn--ghost:hover {
+	background: #e5e5ea;
+}
+
+.licenser-portal-btn--ghost.is-copied {
+	background: #e9f9ef;
+	color: #166534;
+}
+
+.licenser-portal-btn--danger-ghost {
+	background: transparent;
+	color: #b42318;
+	border-color: #f3c4c4;
+	padding: 5px 10px;
+	font-size: 12px;
+}
+
+.licenser-portal-btn--danger-ghost:hover {
+	background: #fef2f2;
+}
+
+.licenser-portal-btn--danger {
+	background: #d92d20;
+	color: #ffffff;
+	padding: 5px 10px;
+	font-size: 12px;
+}
+
+.licenser-portal-btn--danger:hover {
+	background: #b42318;
+}
+
+/* Collapsible Sites Panel */
+.licenser-portal-sites {
+	padding: 14px 20px 18px;
+	background: #fbfbfd;
+	border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.licenser-portal-sites__notice {
+	padding: 9px 12px;
+	margin-bottom: 12px;
+	border-radius: 8px;
+	font-size: 12.5px;
+	background: #e9f9ef;
+	color: #166534;
+}
+
+.licenser-portal-sites__notice.is-error {
+	background: #fef2f2;
+	color: #b42318;
+}
+
+.licenser-portal-sites__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.licenser-portal-site-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 10px 12px;
+	border-radius: 10px;
+	background: #ffffff;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	flex-wrap: wrap;
+}
+
+.licenser-portal-site-row__info {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	min-width: 0;
+}
+
+.licenser-portal-site-row__domain {
+	font-size: 13px;
+	font-weight: 500;
+	word-break: break-all;
+}
+
+.licenser-portal-site-row__actions,
+.licenser-portal-confirm-inline {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.licenser-portal-sites__empty {
+	margin: 0;
+	font-size: 13px;
+	color: #6e6e73;
+}
+
+.licenser-portal-empty {
+	background: #ffffff;
+	border: 1px solid rgba(0, 0, 0, 0.09);
+	border-radius: 14px;
+	padding: 40px 24px;
+	text-align: center;
+}
+
+.licenser-portal-empty h3 {
+	margin: 0 0 8px;
+	font-size: 17px;
+	font-weight: 600;
+}
+
+.licenser-portal-empty p {
+	margin: 0 auto 18px;
+	max-width: 420px;
+	font-size: 13.5px;
+	color: #6e6e73;
+}
+
+@media (max-width: 640px) {
+	.licenser-portal-card__meta {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}

@@ -6,6 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Licenser\Models\License;
+use Licenser\Models\Product;
+
 /**
  * The Menu handler class.
  */
@@ -35,7 +38,7 @@ class Menu {
 		$capability  = 'manage_options';
 
 		$pro_tag = defined( 'LICENSER_PRO_VERSION' )
-			? '<span class="menu-counter" style="background: #e27731;">' . esc_html__( 'PRO', 'licenser' ) . '</span>'
+			? '<span class="update-plugins licenser-menu-badge"><span class="plugin-count">' . esc_html__( 'PRO', 'licenser' ) . '</span></span>'
 			: '';
 
 		/* translators: %s: Optional PRO badge HTML. */
@@ -53,14 +56,124 @@ class Menu {
 		$this->admin_menus = $hook;
 
 		add_submenu_page( $parent_slug, __( 'Dashboard - Licenser', 'licenser' ), __( 'Dashboard', 'licenser' ), $capability, $parent_slug, [ $this, 'dashboard_page' ] );
-		add_submenu_page( $parent_slug, __( 'Plugins - Licenser', 'licenser' ), __( 'Plugins', 'licenser' ), $capability, $parent_slug . '-plugins', [ $this, 'plugins_page' ] );
-		add_submenu_page( $parent_slug, __( 'Themes - Licenser', 'licenser' ), __( 'Themes', 'licenser' ), $capability, $parent_slug . '-themes', [ $this, 'themes_page' ] );
-		add_submenu_page( $parent_slug, __( 'Licenses - Licenser', 'licenser' ), __( 'Licenses', 'licenser' ), $capability, $parent_slug . '-licenses', [ $this, 'licenses_page' ] );
+		$plugins_hook  = add_submenu_page( $parent_slug, __( 'Plugins - Licenser', 'licenser' ), __( 'Plugins', 'licenser' ), $capability, $parent_slug . '-plugins', [ $this, 'plugins_page' ] );
+		$themes_hook   = add_submenu_page( $parent_slug, __( 'Themes - Licenser', 'licenser' ), __( 'Themes', 'licenser' ), $capability, $parent_slug . '-themes', [ $this, 'themes_page' ] );
+		$licenses_hook = add_submenu_page( $parent_slug, __( 'Licenses - Licenser', 'licenser' ), __( 'Licenses', 'licenser' ), $capability, $parent_slug . '-licenses', [ $this, 'licenses_page' ] );
 		add_submenu_page( $parent_slug, __( 'Settings - Licenser', 'licenser' ), __( 'Settings', 'licenser' ), $capability, 'licenser-settings', [ $this, 'settings_page' ] );
 		add_submenu_page( $parent_slug, __( 'SDK Generator - Licenser', 'licenser' ), __( 'SDK Generator', 'licenser' ), $capability, 'licenser-sdk-generator', [ $this, 'sdk_generator_page' ] );
 		add_submenu_page( $parent_slug, __( 'Addons - Licenser', 'licenser' ), __( 'Addons', 'licenser' ), $capability, 'licenser-addons', [ $this, 'addons_page' ] );
 
 		add_action( 'admin_head-' . $hook, [ $this, 'enqueue_assets' ] );
+
+		if ( $plugins_hook ) {
+			add_action( 'load-' . $plugins_hook, [ $this, 'handle_products_bulk_actions' ] );
+		}
+		if ( $themes_hook ) {
+			add_action( 'load-' . $themes_hook, [ $this, 'handle_products_bulk_actions' ] );
+		}
+		if ( $licenses_hook ) {
+			add_action( 'load-' . $licenses_hook, [ $this, 'handle_licenses_bulk_actions' ] );
+		}
+	}
+
+	/**
+	 * Handle nonce-verified bulk actions for Products list screens prior to output.
+	 *
+	 * @return void
+	 */
+	public function handle_products_bulk_actions() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$action  = isset( $_POST['action'] ) && '-1' !== $_POST['action'] ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '';
+		$action2 = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : '';
+		$bulk    = '' !== $action ? $action : $action2;
+
+		if ( ! in_array( $bulk, [ 'bulk_delete', 'bulk_archive', 'bulk_activate' ], true ) ) {
+			return;
+		}
+
+		check_admin_referer( 'bulk-products' );
+
+		$ids   = isset( $_POST['product_id'] ) ? array_values( array_filter( wp_parse_id_list( wp_unslash( $_POST['product_id'] ) ) ) ) : [];
+		$count = 0;
+		$model = Product::instance();
+
+		foreach ( $ids as $id ) {
+			if ( 'bulk_delete' === $bulk ) {
+				if ( $model->delete( $id ) ) {
+					++$count;
+				}
+			} elseif ( 'bulk_archive' === $bulk ) {
+				if ( $model->update_status( $id, 'draft' ) ) {
+					++$count;
+				}
+			} elseif ( 'bulk_activate' === $bulk ) {
+				if ( $model->update_status( $id, 'active' ) ) {
+					++$count;
+				}
+			}
+		}
+
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'licenser-plugins';
+
+		wp_safe_redirect(
+			add_query_arg(
+				[
+					'page'          => $page,
+					'licenser_msg'  => $bulk,
+					'licenser_done' => $count,
+				],
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Handle nonce-verified bulk actions for Licenses list screen prior to output.
+	 *
+	 * @return void
+	 */
+	public function handle_licenses_bulk_actions() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$action  = isset( $_POST['action'] ) && '-1' !== $_POST['action'] ? sanitize_key( wp_unslash( $_POST['action'] ) ) : '';
+		$action2 = isset( $_POST['action2'] ) && '-1' !== $_POST['action2'] ? sanitize_key( wp_unslash( $_POST['action2'] ) ) : '';
+		$bulk    = '' !== $action ? $action : $action2;
+
+		if ( ! in_array( $bulk, [ 'bulk_activate', 'bulk_deactivate', 'bulk_delete' ], true ) ) {
+			return;
+		}
+
+		check_admin_referer( 'bulk-licenses' );
+
+		$ids   = isset( $_POST['license_id'] ) ? array_values( array_filter( wp_parse_id_list( wp_unslash( $_POST['license_id'] ) ) ) ) : [];
+		$model = License::instance();
+		$count = 0;
+
+		if ( 'bulk_activate' === $bulk ) {
+			$count = $model->bulk_update_status( $ids, 1 );
+		} elseif ( 'bulk_deactivate' === $bulk ) {
+			$count = $model->bulk_update_status( $ids, 0 );
+		} elseif ( 'bulk_delete' === $bulk ) {
+			$count = $model->bulk_delete( $ids );
+		}
+
+		wp_safe_redirect(
+			add_query_arg(
+				[
+					'page'          => 'licenser-licenses',
+					'licenser_msg'  => $bulk,
+					'licenser_done' => $count,
+				],
+				admin_url( 'admin.php' )
+			)
+		);
+		exit;
 	}
 
 	/**

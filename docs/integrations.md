@@ -22,19 +22,28 @@ Handled by [`includes/Api/Public_Apis.php`](../includes/Api/Public_Apis.php) (`p
 |---|---|---|
 | `GET /licenser/v1/products` | `Api/Products.php` | Lists Licenser products (`per_page`, `page`, `product_type`, `status`, `inc_packages`) |
 | `POST /licenser/v1/products` | `Api/Products.php` | Creates/updates Licenser product, optional release, and packages; returns fresh product object |
-| `DELETE /licenser/v1/products/{id}` | `Api/Products.php` | Deletes product row and clears product transient caches |
-| `GET /licenser/v1/products/packages?product_id={id}` | `Api/Products.php` | Lists all packages for a product (used by License form & `Wc_Lite` product editor) |
+| `POST /licenser/v1/products/{id}/status` | `Api/Products.php` | Updates product status (`active` \| `draft` \| `trash`) for safe archiving/restoration |
+| `DELETE /licenser/v1/products/{id}` | `Api/Products.php` | Deletes product row (optional `cascade=true` removes linked releases & packages) and clears product transient caches |
+| `POST /licenser/v1/products/releases` | `Api/Products.php` | Creates or updates a single product release independently and returns refreshed release history |
+| `DELETE /licenser/v1/products/releases/{id}` | `Api/Products.php` | Deletes a single product release by integer `id` and clears parent product cache |
+| `GET /licenser/v1/products/packages?product_id={id}` | `Api/Products.php` | Lists all packages for a product (used by License form & `WooLite` product editor) |
 | `POST /licenser/v1/products/packages` | `Api/Products.php` | Creates/updates a package and returns the saved package object |
 | `DELETE /licenser/v1/products/packages/{id}` | `Api/Products.php` | Deletes a package by integer `id` and clears parent product cache |
 | `GET /licenser/v1/licenses` | `Api/Licenses.php` | Lists Licenser licenses (`per_page`, `page`, `product_id`, `source`, `inc_domains`) |
 | `GET /licenser/v1/licenses/{id}` | `Api/Licenses.php` | Returns a single license record (`404` if not found) |
 | `POST /licenser/v1/licenses` | `Api/Licenses.php` | Creates/updates a license; returns `License::get($id)` |
+| `POST /licenser/v1/licenses/bulk` | `Api/Licenses.php` | Bulk-generates 1–100 license keys sharing product/package/limit/expiry/source settings |
 | `POST /licenser/v1/licenses/generate-key` | `Api/Licenses.php` | Generates and returns a formatted license key string |
 | `DELETE /licenser/v1/licenses/{id}` | `Api/Licenses.php` | Deletes license row and cascades its domains & metadata |
+| `POST /licenser/v1/licenses/{id}/domains` | `Api/Licenses.php` | Manually normalizes and adds an activated domain row to a license |
+| `POST /licenser/v1/licenses/domains/{id}` | `Api/Licenses.php` | Toggles an activated domain row `status` (`0` \| `1`) |
 | `DELETE /licenser/v1/licenses/domains/{id}` | `Api/Licenses.php` | Deletes an activated domain row by integer `id` |
+| `POST /licenser/v1/licenses/{id}/meta` | `Api/Licenses.php` | Adds or updates a custom key/value metadata entry for a license |
 | `DELETE /licenser/v1/licenses/meta/{id}` | `Api/Licenses.php` | Deletes a license meta row by integer `id` |
-| `GET /licenser/v1/settings` | `Api/Settings.php` | Returns saved Licenser settings array |
+| `GET /licenser/v1/settings` | `Api/Settings.php` | Returns saved Licenser settings array merged with defaults |
 | `POST /licenser/v1/settings` | `Api/Settings.php` | Sanitizes & saves settings to `licenser_settings` option; returns saved array |
+| `POST /licenser/v1/settings/clear-cache` | `Api/Settings.php` | Clears all `licenser_cache_*` transients |
+| `POST /licenser/v1/settings/integrations` | `Api/Settings.php` | Toggles a registered store integration (`integration`, `enabled`) in `licenser_settings['integrations']` |
 
 ---
 
@@ -86,7 +95,7 @@ Customer Checkout (WooCommerce)
                           └─▶ Ppgw_Gateway::on_paddle_payment_webhook_response()
                                 └─▶ Verifies RSA-SHA1 p_signature -> $order->payment_complete()
                                       └─▶ Order status -> processing / completed
-                                            └─▶ Licenser Wc_Lite (woocommerce_order_status_changed, prio 150)
+                                            └─▶ Licenser WooLite (woocommerce_order_status_changed, prio 150)
                                                   └─▶ Order_Handler::generate_license($order_id)
                                                         ├─▶ Creates row in licenser_licenses (source='wc', source_id=$order_id)
                                                         ├─▶ Saves HPOS-safe order meta (license_generated_item_id/key_{item_id}, is_license_order)
@@ -110,7 +119,8 @@ Portal child theme glue (`/Users/akshuvo/Local Sites/addonmaster-portal/app/publ
 | `licenser_refresh_license_public_response` | `includes/controllers/License.php` | Modify public `check`/`activate` JSON payload (`$response, $license`) |
 | `licenser_should_enforce_domain_limit` | `includes/controllers/License.php` | Override domain limit enforcement (`$enforce, $license, $args`) — e.g., Pro local-domain exemption |
 | `licenser_sanitize_settings` | `includes/models/Settings.php` | Extend settings allowlist/sanitization (`$sanitized, $data`) |
-| `licenser_wclite_products_page_url` | `addons/Wc_Lite/Shortcode.php` | Filter "Browse products" button URL in empty My Account table |
+| `licenser_integrations` | `includes/controllers/Addons.php` | Register or customize toggleable store integrations (`$integrations`, e.g., WooCommerce, Easy Digital Downloads) |
+| `licenser_wclite_products_page_url` | `addons/WooLite/Shortcode.php` | Filter "Browse products" button URL in empty My Account table |
 
 ### Actions in Licenser (Free)
 | Hook | Location | Arguments |

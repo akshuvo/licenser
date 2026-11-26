@@ -47,8 +47,7 @@ function licenser_get_option( $name = null ) {
 		return '';
 	}
 
-	$settings = get_option( 'licenser_settings', [] );
-	return is_array( $settings ) && isset( $settings[ $name ] ) ? $settings[ $name ] : '';
+	return \Licenser\Models\Settings::instance()->get( (string) $name );
 }
 
 /**

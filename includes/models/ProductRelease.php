@@ -223,4 +223,34 @@ class ProductRelease {
 
 		return $insert_id;
 	}
+
+	/**
+	 * Delete a single release by ID and invalidate its parent product cache.
+	 *
+	 * @param int $id Release ID.
+	 * @return bool
+	 */
+	public function delete( $id ) {
+		global $wpdb;
+
+		$id      = absint( $id );
+		$release = $this->get( $id );
+
+		if ( ! $release ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->delete(
+			$wpdb->licenser_product_releases,
+			[ 'id' => $id ],
+			[ '%d' ]
+		);
+
+		if ( ! empty( $release->product_id ) ) {
+			Product::instance()->clear_cache( (int) $release->product_id );
+		}
+
+		return true;
+	}
 }

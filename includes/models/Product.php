@@ -216,6 +216,7 @@ class Product {
 			'name'         => '',
 			'slug'         => '',
 			'uuid'         => '',
+			'search'       => '',
 			'product_type' => '',
 			'status'       => 'active',
 			'inc_packages' => false,
@@ -227,8 +228,10 @@ class Product {
 		$has_name         = ! empty( $args['name'] ) ? 1 : 0;
 		$has_slug         = ! empty( $args['slug'] ) ? 1 : 0;
 		$has_uuid         = ! empty( $args['uuid'] ) ? 1 : 0;
+		$has_search       = ! empty( $args['search'] ) ? 1 : 0;
+		$search_like      = $has_search ? '%' . $wpdb->esc_like( sanitize_text_field( (string) $args['search'] ) ) . '%' : '';
 		$has_product_type = ! empty( $args['product_type'] ) ? 1 : 0;
-		$has_status       = ! empty( $args['status'] ) ? 1 : 0;
+		$has_status       = ( ! empty( $args['status'] ) && 'all' !== $args['status'] ) ? 1 : 0;
 
 		$orderby      = in_array( $args['orderby'], self::ALLOWED_COLUMNS, true ) ? $args['orderby'] : 'id';
 		$order        = 'ASC' === strtoupper( (string) $args['order'] ) ? 'ASC' : 'DESC';
@@ -239,13 +242,17 @@ class Product {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$items = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT {$columns} FROM {$wpdb->licenser_products} WHERE ( 0 = %d OR name = %s ) AND ( 0 = %d OR slug = %s ) AND ( 0 = %d OR uuid = %s ) AND ( 0 = %d OR product_type = %s ) AND ( 0 = %d OR status = %s ) ORDER BY {$order_by_sql} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT {$columns} FROM {$wpdb->licenser_products} WHERE ( 0 = %d OR name = %s ) AND ( 0 = %d OR slug = %s ) AND ( 0 = %d OR uuid = %s ) AND ( 0 = %d OR name LIKE %s OR slug LIKE %s OR uuid LIKE %s ) AND ( 0 = %d OR product_type = %s ) AND ( 0 = %d OR status = %s ) ORDER BY {$order_by_sql} LIMIT %d, %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$has_name,
 					(string) $args['name'],
 					$has_slug,
 					(string) $args['slug'],
 					$has_uuid,
 					(string) $args['uuid'],
+					$has_search,
+					$search_like,
+					$search_like,
+					$search_like,
 					$has_product_type,
 					(string) $args['product_type'],
 					$has_status,
@@ -258,13 +265,17 @@ class Product {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$items = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT {$columns} FROM {$wpdb->licenser_products} WHERE ( 0 = %d OR name = %s ) AND ( 0 = %d OR slug = %s ) AND ( 0 = %d OR uuid = %s ) AND ( 0 = %d OR product_type = %s ) AND ( 0 = %d OR status = %s ) ORDER BY {$order_by_sql}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+					"SELECT {$columns} FROM {$wpdb->licenser_products} WHERE ( 0 = %d OR name = %s ) AND ( 0 = %d OR slug = %s ) AND ( 0 = %d OR uuid = %s ) AND ( 0 = %d OR name LIKE %s OR slug LIKE %s OR uuid LIKE %s ) AND ( 0 = %d OR product_type = %s ) AND ( 0 = %d OR status = %s ) ORDER BY {$order_by_sql}", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$has_name,
 					(string) $args['name'],
 					$has_slug,
 					(string) $args['slug'],
 					$has_uuid,
 					(string) $args['uuid'],
+					$has_search,
+					$search_like,
+					$search_like,
+					$search_like,
 					$has_product_type,
 					(string) $args['product_type'],
 					$has_status,
@@ -305,22 +316,99 @@ class Product {
 			[
 				'product_type' => '',
 				'status'       => '',
+				'search'       => '',
 			]
 		);
 
 		$has_product_type = ! empty( $args['product_type'] ) ? 1 : 0;
-		$has_status       = ! empty( $args['status'] ) ? 1 : 0;
+		$has_status       = ( ! empty( $args['status'] ) && 'all' !== $args['status'] ) ? 1 : 0;
+		$has_search       = ! empty( $args['search'] ) ? 1 : 0;
+		$search_like      = $has_search ? '%' . $wpdb->esc_like( sanitize_text_field( (string) $args['search'] ) ) . '%' : '';
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		return (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM {$wpdb->licenser_products} WHERE ( 0 = %d OR product_type = %s ) AND ( 0 = %d OR status = %s )",
+				"SELECT COUNT(*) FROM {$wpdb->licenser_products} WHERE ( 0 = %d OR product_type = %s ) AND ( 0 = %d OR status = %s ) AND ( 0 = %d OR name LIKE %s OR slug LIKE %s OR uuid LIKE %s )",
 				$has_product_type,
 				(string) $args['product_type'],
 				$has_status,
-				(string) $args['status']
+				(string) $args['status'],
+				$has_search,
+				$search_like,
+				$search_like,
+				$search_like
 			)
 		);
+	}
+
+	/**
+	 * Fetch grouped dependency counts (releases, packages, licenses) for a batch of product IDs.
+	 *
+	 * @param int[] $product_ids List of product IDs.
+	 * @return array<int, array{releases: int, packages: int, licenses: int}>
+	 */
+	public function get_dependency_counts( $product_ids ) {
+		global $wpdb;
+
+		$ids = array_values( array_filter( wp_parse_id_list( $product_ids ) ) );
+		if ( empty( $ids ) ) {
+			return [];
+		}
+
+		$counts = [];
+		foreach ( $ids as $id ) {
+			$counts[ $id ] = [
+				'releases' => 0,
+				'packages' => 0,
+				'licenses' => 0,
+			];
+		}
+
+		$ids_csv = implode( ',', $ids );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$release_rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT product_id, COUNT(*) AS total FROM {$wpdb->licenser_product_releases} WHERE FIND_IN_SET( product_id, %s ) > 0 GROUP BY product_id",
+				$ids_csv
+			)
+		);
+		foreach ( (array) $release_rows as $row ) {
+			$pid = absint( $row->product_id );
+			if ( isset( $counts[ $pid ] ) ) {
+				$counts[ $pid ]['releases'] = absint( $row->total );
+			}
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$package_rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT product_id, COUNT(*) AS total FROM {$wpdb->licenser_license_packages} WHERE FIND_IN_SET( product_id, %s ) > 0 GROUP BY product_id",
+				$ids_csv
+			)
+		);
+		foreach ( (array) $package_rows as $row ) {
+			$pid = absint( $row->product_id );
+			if ( isset( $counts[ $pid ] ) ) {
+				$counts[ $pid ]['packages'] = absint( $row->total );
+			}
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$license_rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT product_id, COUNT(*) AS total FROM {$wpdb->licenser_licenses} WHERE FIND_IN_SET( product_id, %s ) > 0 GROUP BY product_id",
+				$ids_csv
+			)
+		);
+		foreach ( (array) $license_rows as $row ) {
+			$pid = absint( $row->product_id );
+			if ( isset( $counts[ $pid ] ) ) {
+				$counts[ $pid ]['licenses'] = absint( $row->total );
+			}
+		}
+
+		return $counts;
 	}
 
 	/**
@@ -511,16 +599,33 @@ class Product {
 	}
 
 	/**
-	 * Delete a product by ID.
+	 * Delete a product by ID, optionally cascading linked releases and packages.
 	 *
-	 * @param int $id Product ID.
+	 * @param int  $id      Product ID.
+	 * @param bool $cascade Whether to also delete linked releases and packages.
 	 * @return bool
 	 */
-	public function delete( $id ) {
+	public function delete( $id, $cascade = false ) {
 		global $wpdb;
 
 		$id = absint( $id );
 		$this->clear_cache( $id );
+
+		if ( $cascade ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete(
+				$wpdb->licenser_product_releases,
+				[ 'product_id' => $id ],
+				[ '%d' ]
+			);
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->delete(
+				$wpdb->licenser_license_packages,
+				[ 'product_id' => $id ],
+				[ '%d' ]
+			);
+		}
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->delete(

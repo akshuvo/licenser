@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Licenser\Controllers\RestController;
 use Licenser\Models\LicensePackage;
 use Licenser\Models\Product;
+use Licenser\Models\ProductRelease;
 use WP_Error;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -125,6 +126,82 @@ class Products extends RestController {
 			]
 		);
 
+		// Create or update a product release.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/releases',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'save_release' ],
+					'permission_callback' => [ $this, 'create_item_permissions_check' ],
+					'args'                => [
+						'product_id'    => [
+							'description' => __( 'Product ID.', 'licenser' ),
+							'type'        => 'integer',
+							'required'    => true,
+						],
+						'version'       => [
+							'description' => __( 'Release Version.', 'licenser' ),
+							'type'        => 'string',
+							'required'    => true,
+						],
+						'download_link' => [
+							'description' => __( 'Download URL.', 'licenser' ),
+							'type'        => 'string',
+							'required'    => true,
+						],
+					],
+				],
+			]
+		);
+
+		// Delete a single product release by ID.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/releases/(?P<id>[\d]+)',
+			[
+				[
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => [ $this, 'delete_release' ],
+					'permission_callback' => [ $this, 'delete_item_permissions_check' ],
+					'args'                => [
+						'id' => [
+							'description' => __( 'Release ID.', 'licenser' ),
+							'type'        => 'integer',
+							'required'    => true,
+						],
+					],
+				],
+			]
+		);
+
+		// Update single product status (active / draft / trash).
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)/status',
+			[
+				[
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => [ $this, 'update_status' ],
+					'permission_callback' => [ $this, 'create_item_permissions_check' ],
+					'args'                => [
+						'id'     => [
+							'description' => __( 'Product ID.', 'licenser' ),
+							'type'        => 'integer',
+							'required'    => true,
+						],
+						'status' => [
+							'description' => __( 'Target status.', 'licenser' ),
+							'type'        => 'string',
+							'required'    => true,
+							'enum'        => [ 'active', 'draft', 'trash' ],
+						],
+					],
+				],
+			]
+		);
+
 		// Single product delete route.
 		register_rest_route(
 			$this->namespace,
@@ -135,10 +212,16 @@ class Products extends RestController {
 					'callback'            => [ $this, 'delete_item' ],
 					'permission_callback' => [ $this, 'delete_item_permissions_check' ],
 					'args'                => [
-						'id' => [
+						'id'      => [
 							'description' => __( 'Product ID.', 'licenser' ),
 							'type'        => 'integer',
 							'required'    => true,
+						],
+						'cascade' => [
+							'description' => __( 'Whether to also remove linked releases and packages.', 'licenser' ),
+							'type'        => 'boolean',
+							'required'    => false,
+							'default'     => false,
 						],
 					],
 				],
@@ -181,7 +264,8 @@ class Products extends RestController {
 		$product    = Product::instance()->get(
 			$product_id,
 			[
-				'cache' => false,
+				'cache'        => false,
+				'inc_releases' => true,
 			]
 		);
 
@@ -196,9 +280,111 @@ class Products extends RestController {
 	 */
 	public function delete_item( $request ) {
 		$id      = absint( $request->get_param( 'id' ) );
-		$deleted = Product::instance()->delete( $id );
+		$cascade = rest_sanitize_boolean( $request->get_param( 'cascade' ) );
+		$deleted = Product::instance()->delete( $id, $cascade );
 
 		return rest_ensure_response( $deleted );
+	}
+
+	/**
+	 * Update a product's status (`active`, `draft`, `trash`).
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function update_status( $request ) {
+		$id     = absint( $request->get_param( 'id' ) );
+		$status = sanitize_key( (string) $request->get_param( 'status' ) );
+
+		$updated = Product::instance()->update_status( $id, $status );
+		if ( ! $updated ) {
+			return new WP_Error(
+				'invalid_status',
+				__( 'Invalid product status.', 'licenser' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		return rest_ensure_response(
+			[
+				'updated' => true,
+				'id'      => $id,
+				'status'  => $status,
+			]
+		);
+	}
+
+	/**
+	 * Create or update a product release independently.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function save_release( $request ) {
+		$product_id    = absint( $request->get_param( 'product_id' ) );
+		$version       = sanitize_text_field( (string) $request->get_param( 'version' ) );
+		$download_link = esc_url_raw( (string) $request->get_param( 'download_link' ) );
+
+		if ( $product_id <= 0 || '' === $version || '' === $download_link ) {
+			return new WP_Error(
+				'missing_fields',
+				__( 'Product ID, version, and download URL are required.', 'licenser' ),
+				[ 'status' => 400 ]
+			);
+		}
+
+		$release_id = ProductRelease::instance()->create(
+			[
+				'id'            => absint( $request->get_param( 'id' ) ),
+				'product_id'    => $product_id,
+				'version'       => $version,
+				'changelog'     => (string) $request->get_param( 'changelog' ),
+				'file_name'     => (string) $request->get_param( 'file_name' ),
+				'download_link' => $download_link,
+				'release_date'  => (string) $request->get_param( 'release_date' ),
+			]
+		);
+
+		$release = ProductRelease::instance()->get( $release_id );
+		$all     = ProductRelease::instance()->get_all(
+			[
+				'product_id' => $product_id,
+				'number'     => -1,
+			]
+		);
+
+		return rest_ensure_response(
+			[
+				'release'  => $release,
+				'releases' => is_array( $all ) ? $all : [],
+			]
+		);
+	}
+
+	/**
+	 * Delete a single product release.
+	 *
+	 * @param WP_REST_Request $request Full data about the request.
+	 * @return WP_Error|WP_REST_Response
+	 */
+	public function delete_release( $request ) {
+		$id      = absint( $request->get_param( 'id' ) );
+		$deleted = ProductRelease::instance()->delete( $id );
+
+		if ( ! $deleted ) {
+			return new WP_Error(
+				'not_found',
+				__( 'Invalid Release ID.', 'licenser' ),
+				[ 'status' => 404 ]
+			);
+		}
+
+		return rest_ensure_response(
+			[
+				'deleted' => true,
+				'id'      => $id,
+			]
+		);
 	}
 
 	/**

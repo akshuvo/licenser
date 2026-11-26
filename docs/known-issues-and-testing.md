@@ -26,7 +26,7 @@
 - **Core Licensing, Security, WooCommerce & Admin UI:**
   - Implemented `License::deactivate()` to release domain slots; enabled `domain_limit` enforcement with `www.`/trailing-slash idempotency; hardened public `action=check` and `Product::download()` (product ownership, expiry, status, remote URL validation, `ABSPATH` local file readability checks).
   - Secured `wp_ajax_licenser_media_frame_state` (`manage_options` + nonce), allowlisted SQL identifiers, prepared `IN (...)` and `licenser_delete_cache()` `LIKE` queries, sanitized settings, and escaped list-table/template outputs.
-  - Migrated `Wc_Lite` order metadata to HPOS-safe CRUD (`$order->get_meta()`, `$order->update_meta_data()`, `$order->save()`), fixed blank license keys in order emails (+ DB fallback & plain-text support), fixed multi-item `generate_license()` loop (`continue`), fixed `display_item_data_cart()` return value, and buffered `Shortcode::output()`.
+  - Migrated `WooLite` order metadata to HPOS-safe CRUD (`$order->get_meta()`, `$order->update_meta_data()`, `$order->save()`), fixed blank license keys in order emails (+ DB fallback & plain-text support), fixed multi-item `generate_license()` loop (`continue`), fixed `display_item_data_cart()` return value, and buffered `Shortcode::output()`.
   - Wired live counts on Dashboard, real pagination & `column_end_date`/`column_domain_limit` on list tables, fixed `licenses/new.php` edit/status/meta-delete controls, fixed SDK Generator (`submenu` + single-slash API URL), fixed `GET /products`, `GET /licenses`, `GET /settings`, and cleaned Addons page.
 - **Local Portal DB Migration (`http://portal-addonmaster.local`):**
   - Migrated all 4 products (IDs `1`–`4`, exact production UUIDs recovered from release ZIPs and cached transients) and all 15 license packages (IDs `1`–`15`, matching WooCommerce variations and existing 87 licenses) into `wp_licenser_products` and `wp_licenser_license_packages`.
@@ -36,11 +36,11 @@
 
 ## 2. Remaining Backlog
 
-1. **WooCommerce Quantity `> 1`:** `Order_Handler::generate_license()` creates one license per order item regardless of quantity (`quantity > 1` policy — multiply domain limit vs multiple keys — to be decided).
-2. **Customer Self-Service Domain Deactivation:** My Account (`Wc_Lite\Shortcode`) currently displays activated domains read-only (candidate for Free or `licenser-pro`).
-3. **Product Delete Cascade:** `Models\Product::delete()` deletes the product row and clears cache, leaving child releases/packages/licenses intact until a trash/cascade policy is decided.
-4. **Client SDK `Insights` Endpoints:** `LicenserWP/client`'s optional `Insights.php` posts to `track` and uninstall routes, which are not implemented in `licenser` yet.
-5. **Automated Test Suite:** No PHPUnit suite is checked in yet; consider adding WordPress integration tests before major feature expansion.
+1. **Client SDK `Insights` Endpoints:** `LicenserWP/client`'s optional `Insights.php` posts to `track` and uninstall routes, which remain reserved for `licenser-pro` or a future release.
+2. **Local/Staging Domain Exemption UI:** Core already exposes the `licenser_should_enforce_domain_limit` filter; UI policy rules remain reserved for `licenser-pro`.
+3. **Automated PHPUnit Suite:** No PHPUnit suite is checked in yet (release boundary tests live in `tests/test_release.py` and WordPress activation smoke tests in `tests/smoke.php`); consider adding PHPUnit WP integration tests before major v2 expansion.
+
+*(Resolved in the Cupertino × WP-Native UI/UX & Feature Completion pass: WooCommerce `quantity > 1` configurable policy, customer self-service domain deactivation with order-ownership verification, safe product archive/cascade delete modal, full release history CRUD, bulk license generation + CSV export, API Diagnostics Tester, WooCommerce Order Admin Meta Box, and refund auto-suspend/restore.)*
 
 ---
 
@@ -71,29 +71,29 @@ php -d mysqli.default_socket="/Users/akshuvo/Library/Application Support/Local/r
 
 ## 4. Verification Record (2026-11-26)
 
-### Static, Plugin Check & WP.org Release Packaging Checks
-- `php -l` across all 36 first-party PHP files (including `tests/smoke.php`): **PASS** (0 errors).
-- `node --check` across all first-party JS files: **PASS** (0 errors).
+### Static, Plugin Check & WP.org Release Packaging Checks (Post UI/UX Redesign & Feature Pass)
+- `php -l` across all first-party PHP files (including `tests/smoke.php`): **PASS** (0 errors).
+- `node --check` across all first-party JS files (`assets/js/admin.js`, `addons/WooLite/assets/js/admin.js`, `addons/WooLite/assets/js/scripts.js`): **PASS** (0 errors).
 - `phpcs` with [`phpcs.xml`](../phpcs.xml): **PASS** (`0` errors, `0` warnings).
-- **WordPress Plugin Check (`tools.php?page=plugin-check&plugin=licenser%2Flicenser.php`):**
-  - Live WP Admin UI & CLI on local checkout: **0 errors**, **0 PHP/JS/CSS/readme warnings** (only the 4 repo-only files `.gitignore`, `.distignore`, `.github`, `AGENTS.md`, which are excluded from production builds).
-  - Built production release package (`scripts/release.py build` -> `licenser.zip`): **0 errors, 0 warnings** on Plugin Check (`--include-experimental`), 0 dev/asset leaks, `composer.json` + `vendor/autoload.php` verified intact.
-- `tests/test_release.py` (15 disposable Git/SVN boundary tests including `.wordpress/` listing asset staging, MIME types, initial launch null-baseline support, immutable tags, and reproducible ZIP hashes): **15/15 PASS**.
-- WP.org static checks: **0** PHP files missing `ABSPATH` guard, **0** inline `<script>`/`<style>` tags in PHP templates, **0** `console.log()` in JS, **0** `.DS_Store` files, **0** diffs in `vendor/`.
+- **WordPress Plugin Check (`--include-experimental` on exact `.github/release-files.txt` 58-file production package):** **PASS** (`0` errors, `0` warnings — `Success: Checks complete. No errors found.`).
+- `tests/test_release.py` (15 disposable Git/SVN boundary tests including `.wordpress/` listing asset staging, MIME types, initial launch null-baseline support, immutable tags, and reproducible 58-file ZIP hashes): **15/15 PASS**.
+- WP.org & UX static checks: **0** PHP files missing `ABSPATH` guard, **0** inline `<script>`/`<style>` tags in PHP templates, **0** browser `alert()`/`confirm()`/`console.log()` calls in first-party JS, **0** `.DS_Store` files, **0** diffs in `vendor/`.
 
-### Browser QA on `http://portal-addonmaster.local/` (Post-Migration)
-Verified across two live browser passes (`wp-admin/?localwp_auto_login=1`, **0 PHP notices/warnings/fatals**, **0 JS console errors**):
-- **Dashboard (`page=licenser`):** Displays live counts — **Total Plugins: 4**, **Total Themes: 0**, **Total Licenses: 87**.
-- **Plugins List & Edit (`page=licenser-plugins`):** All 4 plugins render (`4 items` pagination). Editing **GridMaster Pro (`id=4`)** displays UUID `da399f0f-c005-4b5f-80b8-df3222e79169`, all 5 sidebar anchors, stable release `1.2.2`, all 3 packages hydrated via `assets/js/admin.js`, and `<template>` `Add License Package` working cleanly.
-- **Licenses List & Edit (`page=licenser-licenses`):** `87 items` pagination (`1 of 5`), formatted `Expires` dates & `Lifetime`, `Unlimited` / numeric `Domain Limit`. Editing license `id=91` pre-selects `Status = Active`, `Product Type = Plugin`, `Product = Load More Anything Pro`, and auto-populates/selects `Package = 1 website - Yearly` via REST.
-- **SDK Generator (`page=licenser-sdk-generator`):** Selecting `Plugin` -> `GridMaster Pro` -> `Sub Menu` generates valid `<?php` code with `'da399f0f-c005-4b5f-80b8-df3222e79169'`, `'http://portal-addonmaster.local'` (no trailing slash), and `'type'        => 'submenu'`.
-- **Settings & Addons:** Microtime / WP Password / UUID v4 options render; `WooCommerce Lite (Built-in)` shows `Active` and `Licenser Pro` card renders cleanly.
-- **Asset Scoping & WooCommerce Product `#188` (`Gridmaster Pro`):** `licenser-admin-script` confirmed absent on `wp-admin/edit.php`; WooCommerce variation `#189` loads `GridMaster Pro` + `1 Year, 1 Site` cleanly via `licenser-wc-admin`.
-- **Security checks:** Unauthenticated `GET /licenser/v1/products` returns `401`; nonce-less `admin-ajax.php?action=licenser_media_frame_state&state=open` returns `403` (`Invalid nonce.`).
+### Browser QA on `http://portal-addonmaster.local/` (Cupertino × WP-Native Redesign)
+Verified across desktop (`1440x900`), tablet (`1024x900` / `1024x768`), and narrow (`768x900`) viewports (**0 PHP notices/warnings/fatals**, **0 Licenser JS console errors**):
+- **Dashboard (`page=licenser`):** 5 KPI cards in a balanced single row (Plugins: `4`, Themes: `0`, Active Licenses: `2`, Expired & Inactive: `85`, Active Domains: `86`), 2-column Bento grid (Recent Licenses with single-line key pills + Copy, Recent Domain Activations, Quick Actions, Setup & Server Status with Public REST API Copy & Clear Cache).
+- **Plugins & Themes (`page=licenser-plugins`, `page=licenser-themes`):** Enriched catalog with 40×40 icon thumbnails/monograms, latest release version badges, package/license counts, UUID Copy + toast feedback, status filter pills, search, bulk actions, and centered Cupertino empty state on Themes (`Add Your First Theme`). Proportional column widths verified at `1440px` and `1024px`.
+- **Product Editor (`page=licenser-plugins&action=edit&id=4`):** Frosted sticky topbar, scroll-spy sidebar + Product Snapshot card (collapses to horizontal pill tabs at `1024px`), UUID Copy, full Release History (`v1.2.2 Stable`, `v1.2.0 Previous` with Edit/Delete icons), all 3 License Packages with live `365 Days • X Sites` summary pills and confirmation-guarded deletion, live Icon/Banner previews, and Public API endpoints.
+- **Licenses List & Editor (`page=licenser-licenses`):** Status filter pills (`All 87`, `Active 2`, `Expiring Soon 0`, `Expired 85`, `Inactive 0`), Product filter, Search, `Export CSV`, `Bulk Generate` modal (solid elevated card, Lifetime switch disabling Expiry Override), single-line ellipsis key pills + Copy, human-readable Product & Package names, domain usage meters, clickable `WC #...` order links. License Editor 2-column layout with License Snapshot panel, inline Add Domain, confirmation-guarded Activate/Deactivate domain modal, installed version badges, and inline Add Meta.
+- **SDK Studio & API Diagnostics (`page=licenser-sdk-generator`):** Side-by-side 2-column studio with dark-chrome CodeMirror PHP output, Copy PHP Code button, contextual mode help, and Step 1 setup guide (`<code>licenser</code>`). API Diagnostics tab tested live against `GridMaster Pro` Product Update Info returning `HTTP 200` + formatted JSON.
+- **Settings & Addons (`page=licenser-settings`, `page=licenser-addons`):** 3 structured Cupertino cards with 24px gaps, Key Generation radio cards + live Sample Key Preview, WooCommerce Multi-Quantity radio cards + tactile iOS switches, clean single-line Public Routes, and Clear Product Cache; modular 2-section Addons & Integrations screen (**Store Integrations** with live confirmation-guarded enable/disable toggle for WooCommerce Lite + Easy Digital Downloads Coming Soon slot, and **SDK & Extensions**).
+- **Modular Store Integrations Toggle (`POST /settings/integrations`):** Verified live in a fresh PHP/WordPress bootstrap that disabling `woocommerce` (while WooCommerce plugin remains installed & active) results in **0** `addons/WooLite*` files in `get_included_files()`, `LICENSER_WCLITE_PLUGIN_URL` undefined, `[licenser_wc_manager]` unregistered, and `0` `WooLite` hooks attached — while saving general settings preserves the disabled state and Dashboard/Settings display accurate `Disabled` / `Disabled in Addons` states. Unauthenticated calls return HTTP `401` and unavailable integrations (`edd`) return HTTP `400`.
+- **WooCommerce Admin & Customer Portal:** Variation `#189` on Product `#188` renders clean `Licenser Settings` card with `1 Year, 1 Site` pre-selected and zero CSS bleed; Order `#388` displays the **Licenser Licenses** side meta box with status badge, Copy Key, sites counter, and `Manage →` link; Customer My Account (`/?wc_tab=license_manager`) highlights `License Manager`, hides the redundant dashboard greeting, and renders License `#74` (`Load More Anything Pro`, `v1.2.4`, `Lifetime`, `Download v1.2.4`, expandable `Manage Sites`) cleanly even with `package_id = 0`.
+- **Fresh PII-Free WP.org Screenshots:** Re-captured `.wordpress/screenshot-1.png`–`screenshot-6.png` matching the redesigned UI (with Dashboard sample key pills masked to demo tokens) and updated `readme.txt`.
 
-### WordPress Integration Suite (LocalWP PHP + MySQL Socket)
-Verified live against migrated `wp_licenser_*` tables (`DB_VERSION = 29`, `licenser_settings`, 4 plugins, 15 packages) using disposable test records (cleaned up with exact row counts restored):
-- Public updater `POST /public/products/da399f0f-c005-4b5f-80b8-df3222e79169` returns live GridMaster Pro `1.2.2` metadata.
-- Full license lifecycle (`activate`, `www.`/trailing-slash idempotency, `domain_limit=1` rejection, `check` rejecting wrong product/expired/inactive keys, `deactivate` freeing slot, 2nd site activation) passed.
-- Cross-product download (`GridMaster Pro` key requesting `Load More Anything Pro` download) rejected with HTTP `403`.
-- Settings allowlist/sanitization, meta deletion endpoint, `Wc_Lite` hidden cart filter preservation, and buffered `Shortcode::output()` all passed.
+### WordPress Integration & Security Suite (LocalWP PHP + MySQL Socket)
+Verified live against `wp_licenser_*` tables (`DB_VERSION = 29`, `licenser_settings`, 4 plugins, 15 packages, 87 licenses, 86 domains) using disposable test records (cleaned up with exact live row counts preserved):
+- Public updater `POST /public/products/da399f0f-c005-4b5f-80b8-df3222e79169` returns live GridMaster Pro `1.2.2` metadata (100% `LicenserWP/client` v2.0.1 wire-compatible).
+- Unauthenticated requests to all new admin endpoints (`POST /products/releases`, `POST /licenses/bulk`, `POST /settings/clear-cache`, `POST /licenses/{id}/domains`, `POST /licenses/{id}/meta`) blocked with HTTP `401`.
+- Full authenticated CRUD verified for independent release create/delete, bulk license creation, manual domain add & status toggle, custom meta creation, cache clear, dashboard stats aggregation, and `WooLite\Shortcode::output()` hydration.
+- Final live DB counts verified intact: **4 products, 15 packages, 87 licenses, 86 domains**.

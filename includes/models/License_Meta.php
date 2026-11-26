@@ -47,6 +47,57 @@ class License_Meta {
 	}
 
 	/**
+	 * Get a single metadata row by license ID and meta key.
+	 *
+	 * @param int    $license_id License ID.
+	 * @param string $meta_key   Meta key.
+	 * @return object|null
+	 */
+	public function get_row( $license_id, $meta_key ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT id, meta_key, meta_value FROM {$wpdb->licenser_license_meta} WHERE license_id = %d AND meta_key = %s LIMIT 1",
+				absint( $license_id ),
+				sanitize_text_field( $meta_key )
+			)
+		);
+	}
+
+	/**
+	 * Get installed product versions mapped by domain ID for a license.
+	 *
+	 * @param int $license_id License ID.
+	 * @return array<int, string>
+	 */
+	public function get_installed_versions_for_license( $license_id ) {
+		global $wpdb;
+
+		$prefix_like = $wpdb->esc_like( 'installed_version_' ) . '%';
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT meta_key, meta_value FROM {$wpdb->licenser_license_meta} WHERE license_id = %d AND meta_key LIKE %s",
+				absint( $license_id ),
+				$prefix_like
+			)
+		);
+
+		$versions = [];
+		foreach ( (array) $rows as $row ) {
+			$domain_id = absint( str_replace( 'installed_version_', '', (string) $row->meta_key ) );
+			if ( $domain_id > 0 ) {
+				$versions[ $domain_id ] = (string) $row->meta_value;
+			}
+		}
+
+		return $versions;
+	}
+
+	/**
 	 * Get all metadata rows for a license.
 	 *
 	 * @param int $license_id License ID.

@@ -71,11 +71,11 @@ git -C "/Users/akshuvo/Local Sites/addonmaster-portal/app/public/wp-content/plug
    - Check `current_user_can()` and `check_ajax_referer()` / REST `permission_callback` on every privileged action.
    - Validate object ownership (e.g., verify a license belongs to the requested `product_id` before activating, checking, deactivating, or downloading).
    - Use `esc_html()`, `esc_attr()`, `esc_url()`, or `wp_kses_post()` on all rendered output.
-4. **WooCommerce Compatibility (`Wc_Lite`):**
+4. **WooCommerce Compatibility (`WooLite`):**
    - `licenser.php` declares HPOS (`custom_order_tables`) compatibility via `FeaturesUtil::declare_compatibility()`.
    - Always use WooCommerce CRUD methods (`$order->get_meta()`, `$order->update_meta_data()`, `$order->save()`) rather than raw `get_post_meta()`/`update_post_meta()` on orders.
 5. **Internationalization, WP.org Readiness & Naming:**
    - Use text domain `'licenser'`, option key `licenser_settings`, and transient prefix `licenser_cache_`.
    - Include `if ( ! defined( 'ABSPATH' ) ) { exit; }` in every PHP file and avoid inline `<script>`/`<style>` tags in PHP templates.
    - Keep `readme.txt` (`Stable tag`, `Tested up to`, `Requires PHP`) aligned with `licenser.php` and keep [`.distignore`](../.distignore) updated for WP.org release builds.
-   - Keep admin assets scoped strictly to Licenser screens (`Admin::enqueue_scripts()`) and WooCommerce `product` edit screens (`Wc_Lite\Admin_Handler::admin_scripts()`).
+   - Keep admin assets scoped strictly to Licenser screens (`Admin::enqueue_scripts()`) and WooCommerce `product` edit screens (`WooLite\Admin_Handler::admin_scripts()`).

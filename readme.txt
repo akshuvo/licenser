@@ -18,12 +18,13 @@ Manage products, versioned releases, license packages, and active site domains d
 
 = Key Features =
 
-* **Product & Release Management:** Register WordPress plugins and themes with changelogs, icons, banners, compatibility metadata, and release ZIP archives.
-* **Flexible License Packages:** Define update periods (expiring or lifetime) and per-license domain activation limits (limited or unlimited).
+* **Overview Dashboard & Live KPIs:** Monitor plugins, themes, active/expired/expiring-soon licenses, active site domains, recent activations, and REST API status from a clean WordPress-native dashboard.
+* **Product & Release Management:** Register WordPress plugins and themes with icon and banner live previews, full release history (add, edit, delete releases with changelogs), compatibility metadata, and release ZIP archives.
+* **Flexible License Packages & Bulk Generation:** Define update periods (expiring or lifetime) and per-license domain limits, bulk-generate batches of keys, filter/search licenses, manage domains (add, toggle active/inactive, view installed version), add custom metadata, and export filtered CSVs.
 * **Domain Activation & Enforcement:** REST API endpoints for activating, validating, and deactivating licenses with domain normalization and automatic slot management.
 * **Automatic Updates & Protected Downloads:** Serve WordPress plugin and theme updates via the open-source [LicenserWP Client SDK](https://github.com/LicenserWP/client) with license-authenticated release downloads.
-* **Built-in WooCommerce Integration (HPOS Compatible):** Map simple and variable WooCommerce products to Licenser products and packages, automatically generate license keys on order completion, include keys and download links in order emails, and display a License Manager tab in My Account.
-* **Built-in SDK Generator:** Generate ready-to-paste PHP bootstrap code for your plugins or themes.
+* **Built-in WooCommerce Integration (HPOS Compatible):** Map simple and variable WooCommerce products to Licenser products and packages, configure multi-quantity policies (separate keys, multiplied domain limits, or single key), auto-suspend licenses on refund/cancellation, view linked keys in the Order Admin Meta Box, include keys and download links in order emails, and give customers a modern My Account License Manager portal with optional self-service domain deactivation.
+* **SDK Studio & Built-in API Diagnostics:** Generate ready-to-paste PHP bootstrap code for plugins or themes with live CodeMirror output and test public REST endpoints directly from wp-admin.
 
 == Installation ==
 
@@ -48,23 +49,26 @@ When uploading release ZIP files through the Licenser product editor media frame
 
 == Screenshots ==
 
-1. Overview dashboard showing total registered plugins, themes, and active licenses at a glance.
-2. Plugins and themes product catalog with slugs, dates, sorting, and quick edit/delete actions.
-3. Product editor for managing UUIDs, WordPress/PHP compatibility metadata, stable releases, license packages, icons/banners, and Public API URLs.
-4. Built-in SDK Generator producing ready-to-paste PHP client integration code for plugins and themes.
-5. License Manager settings for key prefixes, generation methods (Microtime, WP Password, UUID v4), character length, and WooCommerce visibility.
-6. Addons screen showing the built-in WooCommerce Lite integration and extension status.
+1. Overview dashboard with 5 live KPI cards, recent licenses, recent domain activations, quick actions, and REST API server status.
+2. Plugins and themes catalog featuring icon thumbnails, latest release versions, package and license counts, one-click UUID copy, search, status filters, and bulk actions.
+3. Product editor with sticky navigation, product snapshot, full release history management, license package cards, live icon/banner previews, and public REST endpoints.
+4. Built-in SDK Studio with live CodeMirror PHP code generation, one-click copy, contextual output mode guidance, and an integrated API Diagnostics Tester.
+5. Structured settings for license key generation (with live sample key preview), WooCommerce multi-quantity and refund/self-service policies, and transient cache controls.
+6. Addons & Integrations screen featuring modular enable/disable toggles for WooCommerce Lite and upcoming store integrations (such as Easy Digital Downloads), plus the open-source Licenser Client SDK.
 
 == Changelog ==
 
 = 1.0.8 =
+* Redesigned the complete Admin UI and WooCommerce Customer My Account portal with a unified, WordPress-native `licenser-*` design system (zero inline scripts/styles, accessible confirmation modals, toast feedback, and one-click copy controls).
+* Upgraded the Dashboard Overview with 5 KPI cards (including active domains and expiring-soon count), Recent Licenses, Recent Domain Activations, Quick Actions, and Setup/API status.
+* Enhanced Products & Themes catalogs and editor with icon/banner live previews, full release history CRUD, package summaries, safe-delete archive guard, search, status filters, and bulk actions.
+* Enhanced Licenses management with human-readable product/package columns, status badges (`Active`, `Expiring Soon`, `Expired`, `Inactive`), domain usage meters, clickable WooCommerce order links, search/product/status filters, bulk actions, Bulk Key Generator modal, formula-safe CSV export, manual domain add/toggle, installed version display, and custom metadata creation.
+* Upgraded SDK Generator into a 2-column SDK Studio with live CodeMirror preview, one-click Copy, and a built-in API & License Diagnostics Tester.
+* Added modular Store Integrations toggle support in Addons & Integrations (enable or disable WooCommerce Lite without loading its files even when WooCommerce is active, extensible to future integrations like Easy Digital Downloads).
+* Added WooCommerce multi-quantity licensing modes (`separate_keys`, `multiply_domains`, `single_legacy`), auto-suspend/restore on refund/cancellation, HPOS-compatible Order Admin Meta Box, and customer self-service domain deactivation in My Account.
 * Added full WordPress Coding Standards (WPCS) compliance and WooCommerce HPOS compatibility declaration.
-* Implemented license deactivation endpoint to release domain activation slots.
-* Enforced domain activation limits, license expiry, status, and product ownership checks across public check, activate, and download endpoints.
+* Implemented license deactivation endpoint to release domain activation slots and enforced domain limits, expiry, status, and product ownership checks.
 * Migrated settings storage to `licenser_settings` and transient caches to `licenser_cache_` with automatic upgrade migration.
-* Fixed WooCommerce order email license key output, multi-item order license generation, and buffered shortcode output.
-* Fixed Dashboard counters, list table pagination and expiry rendering, license edit form, and SDK Generator output.
-* Hardened AJAX and REST endpoints with capability checks, nonces, settings allowlisting, and prepared SQL queries.
 
 = 1.0.0 =
 * Initial release.

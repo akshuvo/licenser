@@ -6,7 +6,7 @@ Companion repositories and plugins are **separate projects** — never assume a 
 
 | Component | Local Path | Git Repo / Role |
 |---|---|---|
-| **Licenser (Free)** *(this repo)* | `.../addonmaster-portal/app/public/wp-content/plugins/licenser` | `akshuvo/licenser` — core DB tables, REST API, admin UI, `Wc_Lite` addon |
+| **Licenser (Free)** *(this repo)* | `.../addonmaster-portal/app/public/wp-content/plugins/licenser` | `akshuvo/licenser` — core DB tables, REST API, admin UI, `WooLite` addon |
 | **Licenser Pro** | `.../addonmaster-portal/app/public/wp-content/plugins/licenser-pro` | `LicenserWP/licenser-pro` — separate extension repo (currently scaffolded) |
 | **Paddle Payment Gateway** | `.../addonmaster-portal/app/public/wp-content/plugins/wc-paddle-payment-gateway` | No `.git` root here — WooCommerce Paddle Classic checkout/webhook gateway |
 | **Licenser Client SDK** | `https://github.com/LicenserWP/client` (bundled in `gridmaster-pro/licenser/`) | Appsero-forked SDK embedded inside sold plugins/themes (`Licenser\Client`) |
@@ -18,7 +18,7 @@ Local development portal clone: `http://portal-addonmaster.local/` (WP Admin aut
 
 ## Read Before Changing Code
 
-- [Architecture](docs/architecture.md) — bootstrap, PSR-4 autoloading, 6 custom DB tables (`DB_VERSION = 29`), models, controllers, caching, admin UI, and `Wc_Lite` (HPOS-compatible).
+- [Architecture](docs/architecture.md) — bootstrap, PSR-4 autoloading, 6 custom DB tables (`DB_VERSION = 29`), models, controllers, caching, admin UI, and `WooLite` (HPOS-compatible).
 - [Integrations & API Contract](docs/integrations.md) — public & admin REST endpoints, `LicenserWP/client` wire contract, WooCommerce/Paddle order-to-license flow, hooks, and Free/Pro boundary.
 - [Development Workflow](docs/development.md) — Git roots/branches, deployment side effects, WordPress.org GitHub Actions auto-deploy (`wporg.yml` + `.wordpress/`), WPCS/PHPCS tooling (`phpcs.xml`), local environment, and coding conventions.
 - [Known Issues & Testing](docs/known-issues-and-testing.md) — completed stabilization record, remaining backlog items, automated WPCS/lint commands, and manual/integration verification matrices.
@@ -38,7 +38,7 @@ Local development portal clone: `http://portal-addonmaster.local/` (WP Admin aut
    - Use WooCommerce CRUD order metadata (`$order->get_meta()`, `$order->update_meta_data()`, `$order->save()`) for HPOS compatibility.
    - Escape all output by context (`esc_html`, `esc_attr`, `esc_url`, `wp_kses_post`).
    - Keep real customer license keys, Paddle credentials, FTP secrets, and customer PII out of logs, commits, and docs.
-6. **Keep Free/Pro boundaries clean.** Free (`licenser`) owns base tables, core licensing/update endpoints, lifecycle hooks (`licenser_loaded`, `licenser_addons_register`, `licenser_license_*`, `licenser_product_saved`, etc.), and `Wc_Lite`. Pro (`licenser-pro`) must extend Free via those hooks and guard against Free being inactive/missing.
+6. **Keep Free/Pro boundaries clean.** Free (`licenser`) owns base tables, core licensing/update endpoints, lifecycle hooks (`licenser_loaded`, `licenser_addons_register`, `licenser_license_*`, `licenser_product_saved`, etc.), and `WooLite`. Pro (`licenser-pro`) must extend Free via those hooks and guard against Free being inactive/missing.
 7. **WordPress.org repository & schema standards.**
    - Settings option key is `licenser_settings` (migrated automatically from legacy `lmfwppt_settings` in DB v29); transient cache prefix is `licenser_cache_`.
    - Every PHP file must include an `ABSPATH` direct-access guard; keep all admin JS/CSS in enqueued files (`assets/js/admin.js`, `assets/css/admin.css`) with zero inline `<script>`/`<style>` tags in PHP templates.
