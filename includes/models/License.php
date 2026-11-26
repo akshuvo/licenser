@@ -826,7 +826,11 @@ class License {
 		} elseif ( 'uuid' === $method ) {
 			$key = wp_generate_uuid4();
 		} else {
-			$key = md5( microtime() . wp_rand() );
+			try {
+				$key = bin2hex( random_bytes( 16 ) );
+			} catch ( \Exception $e ) {
+				$key = md5( microtime() . wp_rand() );
+			}
 		}
 
 		$prefix = (string) licenser_get_option( 'license_code_prefix' );

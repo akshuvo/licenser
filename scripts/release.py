@@ -19,7 +19,7 @@ import zipfile
 SLUG = os.environ.get('WPORG_PLUGIN_SLUG', 'licenser')
 SVN_URL = 'https://plugins.svn.wordpress.org/' + SLUG
 RUNTIME_DIRS = {'addons', 'assets', 'includes', 'vendor'}
-ROOT_FILES = {'licenser.php', 'readme.txt', 'README.md', 'LICENSE', 'composer.json'}
+ROOT_FILES = {'licenser.php', 'readme.txt', 'LICENSE', 'composer.json'}
 LISTING_ASSET_DIR = '.wordpress'
 LISTING_ASSET_RE = re.compile(
     r'^(banner-(772x250|1544x500)\.(png|jpg)|icon-(128x128|256x256)\.(png|jpg)|icon\.svg|screenshot-[1-9]\d*\.(png|jpg|gif))$'

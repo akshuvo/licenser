@@ -131,7 +131,64 @@ function licenser_parse_file_path( $file_path ) {
 }
 
 /**
+ * Build the per-user transient key tracking whether the Licenser release media modal is open.
+ *
+ * @return string
+ */
+function licenser_media_frame_state_key() {
+	return 'licenser_media_frame_state_' . get_current_user_id();
+}
+
+/**
+ * Check whether the current admin user currently has the Licenser release media modal open.
+ *
+ * @return bool
+ */
+function licenser_is_release_media_frame_open() {
+	if ( ! current_user_can( 'manage_options' ) || ! get_current_user_id() ) {
+		return false;
+	}
+
+	return 'open' === get_transient( licenser_media_frame_state_key() );
+}
+
+/**
+ * Ensure the release uploads directory contains protective `index.php` and `.htaccess` files.
+ *
+ * @param string $dir Absolute directory path.
+ * @return void
+ */
+function licenser_protect_release_dir( $dir ) {
+	if ( '' === $dir || ! wp_mkdir_p( $dir ) ) {
+		return;
+	}
+
+	if ( ! function_exists( 'WP_Filesystem' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+	}
+
+	global $wp_filesystem;
+	if ( ! WP_Filesystem() || ! $wp_filesystem ) {
+		return;
+	}
+
+	$index_file = trailingslashit( $dir ) . 'index.php';
+	if ( ! $wp_filesystem->exists( $index_file ) ) {
+		$wp_filesystem->put_contents( $index_file, "<?php\n// Silence is golden.\n", FS_CHMOD_FILE );
+	}
+
+	$htaccess_file = trailingslashit( $dir ) . '.htaccess';
+	if ( ! $wp_filesystem->exists( $htaccess_file ) ) {
+		$rules = "<IfModule mod_authz_core.c>\n\tRequire all denied\n</IfModule>\n<IfModule !mod_authz_core.c>\n\tOrder deny,allow\n\tDeny from all\n</IfModule>\nOptions -Indexes\n";
+		$wp_filesystem->put_contents( $htaccess_file, $rules, FS_CHMOD_FILE );
+	}
+}
+
+/**
  * Save media frame open/close state via AJAX so release uploads go to `/license-manager`.
+ *
+ * Scoped to the current admin user with a short 5-minute TTL so an abandoned
+ * browser tab can never redirect site-wide uploads indefinitely.
  *
  * @return void
  */
@@ -146,8 +203,19 @@ function licenser_media_frame_state_action() {
 
 	$raw_state = isset( $_POST['state'] ) ? sanitize_key( wp_unslash( $_POST['state'] ) ) : 'close';
 	$state     = ( 'open' === $raw_state ) ? 'open' : 'close';
+	$key       = licenser_media_frame_state_key();
 
-	update_option( 'licenser_media_frame_state', $state );
+	// Clean up legacy global option if present from earlier versions.
+	if ( false !== get_option( 'licenser_media_frame_state', false ) ) {
+		delete_option( 'licenser_media_frame_state' );
+	}
+
+	if ( 'open' === $state ) {
+		set_transient( $key, 'open', 5 * MINUTE_IN_SECONDS );
+	} else {
+		delete_transient( $key );
+	}
+
 	wp_send_json_success( $state );
 }
 add_action( 'wp_ajax_licenser_media_frame_state', 'licenser_media_frame_state_action' );
@@ -159,7 +227,7 @@ add_action( 'wp_ajax_licenser_media_frame_state', 'licenser_media_frame_state_ac
  * @return array
  */
 function licenser_license_manager_pre_upload( $file ) {
-	if ( current_user_can( 'manage_options' ) && 'open' === get_option( 'licenser_media_frame_state' ) ) {
+	if ( licenser_is_release_media_frame_open() ) {
 		add_filter( 'upload_dir', 'licenser_license_manager_uploads_dir' );
 	}
 
@@ -168,16 +236,18 @@ function licenser_license_manager_pre_upload( $file ) {
 add_filter( 'wp_handle_upload_prefilter', 'licenser_license_manager_pre_upload' );
 
 /**
- * Redirect uploads into `uploads/license-manager` while the Licenser media modal is open.
+ * Redirect uploads into `uploads/license-manager` while the Licenser release media modal is open.
  *
  * @param array $param Upload directory parameters.
  * @return array
  */
 function licenser_license_manager_uploads_dir( $param ) {
-	if ( current_user_can( 'manage_options' ) && 'open' === get_option( 'licenser_media_frame_state' ) ) {
+	if ( licenser_is_release_media_frame_open() ) {
 		$mydir         = '/license-manager';
 		$param['path'] = $param['basedir'] . $mydir;
 		$param['url']  = $param['baseurl'] . $mydir;
+
+		licenser_protect_release_dir( $param['path'] );
 	}
 
 	return $param;

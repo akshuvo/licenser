@@ -4,6 +4,15 @@ jQuery(function ($) {
 	var cfg = typeof Licenser !== 'undefined' ? Licenser : {};
 	var i18n = cfg.i18n || {};
 
+	function escapeHtml(str) {
+		return String(str == null ? '' : str)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#039;');
+	}
+
 	function filterProductsByType($container, isInit) {
 		var type = $container.find('.licenser_product_type').val();
 		var $prodSelect = $container.find('.licenser_product_id');
@@ -39,7 +48,7 @@ jQuery(function ($) {
 
 		if (!$this.val()) {
 			$packageSelect
-				.html('<option value="" class="blank">' + $('<div>').text(i18n.select_package || 'Select Package').html() + '</option>')
+				.html('<option value="" class="blank">' + escapeHtml(i18n.select_package || 'Select Package') + '</option>')
 				.prop('disabled', true);
 			return;
 		}
@@ -58,14 +67,13 @@ jQuery(function ($) {
 			success: function (packages) {
 				var options = '';
 				if (Array.isArray(packages) && packages.length) {
-					options = '<option value="" class="blank">' + $('<div>').text(i18n.select_package || 'Select Package').html() + '</option>';
+					options = '<option value="" class="blank">' + escapeHtml(i18n.select_package || 'Select Package') + '</option>';
 					packages.forEach(function (pkg) {
-						var label = $('<div>').text(pkg.label).html();
-						options += '<option value="' + pkg.id + '">' + label + '</option>';
+						options += '<option value="' + escapeHtml(pkg.id) + '">' + escapeHtml(pkg.label) + '</option>';
 					});
 					$packageSelect.prop('disabled', false);
 				} else {
-					options = '<option value="" class="blank">' + $('<div>').text(i18n.no_package_found || 'No Package Found').html() + '</option>';
+					options = '<option value="" class="blank">' + escapeHtml(i18n.no_package_found || 'No Package Found') + '</option>';
 					$packageSelect.prop('disabled', true);
 				}
 

@@ -35,7 +35,12 @@ jQuery(function ($) {
 	}
 
 	function escapeHtml(str) {
-		return $('<div>').text(str == null ? '' : String(str)).html();
+		return String(str == null ? '' : str)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#039;');
 	}
 
 	function escapeSingleQuote(str) {
@@ -498,17 +503,37 @@ jQuery(function ($) {
 	// -------------------------------------------------------------------------
 	var fileFrame;
 	var activeMediaBtn = null;
+	var isReleaseMediaOpen = false;
 
-	function setMediaState(state) {
+	function setMediaState(state, useBeacon) {
 		if (!cfg.media_state_nonce) {
 			return;
 		}
-		$.post(cfg.ajaxurl || ajaxurl, {
+		var normalized = state === 'open' ? 'open' : 'close';
+		isReleaseMediaOpen = normalized === 'open';
+		var endpoint = cfg.ajaxurl || ajaxurl;
+
+		if (useBeacon && typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+			var params = new URLSearchParams();
+			params.append('action', 'licenser_media_frame_state');
+			params.append('nonce', cfg.media_state_nonce);
+			params.append('state', normalized);
+			navigator.sendBeacon(endpoint, params);
+			return;
+		}
+
+		$.post(endpoint, {
 			action: 'licenser_media_frame_state',
 			nonce: cfg.media_state_nonce,
-			state: state || 'close'
+			state: normalized
 		});
 	}
+
+	$(window).on('beforeunload.licenserMedia', function () {
+		if (isReleaseMediaOpen) {
+			setMediaState('close', true);
+		}
+	});
 
 	function updateMediaPreview($input) {
 		var previewSelector = $input.attr('data-preview-target');
@@ -552,9 +577,7 @@ jQuery(function ($) {
 		activeMediaBtn = $(this);
 		var isReleaseZip = activeMediaBtn.attr('data-media-scope') === 'release';
 
-		if (isReleaseZip) {
-			setMediaState('open');
-		}
+		setMediaState(isReleaseZip ? 'open' : 'close');
 
 		if (undefined !== fileFrame) {
 			fileFrame.open();
@@ -609,9 +632,9 @@ jQuery(function ($) {
 		}
 
 		var details = [
-			{ label: releases + ' Releases', variant: 'neutral' },
-			{ label: packages + ' Packages', variant: 'neutral' },
-			{ label: licenses + ' Licenses', variant: licenses > 0 ? 'warning' : 'neutral' }
+			{ label: releases + ' ' + msg('releases_suffix', 'Releases'), variant: 'neutral' },
+			{ label: packages + ' ' + msg('packages_suffix', 'Packages'), variant: 'neutral' },
+			{ label: licenses + ' ' + msg('licenses_suffix', 'Licenses'), variant: licenses > 0 ? 'warning' : 'neutral' }
 		];
 
 		var modalOpts = {
@@ -934,7 +957,7 @@ jQuery(function ($) {
 		var d = $.extend(
 			{
 				id: '',
-				form_title: data && data.id ? 'Edit Release' : 'Add New Release',
+				form_title: data && data.id ? msg('edit_release', 'Edit Release') : msg('add_new_release', 'Add New Release'),
 				version: '',
 				release_date: today,
 				file_name: '',
@@ -988,13 +1011,13 @@ jQuery(function ($) {
 		};
 
 		if (!payload.version || !payload.download_link) {
-			showToast('Version and File URL are required.', 'error');
+			showToast(msg('release_fields_required', 'Version and File URL are required.'), 'error');
 			return;
 		}
 
 		// For brand-new unsaved products, keep fields in main form so saving the product creates both.
 		if (!productId) {
-			showToast('Release ready — click Add Product to save.', 'info');
+			showToast(msg('release_ready_hint', 'Release ready — click Add Product to save.'), 'info');
 			return;
 		}
 
@@ -1478,7 +1501,7 @@ jQuery(function ($) {
 		var domainVal = String($('#licenser-new-domain-input').val() || '').trim();
 
 		if (!licenseId || !domainVal) {
-			showToast('Please enter a domain name or URL.', 'error');
+			showToast(msg('domain_required', 'Please enter a domain name or URL.'), 'error');
 			return;
 		}
 
@@ -1627,7 +1650,7 @@ jQuery(function ($) {
 		var metaValue = String($('#licenser-new-meta-value').val() || '').trim();
 
 		if (!licenseId || !metaKey) {
-			showToast('Meta key is required.', 'error');
+			showToast(msg('meta_key_required', 'Meta key is required.'), 'error');
 			return;
 		}
 
@@ -2239,7 +2262,7 @@ jQuery(function ($) {
 		var $btn = $(this).find('[type="submit"]');
 
 		if (!uuid) {
-			showToast('Please select a product.', 'error');
+			showToast(msg('select_product_error', 'Please select a product.'), 'error');
 			return;
 		}
 

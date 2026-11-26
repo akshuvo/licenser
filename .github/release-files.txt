@@ -1,5 +1,4 @@
 LICENSE
-README.md
 addons/WooLite.php
 addons/WooLite/Admin_Handler.php
 addons/WooLite/Order_Handler.php

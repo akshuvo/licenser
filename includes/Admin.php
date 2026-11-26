@@ -274,6 +274,16 @@ class Admin {
 					'select_media_title'          => __( 'Select File', 'licenser' ),
 					'select_media_button'         => __( 'Use File', 'licenser' ),
 					'running_request'             => __( 'Running request...', 'licenser' ),
+					'releases_suffix'             => __( 'Releases', 'licenser' ),
+					'packages_suffix'             => __( 'Packages', 'licenser' ),
+					'licenses_suffix'             => __( 'Licenses', 'licenser' ),
+					'edit_release'                => __( 'Edit Release', 'licenser' ),
+					'add_new_release'             => __( 'Add New Release', 'licenser' ),
+					'release_fields_required'     => __( 'Version and File URL are required.', 'licenser' ),
+					'release_ready_hint'          => __( 'Release ready — click Add Product to save.', 'licenser' ),
+					'domain_required'             => __( 'Please enter a domain name or URL.', 'licenser' ),
+					'meta_key_required'           => __( 'Meta key is required.', 'licenser' ),
+					'select_product_error'        => __( 'Please select a product.', 'licenser' ),
 				],
 			]
 		);

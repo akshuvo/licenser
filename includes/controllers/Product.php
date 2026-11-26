@@ -120,10 +120,34 @@ class Product {
 
 		$file_path = isset( $parsed_file_path['file_path'] ) ? (string) $parsed_file_path['file_path'] : '';
 		$real_file = '' !== $file_path ? realpath( $file_path ) : false;
-		$real_root = realpath( ABSPATH );
+		$uploads   = wp_upload_dir();
 
-		// Confirm the resolved local file exists, is readable, and stays inside WordPress root.
-		if ( ! $real_file || ! $real_root || 0 !== strpos( $real_file, $real_root ) || ! is_file( $real_file ) || ! is_readable( $real_file ) ) {
+		/**
+		 * Filter the list of local directories allowed for release file downloads.
+		 *
+		 * Defaults to the WordPress uploads base directory to prevent streaming
+		 * core or configuration files outside uploads.
+		 *
+		 * @param string[] $dirs Allowed local base directories.
+		 */
+		$allowed_dirs = apply_filters( 'licenser_allowed_download_dirs', [ $uploads['basedir'] ] );
+		$is_allowed   = false;
+
+		if ( $real_file && is_array( $allowed_dirs ) ) {
+			foreach ( $allowed_dirs as $dir ) {
+				$real_dir = realpath( (string) $dir );
+				if ( $real_dir && 0 === strpos( $real_file, $real_dir . DIRECTORY_SEPARATOR ) ) {
+					$is_allowed = true;
+					break;
+				}
+			}
+		}
+
+		$base_name       = $real_file ? basename( $real_file ) : '';
+		$is_blocked_file = ( '' === $base_name || 0 === strpos( $base_name, '.' ) || (bool) preg_match( '/\.(php\d*|phtml|phar|htaccess|htpasswd|ini|env|sql|log)$/i', $base_name ) );
+
+		// Confirm the resolved local file exists, is readable, is not a sensitive/executable file, and stays inside an allowed directory.
+		if ( ! $real_file || ! $is_allowed || $is_blocked_file || ! is_file( $real_file ) || ! is_readable( $real_file ) ) {
 			return new WP_Error(
 				'file_not_found',
 				__( 'Release file could not be found on server.', 'licenser' ),
