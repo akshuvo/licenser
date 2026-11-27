@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Licenser – Self-Hosted License & Update Server
+ * Plugin Name: Licenser
  * Plugin URI: https://github.com/akshuvo/licenser
  * Description: Self-hosted license manager & automatic update server for WordPress plugins and themes — with domain limits, client SDK & WooCommerce delivery.
  * Author: AddonMaster

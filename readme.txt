@@ -1,4 +1,4 @@
-=== Licenser – Self-Hosted License & Update Server ===
+=== Licenser ===
 Contributors: mdshuvo, addonmaster
 Tags: license manager, software licensing, woocommerce, plugin updates, license key
 Requires at least: 5.8
