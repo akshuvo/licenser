@@ -78,13 +78,23 @@ class License {
 		$enforce_limit = apply_filters( 'licenser_should_enforce_domain_limit', (bool) $args['enforce_domain_limit'], $license, $args );
 
 		if ( $enforce_limit && (int) $license->domain_limit > 0 ) {
-			$domain_count      = (int) License_Model::instance()->get_domains(
+			$domain_count = (int) License_Model::instance()->get_domains(
 				[
 					'license_id'  => $license->id,
 					'status'      => 1,
 					'count_total' => true,
 				]
 			);
+
+			/**
+			 * Filter the counted active domains used for activation-limit enforcement.
+			 *
+			 * @param int    $domain_count Raw active domain count.
+			 * @param object $license      License record.
+			 * @param string $context      Call context (`check`, `refresh`, `admin_edit`, `portal`).
+			 * @param array  $args         Optional request arguments.
+			 */
+			$domain_count      = max( 0, (int) apply_filters( 'licenser_active_domain_count', $domain_count, $license, 'check', $args ) );
 			$is_already_active = ( $domain_row && 1 === (int) $domain_row->status );
 
 			if ( ! $is_already_active && $domain_count >= (int) $license->domain_limit ) {
@@ -122,6 +132,15 @@ class License {
 		);
 
 		if ( is_wp_error( $license ) ) {
+			/**
+			 * Fires when a public license check fails validation.
+			 *
+			 * @param WP_Error $license Validation error.
+			 * @param array    $args    Request parameters.
+			 * @param string   $action  Action name (`check` or `activate`).
+			 */
+			do_action( 'licenser_license_check_failed', $license, $args, 'check' );
+
 			return [
 				'success' => false,
 				'error'   => $license->get_error_message(),
@@ -177,12 +196,22 @@ class License {
 			[
 				'url'                    => $args['url'],
 				'product_id'             => $args['product_id'],
+				'is_local'               => (bool) $args['is_local'],
 				'enforce_domain_limit'   => true,
 				'reject_inactive_domain' => false,
 			]
 		);
 
 		if ( is_wp_error( $license ) ) {
+			/**
+			 * Fires when a public license activation fails validation.
+			 *
+			 * @param WP_Error $license Validation error.
+			 * @param array    $args    Activation parameters.
+			 * @param string   $action  Action name (`check` or `activate`).
+			 */
+			do_action( 'licenser_license_check_failed', $license, $args, 'activate' );
+
 			return [
 				'success' => false,
 				'error'   => $license->get_error_message(),
@@ -236,6 +265,7 @@ class License {
 				'count_total' => true,
 			]
 		);
+		$domain_count = max( 0, (int) apply_filters( 'licenser_active_domain_count', $domain_count, $license, 'refresh', [] ) );
 
 		$license->domain_count = $domain_count;
 

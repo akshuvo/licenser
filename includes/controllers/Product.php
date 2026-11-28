@@ -59,6 +59,14 @@ class Product {
 		);
 
 		if ( is_wp_error( $license ) ) {
+			/**
+			 * Fires when a product release download fails license validation.
+			 *
+			 * @param WP_Error $license Validation error.
+			 * @param array    $args    Download parameters.
+			 */
+			do_action( 'licenser_product_download_failed', $license, $args );
+
 			return new WP_Error(
 				$license->get_error_code(),
 				$license->get_error_message(),

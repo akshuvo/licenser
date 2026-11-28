@@ -338,6 +338,21 @@ class Order_Handler {
 				continue;
 			}
 
+			/**
+			 * Filter whether WooLite should generate a new license key for an order line item.
+			 *
+			 * Pro extensions (e.g. License Renewals & Plan Upgrades) can handle the item
+			 * in place and return false to avoid issuing a duplicate key.
+			 *
+			 * @param bool                    $should_generate Default true.
+			 * @param \WC_Order_Item_Product  $item            Order line item.
+			 * @param int                     $item_id         Order item ID.
+			 * @param \WC_Order               $order           Order object.
+			 */
+			if ( ! apply_filters( 'licenser_wclite_should_generate_license_for_item', true, $item, $item_id, $order ) ) {
+				continue;
+			}
+
 			$product_id   = $item->get_product_id();
 			$variation_id = method_exists( $item, 'get_variation_id' ) ? $item->get_variation_id() : 0;
 			$target_id    = ( ! empty( $variation_id ) && '0' !== (string) $variation_id ) ? absint( $variation_id ) : absint( $product_id );
@@ -616,6 +631,7 @@ class Order_Handler {
 				'count_total' => true,
 			]
 		);
+		$active_count = max( 0, (int) apply_filters( 'licenser_active_domain_count', $active_count, $license, 'portal_deactivate', [] ) );
 
 		wp_send_json_success(
 			[

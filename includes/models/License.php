@@ -553,7 +553,13 @@ class License {
 			}
 		}
 
-		return $counts;
+		/**
+		 * Filter batch active domain counts keyed by license ID.
+		 *
+		 * @param array<int, int> $counts Active domain counts keyed by license ID.
+		 * @param int[]           $ids    Requested license IDs.
+		 */
+		return (array) apply_filters( 'licenser_active_domain_counts', $counts, $ids );
 	}
 
 	/**

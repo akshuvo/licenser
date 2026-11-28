@@ -103,6 +103,7 @@ class Shortcode {
 						++$active_domains;
 					}
 				}
+				$active_domains = max( 0, (int) apply_filters( 'licenser_active_domain_count', $active_domains, $license_row, 'portal', [] ) );
 
 				$order_id  = absint( $license_row->source_id );
 				$order_url = '';
@@ -277,6 +278,16 @@ class Shortcode {
 										?>
 									</span>
 								<?php endif; ?>
+								<?php
+								/**
+								 * Fires inside a customer portal license card actions bar (e.g. Renew / Upgrade buttons).
+								 *
+								 * @param object $license License record.
+								 * @param object $product Product record.
+								 * @param array  $item    Hydrated license card context.
+								 */
+								do_action( 'licenser_portal_license_actions', $license, $product, $item );
+								?>
 							</div>
 
 							<!-- Collapsible Activated Domains Panel -->
@@ -307,6 +318,15 @@ class Shortcode {
 													<?php if ( $inst_ver ) : ?>
 														<span class="licenser-portal-pill">v<?php echo esc_html( $inst_ver ); ?></span>
 													<?php endif; ?>
+													<?php
+													/**
+													 * Fires inside a customer portal domain row info section (e.g. Staging Exempt pill).
+													 *
+													 * @param object $domain  Domain row object.
+													 * @param object $license Parent license record.
+													 */
+													do_action( 'licenser_portal_domain_badges', $domain, $license );
+													?>
 												</div>
 
 												<?php if ( $allow_deactivation && $is_active ) : ?>

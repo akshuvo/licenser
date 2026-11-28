@@ -74,6 +74,14 @@ class Menu {
 		if ( $licenses_hook ) {
 			add_action( 'load-' . $licenses_hook, [ $this, 'handle_licenses_bulk_actions' ] );
 		}
+
+		/**
+		 * Fires after Licenser core admin submenus have been registered.
+		 *
+		 * @param string $parent_slug Parent menu slug (`licenser`).
+		 * @param string $capability  Required capability (`manage_options`).
+		 */
+		do_action( 'licenser_admin_menu', $parent_slug, $capability );
 	}
 
 	/**

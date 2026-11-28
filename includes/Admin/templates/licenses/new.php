@@ -58,6 +58,9 @@ foreach ( $licenser_domains as $licenser_d ) {
 		++$licenser_active_domains_count;
 	}
 }
+if ( $licenser_license_id > 0 ) {
+	$licenser_active_domains_count = max( 0, (int) apply_filters( 'licenser_active_domain_count', $licenser_active_domains_count, $licenser_license, 'admin_edit', [] ) );
+}
 
 $licenser_installed_versions = $licenser_license_id > 0 ? License_Meta::instance()->get_installed_versions_for_license( $licenser_license_id ) : [];
 $licenser_meta_data          = $licenser_license_id > 0 ? License_Meta::instance()->get_all( $licenser_license_id ) : [];
@@ -324,6 +327,15 @@ if ( $licenser_domain_limit > 0 && $licenser_active_domains_count >= $licenser_d
 													<span class="licenser-badge-label"><?php echo $licenser_domain_active ? esc_html__( 'Active', 'licenser' ) : esc_html__( 'Inactive', 'licenser' ); ?></span>
 												</span>
 												<span class="licenser-domain-row__url"><?php echo esc_html( $licenser_domain_url ); ?></span>
+												<?php
+												/**
+												 * Fires inside each activated domain row to allow badges (e.g. Staging Exempt).
+												 *
+												 * @param object $licenser_domain_item Domain row object.
+												 * @param object $licenser_license     Parent license record.
+												 */
+												do_action( 'licenser_license_domain_row_badges', $licenser_domain_item, $licenser_license );
+												?>
 												<?php if ( $licenser_domain_ver ) : ?>
 													<span class="licenser-badge licenser-badge--accent licenser-tabular">v<?php echo esc_html( $licenser_domain_ver ); ?></span>
 												<?php endif; ?>
@@ -400,6 +412,16 @@ if ( $licenser_domain_limit > 0 && $licenser_active_domains_count >= $licenser_d
 								</div>
 							</div>
 						</div>
+
+						<?php
+						/**
+						 * Fires after core cards on the License Edit screen (e.g. Activity Timeline).
+						 *
+						 * @param object $licenser_license    License record.
+						 * @param int    $licenser_license_id License ID.
+						 */
+						do_action( 'licenser_license_edit_after_cards', $licenser_license, $licenser_license_id );
+						?>
 					<?php endif; ?>
 				</div>
 
@@ -475,6 +497,17 @@ if ( $licenser_domain_limit > 0 && $licenser_active_domains_count >= $licenser_d
 							<?php endif; ?>
 						</div>
 					</div>
+					<?php
+					if ( $licenser_is_edit ) {
+						/**
+						 * Fires inside the License Edit sticky sidebar below the Snapshot card.
+						 *
+						 * @param object $licenser_license    License record.
+						 * @param int    $licenser_license_id License ID.
+						 */
+						do_action( 'licenser_license_edit_sidebar', $licenser_license, $licenser_license_id );
+					}
+					?>
 				</aside>
 			</div>
 		</div>

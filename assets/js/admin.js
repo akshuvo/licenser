@@ -349,6 +349,14 @@ jQuery(function ($) {
 		});
 	}
 
+	// Expose shared Cupertino UI helpers for Pro/extension scripts.
+	window.LicenserUI = {
+		toast: showToast,
+		notice: showInlineNotice,
+		confirm: openConfirmModal,
+		extractError: extractErrorMessage
+	};
+
 	// -------------------------------------------------------------------------
 	// Universal One-Click Clipboard Copy
 	// -------------------------------------------------------------------------

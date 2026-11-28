@@ -117,10 +117,15 @@ Portal child theme glue (`/Users/akshuvo/Local Sites/addonmaster-portal/app/publ
 | `licenser_api_url` | `includes/functions.php` | Filter base URL used in download URLs & SDK Generator (defaults to `home_url('/')`) |
 | `licenser_product_types` | `includes/models/Product.php` | Add/modify product types (`plugin`, `theme`) |
 | `licenser_refresh_license_public_response` | `includes/controllers/License.php` | Modify public `check`/`activate` JSON payload (`$response, $license`) |
-| `licenser_should_enforce_domain_limit` | `includes/controllers/License.php` | Override domain limit enforcement (`$enforce, $license, $args`) — e.g., Pro local-domain exemption |
+| `licenser_should_enforce_domain_limit` | `includes/controllers/License.php` | Override domain limit enforcement (`$enforce, $license, $args`) — e.g., Pro local/staging domain exemption |
+| `licenser_active_domain_count` | `includes/controllers/License.php`, `includes/Admin/templates/licenses/new.php`, `addons/WooLite/Shortcode.php`, `addons/WooLite/Order_Handler.php` | Filter counted active domains for a single license (`$count, $license, $context, $args`) — e.g., exclude staging domains |
+| `licenser_active_domain_counts` | `includes/models/License.php` | Filter batch active domain counts keyed by license ID (`$counts, $ids`) |
 | `licenser_sanitize_settings` | `includes/models/Settings.php` | Extend settings allowlist/sanitization (`$sanitized, $data`) |
+| `licenser_settings_tabs` | `includes/Admin/templates/settings/settings.php` | Register additional tabs on Licenser Settings (`$tabs`) |
 | `licenser_integrations` | `includes/controllers/Addons.php` | Register or customize toggleable store integrations (`$integrations`, e.g., WooCommerce, Easy Digital Downloads) |
+| `licenser_wclite_should_generate_license_for_item` | `addons/WooLite/Order_Handler.php` | Short-circuit new key issuance per WC order item (`$should_generate, $item, $item_id, $order`) — e.g., Pro renewals/upgrades |
 | `licenser_wclite_products_page_url` | `addons/WooLite/Shortcode.php` | Filter "Browse products" button URL in empty My Account table |
+| `licenser_allowed_download_dirs` | `includes/controllers/Product.php` | Filter local directories permitted for release ZIP streaming (`$dirs`) |
 
 ### Actions in Licenser (Free)
 | Hook | Location | Arguments |
@@ -133,11 +138,20 @@ Portal child theme glue (`/Users/akshuvo/Local Sites/addonmaster-portal/app/publ
 | `licenser_license_deleted` | `includes/models/License.php` | `$license_id` |
 | `licenser_license_activated` | `includes/controllers/License.php` | `$license, $args` |
 | `licenser_license_checked` | `includes/controllers/License.php` | `$license, $args` |
-| `licenser_license_deactivated` | `includes/controllers/License.php` | `$license, $url` |
+| `licenser_license_check_failed` | `includes/controllers/License.php` | `$error, $args, $action` (`check` \| `activate`) |
+| `licenser_license_deactivated` | `includes/controllers/License.php`, `addons/WooLite/Order_Handler.php` | `$license, $url` |
 | `licenser_before_product_download` | `includes/controllers/Product.php` | `$release, $license, $args` |
+| `licenser_product_download_failed` | `includes/controllers/Product.php` | `$error, $args` |
+| `licenser_admin_menu` | `includes/Admin/Menu.php` | `$parent_slug, $capability` |
+| `licenser_settings_tab_panels` | `includes/Admin/templates/settings/settings.php` | `$active_tab, $settings` |
+| `licenser_license_domain_row_badges` | `includes/Admin/templates/licenses/new.php` | `$domain_item, $license` |
+| `licenser_license_edit_after_cards` | `includes/Admin/templates/licenses/new.php` | `$license, $license_id` |
+| `licenser_license_edit_sidebar` | `includes/Admin/templates/licenses/new.php` | `$license, $license_id` |
+| `licenser_portal_license_actions` | `addons/WooLite/Shortcode.php` | `$license, $product, $item` |
+| `licenser_portal_domain_badges` | `addons/WooLite/Shortcode.php` | `$domain, $license` |
 
 ### Free ↔ `licenser-pro` Boundary Guidelines
-`licenser-pro` (`LicenserWP/licenser-pro`) is currently a bootstrap stub (`licenser-pro.php`, defines `LICENSER_PRO_*` constants). Free checks `defined('LICENSER_PRO_VERSION')` only for non-breaking UI indicators (`PRO` menu badge and Addons card).
+`licenser-pro` (`LicenserWP/licenser-pro`) is the companion Pro extension (`licenser-pro.php`, `LicenserPro\` PSR-4 namespace, `LICENSER_PRO_*` constants, `licenser_pro_settings` option, and `licenser_pro_activity_logs` / `licenser_pro_email_logs` tables). Free checks `defined('LICENSER_PRO_VERSION')` only for non-breaking UI indicators (`PRO` menu badge and Addons card).
 
 When developing `licenser-pro`:
 1. Hook into `licenser_loaded` (or check `class_exists('Licenser')` on `plugins_loaded`) and show a clean admin notice if Free is missing.

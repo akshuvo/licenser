@@ -27,9 +27,26 @@ $licenser_wc_enabled     = $licenser_addons->is_enabled( 'woocommerce' );
 $licenser_wc_plugin      = $licenser_addons->is_dependency_active( 'woocommerce' );
 $licenser_public_api_url = untrailingslashit( rest_url( 'licenser/v1/public' ) );
 
+/**
+ * Filter additional tabs displayed on the Licenser Settings page.
+ *
+ * Each entry supports `slug`, `label`, `icon` (dashicon class), and optional `dot_class`.
+ *
+ * @param array<int, array<string, string>> $tabs Extra tab definitions.
+ */
+$licenser_extra_tabs = apply_filters( 'licenser_settings_tabs', [] );
+$licenser_extra_tabs = is_array( $licenser_extra_tabs ) ? $licenser_extra_tabs : [];
+
+$licenser_allowed_tabs = [ 'general', 'woocommerce', 'api' ];
+foreach ( $licenser_extra_tabs as $licenser_extra_tab ) {
+	if ( ! empty( $licenser_extra_tab['slug'] ) ) {
+		$licenser_allowed_tabs[] = sanitize_key( (string) $licenser_extra_tab['slug'] );
+	}
+}
+
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only settings tab navigation.
 $licenser_active_tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'general';
-if ( ! in_array( $licenser_active_tab, [ 'general', 'woocommerce', 'api' ], true ) ) {
+if ( ! in_array( $licenser_active_tab, $licenser_allowed_tabs, true ) ) {
 	$licenser_active_tab = 'general';
 }
 
@@ -76,6 +93,25 @@ if ( $licenser_wc_enabled ) {
 						<span class="dashicons dashicons-rest-api" aria-hidden="true"></span>
 						<?php esc_html_e( 'API & Maintenance', 'licenser' ); ?>
 					</button>
+					<?php
+					foreach ( $licenser_extra_tabs as $licenser_extra_tab ) :
+						$licenser_tab_slug = ! empty( $licenser_extra_tab['slug'] ) ? sanitize_key( (string) $licenser_extra_tab['slug'] ) : '';
+						if ( '' === $licenser_tab_slug ) {
+							continue;
+						}
+						$licenser_tab_label = ! empty( $licenser_extra_tab['label'] ) ? (string) $licenser_extra_tab['label'] : $licenser_tab_slug;
+						$licenser_tab_icon  = ! empty( $licenser_extra_tab['icon'] ) ? sanitize_html_class( (string) $licenser_extra_tab['icon'] ) : 'dashicons-admin-generic';
+						$licenser_tab_dot   = ! empty( $licenser_extra_tab['dot_class'] ) ? sanitize_html_class( (string) $licenser_extra_tab['dot_class'] ) : '';
+						$licenser_is_cur    = ( $licenser_tab_slug === $licenser_active_tab );
+						?>
+						<button type="button" id="licenser-tab-btn-<?php echo esc_attr( $licenser_tab_slug ); ?>" class="licenser-pill <?php echo $licenser_is_cur ? 'is-active' : ''; ?>" role="tab" aria-controls="licenser-tab-<?php echo esc_attr( $licenser_tab_slug ); ?>" aria-selected="<?php echo $licenser_is_cur ? 'true' : 'false'; ?>" data-licenser-tab="<?php echo esc_attr( $licenser_tab_slug ); ?>" data-licenser-tab-sync="1">
+							<span class="dashicons <?php echo esc_attr( $licenser_tab_icon ); ?>" aria-hidden="true"></span>
+							<?php echo esc_html( $licenser_tab_label ); ?>
+							<?php if ( '' !== $licenser_tab_dot ) : ?>
+								<span class="licenser-tab__dot <?php echo esc_attr( $licenser_tab_dot ); ?>" aria-hidden="true"></span>
+							<?php endif; ?>
+						</button>
+					<?php endforeach; ?>
 				</div>
 			</div>
 
@@ -364,6 +400,16 @@ if ( $licenser_wc_enabled ) {
 					</div>
 				</div>
 			</div>
+
+			<?php
+			/**
+			 * Fires after core Settings tab panels to allow Pro/extensions to render custom tab panels.
+			 *
+			 * @param string $licenser_active_tab Active tab slug.
+			 * @param array  $licenser_settings   Saved core settings array.
+			 */
+			do_action( 'licenser_settings_tab_panels', $licenser_active_tab, $licenser_settings );
+			?>
 		</div>
 	</div>
 </div>
