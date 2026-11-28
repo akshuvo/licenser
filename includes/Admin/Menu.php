@@ -35,7 +35,12 @@ class Menu {
 	 */
 	public function admin_menu() {
 		$parent_slug = 'licenser';
-		$capability  = 'manage_options';
+		$capability  = (string) apply_filters( 'licenser_admin_capability', 'manage_options', 'dashboard' );
+		$prod_cap    = (string) apply_filters( 'licenser_admin_capability', 'manage_options', 'products' );
+		$lic_cap     = (string) apply_filters( 'licenser_admin_capability', 'manage_options', 'licenses' );
+		$set_cap     = (string) apply_filters( 'licenser_admin_capability', 'manage_options', 'settings' );
+		$sdk_cap     = (string) apply_filters( 'licenser_admin_capability', 'manage_options', 'sdk' );
+		$addons_cap  = (string) apply_filters( 'licenser_admin_capability', 'manage_options', 'addons' );
 
 		$pro_tag = defined( 'LICENSER_PRO_VERSION' )
 			? '<span class="update-plugins licenser-menu-badge"><span class="plugin-count">' . esc_html__( 'PRO', 'licenser' ) . '</span></span>'
@@ -56,12 +61,12 @@ class Menu {
 		$this->admin_menus = $hook;
 
 		add_submenu_page( $parent_slug, __( 'Dashboard - Licenser', 'licenser' ), __( 'Dashboard', 'licenser' ), $capability, $parent_slug, [ $this, 'dashboard_page' ] );
-		$plugins_hook  = add_submenu_page( $parent_slug, __( 'Plugins - Licenser', 'licenser' ), __( 'Plugins', 'licenser' ), $capability, $parent_slug . '-plugins', [ $this, 'plugins_page' ] );
-		$themes_hook   = add_submenu_page( $parent_slug, __( 'Themes - Licenser', 'licenser' ), __( 'Themes', 'licenser' ), $capability, $parent_slug . '-themes', [ $this, 'themes_page' ] );
-		$licenses_hook = add_submenu_page( $parent_slug, __( 'Licenses - Licenser', 'licenser' ), __( 'Licenses', 'licenser' ), $capability, $parent_slug . '-licenses', [ $this, 'licenses_page' ] );
-		add_submenu_page( $parent_slug, __( 'Settings - Licenser', 'licenser' ), __( 'Settings', 'licenser' ), $capability, 'licenser-settings', [ $this, 'settings_page' ] );
-		add_submenu_page( $parent_slug, __( 'SDK Studio - Licenser', 'licenser' ), __( 'SDK Studio', 'licenser' ), $capability, 'licenser-sdk-generator', [ $this, 'sdk_generator_page' ] );
-		add_submenu_page( $parent_slug, __( 'Addons - Licenser', 'licenser' ), __( 'Addons', 'licenser' ), $capability, 'licenser-addons', [ $this, 'addons_page' ] );
+		$plugins_hook  = add_submenu_page( $parent_slug, __( 'Plugins - Licenser', 'licenser' ), __( 'Plugins', 'licenser' ), $prod_cap, $parent_slug . '-plugins', [ $this, 'plugins_page' ] );
+		$themes_hook   = add_submenu_page( $parent_slug, __( 'Themes - Licenser', 'licenser' ), __( 'Themes', 'licenser' ), $prod_cap, $parent_slug . '-themes', [ $this, 'themes_page' ] );
+		$licenses_hook = add_submenu_page( $parent_slug, __( 'Licenses - Licenser', 'licenser' ), __( 'Licenses', 'licenser' ), $lic_cap, $parent_slug . '-licenses', [ $this, 'licenses_page' ] );
+		add_submenu_page( $parent_slug, __( 'Settings - Licenser', 'licenser' ), __( 'Settings', 'licenser' ), $set_cap, 'licenser-settings', [ $this, 'settings_page' ] );
+		add_submenu_page( $parent_slug, __( 'SDK Studio - Licenser', 'licenser' ), __( 'SDK Studio', 'licenser' ), $sdk_cap, 'licenser-sdk-generator', [ $this, 'sdk_generator_page' ] );
+		add_submenu_page( $parent_slug, __( 'Addons - Licenser', 'licenser' ), __( 'Addons', 'licenser' ), $addons_cap, 'licenser-addons', [ $this, 'addons_page' ] );
 
 		add_action( 'admin_head-' . $hook, [ $this, 'enqueue_assets' ] );
 
@@ -145,7 +150,7 @@ class Menu {
 	 * @return void
 	 */
 	public function handle_licenses_bulk_actions() {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( (string) apply_filters( 'licenser_admin_capability', 'manage_options', 'licenses' ) ) ) {
 			return;
 		}
 

@@ -120,6 +120,9 @@ Portal child theme glue (`/Users/akshuvo/Local Sites/addonmaster-portal/app/publ
 | `licenser_should_enforce_domain_limit` | `includes/controllers/License.php` | Override domain limit enforcement (`$enforce, $license, $args`) — e.g., Pro local/staging domain exemption |
 | `licenser_active_domain_count` | `includes/controllers/License.php`, `includes/Admin/templates/licenses/new.php`, `addons/WooLite/Shortcode.php`, `addons/WooLite/Order_Handler.php` | Filter counted active domains for a single license (`$count, $license, $context, $args`) — e.g., exclude staging domains |
 | `licenser_active_domain_counts` | `includes/models/License.php` | Filter batch active domain counts keyed by license ID (`$counts, $ids`) |
+| `licenser_license_matches_product` | `includes/controllers/License.php` | Filter whether a license is valid for a requested product ID (`$matches, $license, $product_id, $args`) — e.g., Pro Bundle / All-Access passes |
+| `licenser_admin_capability` | `includes/Admin/Menu.php` | Filter required capability per Licenser admin screen (`$cap, $context`) — e.g., Pro Support Agent role |
+| `licenser_rest_capability` | `includes/controllers/RestController.php` | Filter required capability per Licenser REST controller & verb (`$cap, $rest_base, $action, $request`) |
 | `licenser_sanitize_settings` | `includes/models/Settings.php` | Extend settings allowlist/sanitization (`$sanitized, $data`) |
 | `licenser_settings_tabs` | `includes/Admin/templates/settings/settings.php` | Register additional tabs on Licenser Settings (`$tabs`) |
 | `licenser_integrations` | `includes/controllers/Addons.php` | Register or customize toggleable store integrations (`$integrations`, e.g., WooCommerce, Easy Digital Downloads) |
@@ -143,6 +146,9 @@ Portal child theme glue (`/Users/akshuvo/Local Sites/addonmaster-portal/app/publ
 | `licenser_before_product_download` | `includes/controllers/Product.php` | `$release, $license, $args` |
 | `licenser_product_download_failed` | `includes/controllers/Product.php` | `$error, $args` |
 | `licenser_admin_menu` | `includes/Admin/Menu.php` | `$parent_slug, $capability` |
+| `licenser_addons_after_store_integrations` | `includes/Admin/templates/addons/addons.php` | None — render Pro/extension module cards inside Addons & Integrations |
+| `licenser_settings_woocommerce_after_card` | `includes/Admin/templates/settings/settings.php` | `$settings` — render Pro WooCommerce cards inside Settings → WooCommerce |
+| `licenser_settings_updated` | `includes/models/Settings.php` | `$sanitized, $data` — persist companion fields saved alongside core Settings |
 | `licenser_settings_tab_panels` | `includes/Admin/templates/settings/settings.php` | `$active_tab, $settings` |
 | `licenser_license_domain_row_badges` | `includes/Admin/templates/licenses/new.php` | `$domain_item, $license` |
 | `licenser_license_edit_after_cards` | `includes/Admin/templates/licenses/new.php` | `$license, $license_id` |

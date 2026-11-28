@@ -53,8 +53,19 @@ class License {
 		}
 
 		// Verify license belongs to the requested product when product_id is supplied.
-		if ( ! empty( $args['product_id'] ) && (int) $license->product_id !== (int) $args['product_id'] ) {
-			return new WP_Error( 'invalid_product', __( 'License key is not valid for this product.', 'licenser' ) );
+		if ( ! empty( $args['product_id'] ) ) {
+			$matches_product = ( (int) $license->product_id === (int) $args['product_id'] );
+			/**
+			 * Filter whether a license is authorized for the requested product ID (e.g. Bundle / All-Access passes).
+			 *
+			 * @param bool   $matches_product Whether license product_id directly matches.
+			 * @param object $license         License record.
+			 * @param int    $product_id      Requested product ID.
+			 * @param array  $args            Validation arguments.
+			 */
+			if ( ! apply_filters( 'licenser_license_matches_product', $matches_product, $license, (int) $args['product_id'], $args ) ) {
+				return new WP_Error( 'invalid_product', __( 'License key is not valid for this product.', 'licenser' ) );
+			}
 		}
 
 		// Verify expiration for non-lifetime licenses.
@@ -340,11 +351,14 @@ class License {
 			];
 		}
 
-		if ( ! empty( $params['product_id'] ) && (int) $license->product_id !== (int) $params['product_id'] ) {
-			return [
-				'success' => false,
-				'error'   => __( 'License key is not valid for this product.', 'licenser' ),
-			];
+		if ( ! empty( $params['product_id'] ) ) {
+			$matches_product = ( (int) $license->product_id === (int) $params['product_id'] );
+			if ( ! apply_filters( 'licenser_license_matches_product', $matches_product, $license, (int) $params['product_id'], $params ) ) {
+				return [
+					'success' => false,
+					'error'   => __( 'License key is not valid for this product.', 'licenser' ),
+				];
+			}
 		}
 
 		$domain_row = ! empty( $params['url'] ) ? License_Model::instance()->get_domain( $params['url'], $license->id ) : null;

@@ -37,8 +37,8 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function get_item_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-		return current_user_can( 'manage_options' );
+	public function get_item_permissions_check( $request ) {
+		return current_user_can( (string) apply_filters( 'licenser_rest_capability', 'manage_options', $this->rest_base, 'read', $request ) );
 	}
 
 	/**
@@ -47,8 +47,8 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function get_items_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-		return current_user_can( 'manage_options' );
+	public function get_items_permissions_check( $request ) {
+		return current_user_can( (string) apply_filters( 'licenser_rest_capability', 'manage_options', $this->rest_base, 'read', $request ) );
 	}
 
 	/**
@@ -57,8 +57,8 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function create_item_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-		return current_user_can( 'manage_options' );
+	public function create_item_permissions_check( $request ) {
+		return current_user_can( (string) apply_filters( 'licenser_rest_capability', 'manage_options', $this->rest_base, 'create', $request ) );
 	}
 
 	/**
@@ -67,8 +67,8 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function update_item_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-		return current_user_can( 'manage_options' );
+	public function update_item_permissions_check( $request ) {
+		return current_user_can( (string) apply_filters( 'licenser_rest_capability', 'manage_options', $this->rest_base, 'update', $request ) );
 	}
 
 	/**
@@ -77,8 +77,8 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function delete_item_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-		return current_user_can( 'manage_options' );
+	public function delete_item_permissions_check( $request ) {
+		return current_user_can( (string) apply_filters( 'licenser_rest_capability', 'manage_options', $this->rest_base, 'delete', $request ) );
 	}
 
 	/**
@@ -87,7 +87,7 @@ abstract class RestController extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full data about the request.
 	 * @return WP_Error|bool
 	 */
-	public function delete_items_permissions_check( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
-		return current_user_can( 'manage_options' );
+	public function delete_items_permissions_check( $request ) {
+		return current_user_can( (string) apply_filters( 'licenser_rest_capability', 'manage_options', $this->rest_base, 'delete', $request ) );
 	}
 }

@@ -1710,6 +1710,8 @@ body[class*="licenser"] #wpfooter {
 }
 
 .licenser-field input[type="text"],
+.licenser-field input[type="email"],
+.licenser-field input[type="password"],
 .licenser-field input[type="url"],
 .licenser-field input[type="number"],
 .licenser-field input[type="date"],

@@ -125,6 +125,17 @@ class Settings {
 
 		update_option( self::OPTION_NAME, $sanitized );
 
+		/**
+		 * Fires after core Licenser settings have been persisted.
+		 *
+		 * Allows companion plugins (e.g., Licenser Pro) to persist their own
+		 * fields rendered inside core Settings tabs into their own option.
+		 *
+		 * @param array $sanitized Sanitized core settings saved to `licenser_settings`.
+		 * @param array $data      Raw input payload submitted to the settings endpoint.
+		 */
+		do_action( 'licenser_settings_updated', $sanitized, $data );
+
 		return $sanitized;
 	}
 

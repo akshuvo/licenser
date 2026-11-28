@@ -1822,6 +1822,13 @@ jQuery(function ($) {
 			}
 		);
 
+		$form.find('input[type="checkbox"][data-licenser-toggle="1"]').each(function () {
+			var name = $(this).attr('name');
+			if (name) {
+				jsonObject[name] = $(this).is(':checked') ? 'on' : '';
+			}
+		});
+
 		$.ajax({
 			type: 'POST',
 			url: cfg.rest_url + 'settings',
@@ -1967,7 +1974,7 @@ jQuery(function ($) {
 		submitIntegrationToggle($input, slug, true);
 	});
 
-	// One-click "Enable WooCommerce Lite" button inside Settings → WooCommerce tab callout
+	// One-click "Enable Integration" button inside Settings store tab callouts (WooCommerce, EDD, etc.)
 	$(document).on('click', '.licenser-quick-enable-integration', function (e) {
 		e.preventDefault();
 		var $btn = $(this);
@@ -1975,6 +1982,10 @@ jQuery(function ($) {
 		if (!slug) {
 			return;
 		}
+		var calloutSelector = $btn.attr('data-callout') || (slug === 'woocommerce' ? '#licenser-wc-disabled-callout' : '#licenser-' + slug + '-disabled-callout');
+		var badgeSelector = $btn.attr('data-badge') || (slug === 'woocommerce' ? '#licenser-wc-settings-badge' : '#licenser-' + slug + '-settings-badge');
+		var dotSelector = $btn.attr('data-dot') || (slug === 'woocommerce' ? '#licenser-wc-tab-dot' : '#licenser-' + slug + '-tab-dot');
+		var activeLabel = $btn.attr('data-active-label') || (slug === 'woocommerce' ? 'WooCommerce Active' : msg('active', 'Active'));
 
 		$.ajax({
 			type: 'POST',
@@ -1993,18 +2004,18 @@ jQuery(function ($) {
 			},
 			success: function (res) {
 				var status = (res && res.status) || 'active';
-				$('#licenser-wc-disabled-callout').attr('hidden', true);
+				$(calloutSelector).attr('hidden', true);
 
-				var $badge = $('#licenser-wc-settings-badge');
+				var $badge = $(badgeSelector);
 				$badge.removeClass('licenser-badge--active licenser-badge--inactive licenser-badge--warning');
-				var $dot = $('#licenser-wc-tab-dot');
+				var $dot = $(dotSelector);
 				$dot.removeClass('licenser-tab__dot--active licenser-tab__dot--inactive licenser-tab__dot--warning');
 
 				if (status === 'active') {
-					$badge.addClass('licenser-badge--active').find('.licenser-badge-label').text('WooCommerce Active');
+					$badge.addClass('licenser-badge--active').find('.licenser-badge-label').text(activeLabel);
 					$dot.addClass('licenser-tab__dot--active');
 				} else {
-					var depName = (res && res.dependency_name) || 'WooCommerce';
+					var depName = (res && res.dependency_name) || slug;
 					$badge.addClass('licenser-badge--warning').find('.licenser-badge-label').text(msg('requires_prefix', 'Requires') + ' ' + depName);
 					$dot.addClass('licenser-tab__dot--warning');
 				}

@@ -159,6 +159,14 @@ $licenser_pro_active   = defined( 'LICENSER_PRO_VERSION' );
 				<?php endforeach; ?>
 			</div>
 
+			<?php
+			/**
+			 * Fires after the Store Integrations grid on Licenser -> Addons so Pro/extensions
+			 * can render modular feature toggles in the same Cupertino card system.
+			 */
+			do_action( 'licenser_addons_after_store_integrations' );
+			?>
+
 			<!-- Section 2: Developer SDK & Extensions -->
 			<div class="licenser-section-header licenser-section-header--spaced">
 				<h2><?php esc_html_e( 'SDK & Extensions', 'licenser' ); ?></h2>
