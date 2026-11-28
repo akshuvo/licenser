@@ -67,6 +67,12 @@ $licenser_export_url = wp_nonce_url(
 				</div>
 			</div>
 			<div class="licenser-topbar__actions">
+				<?php if ( current_user_can( (string) apply_filters( 'licenser_admin_capability', 'manage_options', 'migration' ) ) ) : ?>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-migration&entity=licenses' ) ); ?>" class="licenser-btn licenser-btn--secondary">
+						<span class="dashicons dashicons-upload" aria-hidden="true"></span>
+						<?php esc_html_e( 'Import CSV', 'licenser' ); ?>
+					</a>
+				<?php endif; ?>
 				<a href="<?php echo esc_url( $licenser_export_url ); ?>" class="licenser-btn licenser-btn--secondary">
 					<span class="dashicons dashicons-download"></span>
 					<?php esc_html_e( 'Export CSV', 'licenser' ); ?>

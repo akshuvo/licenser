@@ -1,0 +1,6 @@
+license_key,product_slug,package_label,status,domain_limit,end_date,is_lifetime,customer_email,customer_name,domains,source,source_id
+DEMO-NORTHSTAR-ANNUAL-001,northstar-blocks,Single Site Annual,active,1,2035-11-01 23:59:59,0,alex@example.com,Alex Example,https://alex.example.com,imported,1001
+DEMO-NORTHSTAR-AGENCY-002,northstar-blocks,Agency Annual,active,25,2035-11-02 23:59:59,0,sam@example.com,Sam Example,https://www.agency.example.com;https://client.example.com/shop;agency.example.com,imported,1002
+DEMO-NORTHSTAR-LIFETIME-003,northstar-blocks,Lifetime,active,0,lifetime,1,casey@example.com,Casey Example,https://casey.example.com;https://studio.example.com,imported,1003
+DEMO-HARBOR-EXPIRED-004,harbor-studio,Single Site Annual,expired,1,2020-01-01 23:59:59,0,jordan@example.com,Jordan Example,https://jordan.example.com,imported,1004
+DEMO-HARBOR-LIFETIME-005,harbor-studio,Lifetime,active,unlimited,0,1,taylor@example.com,Taylor Example,,imported,1005

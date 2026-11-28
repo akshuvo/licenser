@@ -2035,8 +2035,8 @@ jQuery(function ($) {
 		var tab = $tab.attr('data-licenser-tab');
 		var $list = $tab.closest('[role="tablist"]');
 		var $tabs = $list.length ? $list.find('[data-licenser-tab]') : $('[data-licenser-tab]');
-		$tabs.removeClass('is-active').attr('aria-selected', 'false');
-		$tab.addClass('is-active').attr('aria-selected', 'true');
+		$tabs.removeClass('is-active').attr({ 'aria-selected': 'false', tabindex: '-1' });
+		$tab.addClass('is-active').attr({ 'aria-selected': 'true', tabindex: '0' });
 		$('.licenser-tab-panel').removeClass('is-active');
 		$('#licenser-tab-' + tab).addClass('is-active');
 
@@ -2044,6 +2044,10 @@ jQuery(function ($) {
 			try {
 				var url = new URL(window.location.href);
 				url.searchParams.set('tab', tab);
+				if ($tab.closest('.licenser-migration').length) {
+					if (tab === 'ai') { url.searchParams.delete('entity'); }
+					else { url.searchParams.set('entity', tab); }
+				}
 				window.history.replaceState({}, '', url.toString());
 			} catch (err) {
 				// Ignore URL API failures in restricted environments.
@@ -2343,4 +2347,236 @@ jQuery(function ($) {
 				$btn.prop('disabled', false).removeClass('is-loading');
 			});
 	});
+	// -------------------------------------------------------------------------
+	// CSV Migration: local parsing, explicit mapping review and bounded imports.
+	// -------------------------------------------------------------------------
+	var $migration = $('[data-licenser-migration]');
+	if ($migration.length) {
+		var migration = JSON.parse($migration.attr('data-licenser-migration'));
+		var ml = migration.labels;
+
+		function normalizeImportHeader(value) {
+			return String(value).trim().replace(/ /g, '_').toLowerCase().replace(/[^a-z0-9_\-]/g, '');
+		}
+
+		function parseImportCsv(text) {
+			if (!text.trim() || text.indexOf('\0') !== -1 || new Blob([text]).size > 2 * 1024 * 1024) {
+				throw new Error(ml.invalid_csv);
+			}
+			text = text.replace(/^\uFEFF/, '');
+			var rows = [], row = [], cell = '', quoted = false, closed = false;
+			for (var i = 0; i < text.length; i++) {
+				var ch = text[i];
+				if (quoted) {
+					if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+					else if (ch === '"') { quoted = false; closed = true; }
+					else { cell += ch; }
+				} else if (ch === '"' && cell === '' && !closed) {
+					quoted = true;
+				} else if (ch === ',' || ch === '\r' || ch === '\n') {
+					row.push(cell); cell = ''; closed = false;
+					if (ch !== ',') {
+						if (ch === '\r' && text[i + 1] === '\n') { i++; }
+						if (row.length !== 1 || row[0] !== '') { rows.push(row); }
+						row = [];
+						if (rows.length > 1001) { throw new Error(ml.invalid_csv); }
+					}
+				} else {
+					if (closed && !/\s/.test(ch)) { throw new Error(ml.bad_quotes); }
+					if (!closed) { cell += ch; }
+				}
+			}
+			if (quoted) { throw new Error(ml.bad_quotes); }
+			if (cell !== '' || row.length || closed) { row.push(cell); rows.push(row); }
+			if (!rows.length || rows.length > 1001) { throw new Error(ml.invalid_csv); }
+			var headers = rows.shift();
+			var normalized = headers.map(normalizeImportHeader);
+			if (normalized.some(function (h) { return !h; }) || new Set(normalized).size !== headers.length) {
+				throw new Error(ml.invalid_csv);
+			}
+			if (rows.some(function (r) { return r.length !== headers.length; })) { throw new Error(ml.bad_columns); }
+			return { headers: headers, normalized: normalized, rows: rows };
+		}
+
+		function safeImportText(value) {
+			var text = String(value == null ? '' : value);
+			return /^\s*[=+@\-]/.test(text) ? "'" + text : text;
+		}
+
+		function refreshMigrationProducts(page) {
+			$.ajax({ url: cfg.rest_url + 'products', data: { page: page, per_page: 100, status: 'all' }, beforeSend: function (xhr) { xhr.setRequestHeader('X-WP-Nonce', cfg.nonce); } }).done(function (products) {
+				if (!Array.isArray(products)) { return; }
+				$migration.find('[name="default_product_id"]').each(function () {
+					var $select = $(this);
+					products.forEach(function (product) {
+						var $option = $select.find('option').filter(function () { return this.value === String(product.id); });
+						if ($option.length) { $option.text(product.name); }
+						else { $select.append($('<option></option>').val(product.id).text(product.name)); }
+					});
+				});
+				if (products.length === 100) { refreshMigrationProducts(page + 1); }
+			});
+		}
+
+		$migration.on('click', '[data-import-download]', function () {
+			var entity = $(this).attr('data-import-download');
+			var url = URL.createObjectURL(new Blob([migration.samples[entity]], { type: 'text/csv;charset=utf-8' }));
+			var anchor = document.createElement('a');
+			anchor.href = url;
+			anchor.download = 'sample-' + entity + '.csv';
+			document.body.appendChild(anchor);
+			anchor.click();
+			anchor.remove();
+			window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+		});
+
+		$migration.find('.licenser-import-form').each(function () {
+			var $form = $(this), entity = $form.attr('data-entity');
+			var $editor = $form.find('[name="csv"]'), $mapping = $form.find('.licenser-import-mapping');
+			var $validation = $form.find('.licenser-import-validation');
+			var parsed = null, previousHeaders = '', overrides = Object.create(null), timer, busy = false, fileToken = 0;
+			var requiredField = entity === 'products' ? 'name' : (entity === 'packages' ? 'label' : 'license_key');
+
+			function invalidateResults() { $form.find('.licenser-import-results').prop('hidden', true); }
+			function validation(text) { $validation.text(text || '').prop('hidden', !text); }
+			function columnMap() {
+				var map = Object.create(null);
+				$mapping.find('select').each(function () { map[$(this).attr('data-field')] = $(this).val(); });
+				return map;
+			}
+			function updateButtons() {
+				var map = columnMap();
+				$form.find('[data-import-run]').prop('disabled', busy || !parsed || !parsed.rows.length || !map[requiredField]);
+			}
+			function sampleValue($select) {
+				var index = parsed.headers.indexOf($select.val());
+				var value = index >= 0 && parsed.rows.length ? parsed.rows[0][index] : '';
+				$select.closest('tr').find('.licenser-import-sample-value').text(value ? safeImportText(value) : ml.empty);
+			}
+			function buildMapping(reset) {
+				if (!parsed) { return; }
+				if (reset) { overrides = Object.create(null); }
+				var preset = $form.find('[name="preset"]').val();
+				if (preset === 'auto') {
+					preset = parsed.normalized.some(function (h) { return ['secret_key', 'user_email', 'quota', 'plan_id', 'is_cancelled'].indexOf(h) !== -1; }) ? 'freemius' : (parsed.normalized.indexOf('code') !== -1 || parsed.normalized.indexOf('expires_at') !== -1 ? 'appsero' : 'edd_sl');
+				}
+				var aliases = migration.aliases[entity][preset] || {};
+				var $body = $mapping.find('tbody').empty();
+				migration.fields[entity].forEach(function (field) {
+					var candidates = [field].concat(aliases[field] || []), selected = '';
+					candidates.some(function (candidate) {
+						var index = parsed.normalized.indexOf(normalizeImportHeader(candidate));
+						if (index < 0) {
+							var fuzzy = normalizeImportHeader(candidate).replace(/[_\-]/g, '');
+							index = parsed.normalized.findIndex(function (h) { return h.replace(/[_\-]/g, '') === fuzzy; });
+						}
+						if (index >= 0) { selected = parsed.headers[index]; return true; }
+						return false;
+					});
+					if (Object.prototype.hasOwnProperty.call(overrides, field)) { selected = overrides[field]; }
+					var $row = $('<tr></tr>'), $label = $('<td></td>').append($('<code></code>').text(field));
+					if (field === requiredField) { $label.append(' ').append($('<span class="licenser-badge licenser-badge--warning"></span>').text(ml.required)); }
+					var $select = $('<select></select>').attr({ 'data-field': field, 'aria-label': field });
+					$select.append($('<option></option>').val('').text(ml.ignore));
+					parsed.headers.forEach(function (header) { $select.append($('<option></option>').val(header).text(header)); });
+					$select.val(selected);
+					$row.append($label).append($('<td class="licenser-field"></td>').append($select)).append($('<td class="licenser-import-sample-value"></td>'));
+					$body.append($row); sampleValue($select);
+				});
+				$mapping.prop('hidden', false); updateButtons();
+			}
+			function parseEditor(reset) {
+				validation(''); parsed = null;
+				try {
+					if (!$editor.val().trim()) { $mapping.prop('hidden', true); updateButtons(); return; }
+					parsed = parseImportCsv($editor.val());
+					var headerKey = JSON.stringify(parsed.headers);
+					buildMapping(reset || headerKey !== previousHeaders);
+					previousHeaders = headerKey;
+				} catch (err) {
+					$mapping.prop('hidden', true); validation(err.message); updateButtons();
+				}
+			}
+			$form.on('submit', function (e) { e.preventDefault(); });
+			$editor.on('input', function () {
+				fileToken++; invalidateResults(); parsed = null; updateButtons();
+				window.clearTimeout(timer); timer = window.setTimeout(function () { parseEditor(false); }, 150);
+			});
+			$form.on('change', '[name="preset"]', function () { invalidateResults(); parseEditor(true); });
+			$form.on('change', '[name="default_product_id"], [name="duplicate_mode"]', invalidateResults);
+			$mapping.on('change', 'select', function () {
+				overrides[$(this).attr('data-field')] = $(this).val(); sampleValue($(this)); invalidateResults(); updateButtons();
+			});
+			$form.on('click', '[data-import-load]', function () {
+				fileToken++; $editor.val(migration.samples[entity]);
+				$form.find('input[type="file"]').val('');
+				invalidateResults(); parseEditor(true); $editor.trigger('focus');
+			});
+			$form.on('change', 'input[type="file"]', function () {
+				var file = this.files && this.files[0];
+				if (!file) { return; }
+				var uploadToken = ++fileToken;
+				window.clearTimeout(timer); invalidateResults(); validation('');
+				$editor.val(''); parsed = null; $mapping.prop('hidden', true); updateButtons();
+				if (file.size > 2 * 1024 * 1024) { validation(ml.invalid_csv); this.value = ''; return; }
+				var reader = new FileReader();
+				reader.onload = function () {
+					if (uploadToken !== fileToken) { return; }
+					try {
+						var decoded = new TextDecoder('utf-8', { fatal: true }).decode(reader.result);
+						$editor.val(decoded); parseEditor(true);
+					} catch (err) { validation(ml.utf8); }
+				};
+				reader.onerror = function () { validation(ml.invalid_csv); };
+				reader.readAsArrayBuffer(file);
+			});
+			function renderReport(report) {
+				if (entity === 'products' && !report.dry_run && (report.created || report.updated)) { refreshMigrationProducts(1); }
+				var $results = $form.find('.licenser-import-results').prop('hidden', false);
+				var $summary = $results.find('.licenser-import-summary').empty();
+				$summary.append($('<strong></strong>').text(report.dry_run ? ml.dry_run : ml.imported));
+				var $counts = $('<div class="licenser-import-counts"></div>');
+				['total_rows', 'created', 'updated', 'skipped', 'errors'].forEach(function (key) {
+					var count = key === 'errors' ? (report.errors || []).length : report[key];
+					$counts.append($('<span></span>').append($('<b></b>').text(count || 0)).append(' ' + (key === 'total_rows' ? ml.rows : ml[key])));
+				});
+				$summary.append($counts);
+				var $preview = $results.find('.licenser-import-preview tbody').empty();
+				(report.preview || []).forEach(function (item) {
+					var $row = $('<tr></tr>'), $info = $('<td></td>');
+					$info.append($('<strong class="licenser-import-identifier"></strong>').text(safeImportText(item.identifier)));
+					$info.append($('<span class="licenser-import-row-summary"></span>').text(safeImportText(typeof item.summary === 'object' ? JSON.stringify(item.summary) : item.summary)));
+					if (item.details) {
+						$info.append($('<details></details>').append($('<summary></summary>').text(ml.details)).append($('<pre></pre>').text(JSON.stringify(item.details, null, 2))));
+					}
+					var operation = item.operation;
+					var $badge = $('<span class="licenser-badge"></span>').addClass(operation === 'skipped' ? 'licenser-badge--inactive' : 'licenser-badge--active').text(ml[operation] || operation);
+					$preview.append($row.append($('<td></td>').text(item.row)).append($('<td></td>').append($badge)).append($info));
+				});
+				if (!(report.preview || []).length) { $preview.append($('<tr></tr>').append($('<td colspan="3" class="licenser-empty-state--inline"></td>').text(ml.no_preview))); }
+				var $errors = $results.find('.licenser-import-errors tbody').empty();
+				(report.errors || []).forEach(function (item) { $errors.append($('<tr></tr>').append($('<td></td>').text(item.row)).append($('<td></td>').text(safeImportText(item.message)))); });
+				if (!(report.errors || []).length) { $errors.append($('<tr></tr>').append($('<td colspan="2" class="licenser-empty-state--inline"></td>').text(ml.no_errors))); }
+				$results[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}
+			function runImport(dryRun) {
+				if (busy) { return; }
+				parseEditor(false);
+				var map = columnMap();
+				if (!parsed || !parsed.rows.length || !map[requiredField]) { validation(ml.required_map); return; }
+				var payload = { entity: entity, csv: $editor.val(), preset: $form.find('[name="preset"]').val(), column_map: map, default_product_id: Number($form.find('[name="default_product_id"]').val() || 0), duplicate_mode: $form.find('[name="duplicate_mode"]').val(), dry_run: dryRun };
+				busy = true; invalidateResults(); $form.attr('aria-busy', 'true').find(':input').prop('disabled', true);
+				$.ajax({ url: cfg.rest_url + 'import', type: 'POST', contentType: 'application/json', data: JSON.stringify(payload), beforeSend: function (xhr) { xhr.setRequestHeader('X-WP-Nonce', cfg.nonce); } })
+					.done(renderReport)
+					.fail(function (xhr) { validation(extractErrorMessage(xhr)); })
+					.always(function () { busy = false; $form.attr('aria-busy', 'false').find(':input').prop('disabled', false); updateButtons(); });
+			}
+			$form.on('click', '[data-import-run]', function () {
+				if ($(this).attr('data-import-run') === 'preview') { runImport(true); return; }
+				window.LicenserUI.confirm({ title: ml.run_title, message: ml.run_body, confirmLabel: ml.run_button, cancelLabel: ml.cancel, confirmVariant: 'primary', onConfirm: function () { runImport(false); } });
+			});
+			updateButtons();
+		});
+	}
+
 });

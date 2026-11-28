@@ -1,6 +1,6 @@
 # Known Issues, Backlog & Testing Guide
 
-> **Last updated:** 2026-11-26 after Phase 1–2 stabilization, local DB migration, and WordPress.org Plugin Repository compliance prep on `licenser` (`main` + uncommitted working tree).
+> **Last updated:** 2026-11-28 for the Free CSV Migration & Importer suite on `licenser` (`main` + uncommitted working tree). The 2026-11-26 verification records below are historical and do not establish live verification of the migration suite.
 
 ---
 
@@ -38,7 +38,8 @@
 
 1. **Client SDK `Insights` Endpoints:** `LicenserWP/client`'s optional `Insights.php` posts to `track` and uninstall routes, which remain reserved for `licenser-pro` or a future release.
 2. **Local/Staging Domain Exemption UI:** Core already exposes the `licenser_should_enforce_domain_limit` filter; UI policy rules remain reserved for `licenser-pro`.
-3. **Automated PHPUnit Suite:** No PHPUnit suite is checked in yet (release boundary tests live in `tests/test_release.py` and WordPress activation smoke tests in `tests/smoke.php`); consider adding PHPUnit WP integration tests before major v2 expansion.
+3. **Automated PHPUnit Suite:** No PHPUnit suite is checked in yet (release boundary tests live in `tests/test_release.py`, import-controller PHP harness tests in `tests/test_import.py`, and WordPress activation smoke tests in `tests/smoke.php`); consider adding PHPUnit WP integration tests before major v2 expansion.
+4. **Migration live integration & visual QA:** The 2026-11-28 session could not access the LocalWP MySQL socket (`Operation not permitted`) or connect to the browser automation host. The new Migration screen and importer still need the local-only manual scenarios below. These environmental failures do not constitute a completed WordPress, Plugin Check, or visual verification.
 
 *(Resolved in the Cupertino × WP-Native UI/UX & Feature Completion pass: WooCommerce `quantity > 1` configurable policy, customer self-service domain deactivation with order-ownership verification, safe product archive/cascade delete modal, full release history CRUD, bulk license generation + CSV export, API Diagnostics Tester, WooCommerce Order Admin Meta Box, and refund auto-suspend/restore.)*
 
@@ -50,16 +51,16 @@ Run from `/Users/akshuvo/Local Sites/addonmaster-portal/app/public/wp-content/pl
 
 ```sh
 # 1. PHP syntax lint (all first-party files)
-find . -type f -name '*.php' -not -path './.git/*' -not -path './vendor/*' -exec php -l {} \;
+find . -maxdepth 4 -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
 
-# 2. JS syntax check (all first-party files)
-find . -type f -name '*.js' -not -path './.git/*' -not -path './vendor/*' -exec node --check {} \;
+# 2. Admin JS syntax check
+node --check assets/js/admin.js
 
 # 3. WordPress Coding Standards (WPCS 3.4.1 / PHPCS 3.13.6)
-"$HOME/.config/composer/vendor/bin/phpcs" --report=full --report=summary
+"$HOME/.config/composer/vendor/bin/phpcs" --parallel=1 --report=summary
 
-# 4. Release pipeline boundary unit tests (disposable Git + SVN)
-python3 -B -m unittest discover -s tests -p 'test_release.py' -v
+# 4. All unit tests (release boundary tests and isolated PHP import harness)
+python3 -B -m unittest discover -s tests -p 'test_*.py' -v
 
 # 5. WordPress Plugin Check (PCP) via LocalWP MySQL socket
 php -d mysqli.default_socket="/Users/akshuvo/Library/Application Support/Local/run/vq5NUpMTM/mysql/mysqld.sock" \
@@ -69,7 +70,42 @@ php -d mysqli.default_socket="/Users/akshuvo/Library/Application Support/Local/r
 
 ---
 
-## 4. Verification Record (2026-11-26)
+## 4. CSV Migration Verification Scope (2026-11-28)
+
+Implemented in Free: [`Api/Import.php`](../includes/Api/Import.php), the `licenser-migration` admin screen, [`Admin/MigrationData.php`](../includes/Admin/MigrationData.php), shared admin JS/CSS, and [migration samples and conversion instructions](migrations/README.md). No database schema or public SDK wire contract change is required. Screen capability context is `migration`; REST base/action are `import` / `create`. Both default to `manage_options`.
+
+`python3 -B -m unittest discover -s tests -p 'test_import.py' -v` passed **31 tests** in the isolated PHP harness during this session. These run the actual `Licenser\Api\Import` class with WordPress/model doubles, track mutation calls, and cover:
+
+- Plugin/theme metadata, optional initial release creation/update, derived slugs, defaults, aliases, duplicate skip/update, URL/type/status validation, and zero-write dry runs.
+- Product ID/slug/default resolution; package identifier/label duplicates; lifetime/unlimited parsing; preservation of package identifiers through label updates; rejected invalid supplied relationships.
+- Generic, EDD SL, Appsero, Freemius, and automatic license mappings; explicit column-map overrides/Ignore; package-label lookup; customer metadata; `source_id`; expiry; domains; report-only formula neutralization; cross-product duplicate guards; intra-CSV simulation.
+- 2 MB / 1,000-row bounds, BOM/quoted/multiline CSV, normalized duplicate or blank headers, row-width errors, invalid request/mapping values, only-explicit-false writes, denied non-admin permissions, and simulated persistence/partial-write failures.
+
+The final mandatory checks passed: PHP syntax (including direct lint of the three changed templates), `node --check assets/js/admin.js`, PHPCS **0 errors / 0 warnings** across 40 PHP files, and full Python discovery **46/46 tests** (31 importer + 15 release tests). Release tests verified a reproducible 60-file runtime package; docs remain excluded.
+
+CSV examples were separately parsed with Python's `csv` module: Products **2 rows / 19 columns**, Packages **5 rows / 5 columns**, Licenses **5 rows / 12 columns**, with unique headers and consistent row widths. The suite also verifies the complete Products → Packages → Licenses sample migration, repeat-skip behavior, full explicit UI mappings with blank optional cells, and exact runtime sample/prompt synchronization with the GitHub documentation.
+
+The requested `-maxdepth 4` PHP command does not reach every nested admin template. Also lint the Migration template directly after editing it:
+
+```sh
+php -l includes/Admin/templates/migration/migration.php
+```
+
+The following scenarios remain **unverified in live WordPress/browser** in this session. Run them only against `http://portal-addonmaster.local/` with disposable demonstration records, then clean up those records:
+
+| Scenario | Required observation |
+|---|---|
+| Three-step migration | Load and dry-run each sample; confirm no database/transient changes. Actually import Products, then Packages, then Licenses; confirm release/package/customer/domain relationships and deduplicated sites. Repeat in Skip and Update modes. |
+| Mapping and errors | Upload/paste CSV, switch entities/presets, change/ignore mappings, inspect first-row samples, and submit malformed rows. Confirm counts/errors and copied report text without formula execution. |
+| Navigation and visual behavior | Open product/license Import CSV links, direct `entity`/`tab` links, keyboard tab navigation, mobile layout, empty/error states, confirmation modal, and screen-reader labels. Confirm no browser alerts, console errors, or PHP warnings; check templates for inline script/style. |
+| Samples and clipboard | Download all CSVs, load them into the editor, copy the AI prompt, and open GitHub links. Confirm downloads work when documentation is absent from the built ZIP. |
+| Access and REST authentication | Verify administrator access with REST nonce; unauthenticated, missing/invalid nonce, and Pro Support Agent requests must be denied. Confirm both menu capability and direct REST boundary. |
+
+Whole-file imports are not transactional. If a release, customer metadata, or domain write fails after the parent record saved, the row report instructs retry with Update. Counts/preview describe completed rows, so review row errors even after an HTTP success. A dry-run of dependencies does not make those products/packages available to a later request.
+
+---
+
+## 5. Historical Verification Record (2026-11-26)
 
 ### Static, Plugin Check & WP.org Release Packaging Checks (Post UI/UX Redesign & Feature Pass)
 - `php -l` across all first-party PHP files (including `tests/smoke.php`): **PASS** (0 errors).

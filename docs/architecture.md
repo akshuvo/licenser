@@ -2,6 +2,8 @@
 
 > **Source baseline:** 2026-11-26, branch `main` (uncommitted Phase 1–2 stabilization & WP.org prep), plugin version `1.0.8` (`Licenser::VERSION = '1.0.8'`, `Installer::DB_VERSION = 29`), WPCS clean (`0` errors / `0` warnings).
 
+> **Migration suite update:** 2026-11-28, uncommitted on `main`. CSV import is owned by Free and reuses the existing tables/models without a schema or public client SDK contract change. Verification scope is recorded in [Known Issues & Testing](known-issues-and-testing.md).
+
 ## 1. Bootstrap & Initialization
 
 Entrypoint: [`licenser.php`](../licenser.php).
@@ -81,6 +83,14 @@ All models use `Licenser\Traits\SingletonTraitSelf` (`::instance()`) and allowli
 - [`Product.php`](../includes/controllers/Product.php) — `download()` (validates license + product ownership, records `installed_version_{domain_id}`, validates remote URL or local path within `ABSPATH`, streams local ZIP or redirects remote URL; returns `WP_Error` with proper HTTP 4xx status on failures).
 - [`Addons.php`](../includes/controllers/Addons.php) — singleton integrations registry and conditional loader (`get_integrations()`, `is_enabled()`, `is_dependency_active()`, `is_active()`, `is_loaded()`). Filterable via `licenser_integrations` so future integrations (e.g., Easy Digital Downloads) share the same toggle & lazy PSR-4 loading mechanism. Disabled integrations are never instantiated and zero files under `addons/` are included. Fires `licenser_addons_register`.
 
+### Core CSV Import API (`includes/Api/Import.php`)
+
+[`Api/Import.php`](../includes/Api/Import.php) extends `Controllers\RestController` and is registered by [`Api.php`](../includes/Api.php). `POST /wp-json/licenser/v1/import` accepts `products`, `packages`, and `licenses`; the default entity is `licenses`. Its inherited create permission check applies `licenser_rest_capability` with base `import`, action `create`, and default `manage_options`, keeping Pro's Support Agent role denied by default.
+
+The controller parses UTF-8 CSV in memory (2 MB / 1,000 data rows, BOM removal, unique nonblank normalized headers), then applies canonical fields, entity-specific preset aliases, and explicit `column_map` overrides. An empty map value explicitly ignores the target. It validates an entire row before that row's mutations. Product references resolve against existing Licenser IDs/slugs, package labels resolve on the selected product, and licenses preserve customer metadata and normalized/deduplicated active domains. External platform IDs require a destination crosswalk.
+
+Dry run is the default; only the explicit JSON boolean `false` authorizes writes. Virtual records simulate intra-CSV duplicate creation/update/skip without mutation methods or product transient writes. Real imports use `Product`, `ProductRelease`, `LicensePackage`, `License`, and `License_Meta`, verify saved records by readback, and return row errors plus preview/counts. Importing a product release again reuses its existing version row. Reports neutralize spreadsheet formula prefixes without changing stored values. Multi-record writes are not transactional; a product/license can be saved before a later release/metadata/domain write fails, so retry corrected rows with Update. See the [full request/response contract](integrations.md#csv-migration-free) and [column reference](migrations/README.md).
+
 ## 5. Admin UI & Assets
 
 - **Unified Design System (`assets/css/admin.css` & `assets/js/admin.js`):** Strictly scoped under `.licenser-app` / `body[class*="licenser"]` (Cupertino × WordPress-Native Hybrid respecting `--wp-admin-theme-color`). Zero legacy `lmfwppt-*`/`lmwppt-*`/`lwp-*`/`twp-*` template classes, zero inline `<script>`/`<style>` tags in PHP templates, zero browser `alert()`/`confirm()` popups (replaced by accessible confirmation modals, bottom-right frosted toasts, and universal clipboard copy buttons).
@@ -93,6 +103,10 @@ All models use `Licenser\Traits\SingletonTraitSelf` (`::instance()`) and allowli
   - `licenser-sdk-generator` -> `templates/tools/tools.php` (2-column SDK Studio with live CodeMirror + Copy + contextual mode help, plus built-in API & License Diagnostics Tester)
   - `licenser-addons` -> `templates/addons/addons.php` (modular Store Integrations section with live enable/disable toggles for WooCommerce Lite and future integrations like Easy Digital Downloads, plus SDK & Extensions cards)
 - List tables: [`ProductsListTable.php`](../includes/Admin/ProductsListTable.php) and [`LicensesListTable.php`](../includes/Admin/LicensesListTable.php) extend `WP_List_Table` with batch-hydrated lookups, allowlisted SQL sorting, search/status/product filtering, and bulk actions.
+
+- **Migration workspace:** `licenser-migration` renders [`templates/migration/migration.php`](../includes/Admin/templates/migration/migration.php), registered after Licenses and before Settings with capability context `migration` (default `manage_options`). Four deep-linkable Cupertino tabs cover Products, License Packages, Licenses, and AI Prompt & Samples. Upload/paste, preset/default product/duplicate controls, mapping review with first-row values, dry-run/import, and preview/error cards use the shared admin assets. Product and license list topbars link directly to the relevant import tab.
+- [`Admin/MigrationData.php`](../includes/Admin/MigrationData.php) embeds the sample CSVs and AI conversion prompt mirrored from [`docs/migrations/`](migrations/README.md). The admin screen can download/load samples and copy the prompt without a GitHub request. Documentation stays on GitHub and is excluded from WordPress.org ZIPs; the runtime helper and migration template are included in [the release inventory](../.github/release-files.txt). `licenser_migration_docs_url` filters the topbar guide URL.
+- [`tests/test_import.py`](../tests/test_import.py) exercises the actual import controller in an isolated PHP harness with WordPress/model doubles and mutation tracking. It complements release boundary tests; it does not replace live WordPress/MySQL or browser verification.
 
 ## 6. Uploads, Options & Caching
 

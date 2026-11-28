@@ -40,10 +40,33 @@ Handled by [`includes/Api/Public_Apis.php`](../includes/Api/Public_Apis.php) (`p
 | `DELETE /licenser/v1/licenses/domains/{id}` | `Api/Licenses.php` | Deletes an activated domain row by integer `id` |
 | `POST /licenser/v1/licenses/{id}/meta` | `Api/Licenses.php` | Adds or updates a custom key/value metadata entry for a license |
 | `DELETE /licenser/v1/licenses/meta/{id}` | `Api/Licenses.php` | Deletes a license meta row by integer `id` |
+| `POST /licenser/v1/import` | `Api/Import.php` | Bounded CSV migration for `products`, `packages`, or `licenses`; validates mappings, supports duplicate skip/update, and defaults to a write-free dry run |
 | `GET /licenser/v1/settings` | `Api/Settings.php` | Returns saved Licenser settings array merged with defaults |
 | `POST /licenser/v1/settings` | `Api/Settings.php` | Sanitizes & saves settings to `licenser_settings` option; returns saved array |
 | `POST /licenser/v1/settings/clear-cache` | `Api/Settings.php` | Clears all `licenser_cache_*` transients |
 | `POST /licenser/v1/settings/integrations` | `Api/Settings.php` | Toggles a registered store integration (`integration`, `enabled`) in `licenser_settings['integrations']` |
+
+### CSV Migration (Free)
+
+`POST /wp-json/licenser/v1/import` accepts the following JSON request fields:
+
+| Parameter | Contract |
+|---|---|
+| `entity` | `products`, `packages`, or `licenses` (default `licenses`). |
+| `csv` | Required UTF-8 CSV string, at most 2 MB and 1,000 data rows. BOM is stripped; headers must be unique and nonblank, and each row must match the header's column count. |
+| `preset` | `auto` (default) or `generic` for all entities; licenses also support `edd_sl`, `appsero`, and `freemius`. |
+| `column_map` | Optional JSON object/associative array mapping target field names to CSV headers. Explicit mappings override preset aliases; `""` explicitly ignores a field. |
+| `default_product_id` | Optional positive Licenser product row ID used for packages/licenses when the CSV supplies neither `product_id` nor `product_slug`. Invalid supplied relationships are rejected. |
+| `duplicate_mode` | `skip` (default) or `update`. Matches products by slug, packages by custom identifier on product or case-insensitive label, and licenses by key. |
+| `dry_run` | Defaults to `true`; only an explicit JSON boolean `false` performs writes. Dry runs simulate duplicate rows within the CSV without calling model mutations. |
+
+Returns `{ dry_run, entity, total_rows, created, updated, skipped, errors: [{ row, message }], preview: [{ row, operation, identifier, summary, details }] }`. Preview strings neutralize spreadsheet formula prefixes without changing stored values. Row errors are reported independently; a successful HTTP response can include failed rows. Writes are not a whole-file transaction: correct a partial metadata/domain failure and retry using `update`.
+
+Products support plugin/theme metadata and an optional stable release. Packages resolve existing products; licenses resolve existing products plus optional `package_id` (integer package row ID) or `package_label` on the same product. The package CSV's `package_id` is its custom string/UUID identifier; it must not be copied into a license CSV's integer `package_id`. Licenses also support customer metadata, nonnegative `source_id`, validated/deduplicated activated domains, and the existing platform presets. Presets rename columns; they do not translate external product or plan IDs. New license domains are added without deleting existing activations.
+
+The route extends `Licenser\Controllers\RestController`, with `rest_base = 'import'` and `create_item_permissions_check`. Its capability filter call is `licenser_rest_capability( 'manage_options', 'import', 'create', $request )`. The **Licenser → Migration** screen separately uses `licenser_admin_capability( 'manage_options', 'migration' )`. Pro's Support Agent role remains denied by default in both contexts. Cookie-authenticated requests require a valid REST nonce.
+
+See the [migration guide, column reference, CSV samples, and copyable AI conversion prompt](migrations/README.md). Import in dependency order: **Products → Packages → Licenses**. `docs/migrations/` stays on GitHub and is intentionally excluded from WordPress.org release ZIPs; the admin screen embeds its downloadable templates and prompt at runtime.
 
 ---
 
@@ -121,8 +144,9 @@ Portal child theme glue (`/Users/akshuvo/Local Sites/addonmaster-portal/app/publ
 | `licenser_active_domain_count` | `includes/controllers/License.php`, `includes/Admin/templates/licenses/new.php`, `addons/WooLite/Shortcode.php`, `addons/WooLite/Order_Handler.php` | Filter counted active domains for a single license (`$count, $license, $context, $args`) — e.g., exclude staging domains |
 | `licenser_active_domain_counts` | `includes/models/License.php` | Filter batch active domain counts keyed by license ID (`$counts, $ids`) |
 | `licenser_license_matches_product` | `includes/controllers/License.php` | Filter whether a license is valid for a requested product ID (`$matches, $license, $product_id, $args`) — e.g., Pro Bundle / All-Access passes |
-| `licenser_admin_capability` | `includes/Admin/Menu.php` | Filter required capability per Licenser admin screen (`$cap, $context`) — e.g., Pro Support Agent role |
-| `licenser_rest_capability` | `includes/controllers/RestController.php` | Filter required capability per Licenser REST controller & verb (`$cap, $rest_base, $action, $request`) |
+| `licenser_admin_capability` | `includes/Admin/Menu.php` | Filter required capability per Licenser admin screen (`$cap, $context`), including `migration` (default `manage_options`) — e.g., Pro Support Agent role |
+| `licenser_rest_capability` | `includes/controllers/RestController.php` | Filter required capability per Licenser REST controller & verb (`$cap, $rest_base, $action, $request`); CSV import uses base `import`, action `create`, default `manage_options` |
+| `licenser_migration_docs_url` | `includes/Admin/templates/migration/migration.php` | Filter the Migration screen's guide URL (defaults to `https://github.com/akshuvo/licenser/tree/main/docs/migrations`) |
 | `licenser_sanitize_settings` | `includes/models/Settings.php` | Extend settings allowlist/sanitization (`$sanitized, $data`) |
 | `licenser_settings_tabs` | `includes/Admin/templates/settings/settings.php` | Register additional tabs on Licenser Settings (`$tabs`) |
 | `licenser_integrations` | `includes/controllers/Addons.php` | Register or customize toggleable store integrations (`$integrations`, e.g., WooCommerce, Easy Digital Downloads) |

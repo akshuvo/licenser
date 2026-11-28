@@ -3494,3 +3494,235 @@ body[class*="licenser"] #wpfooter {
 		border-color: Highlight;
 	}
 }
+
+/* CSV Migration — Cupertino cards, mapping review and local file editor. */
+.licenser-migration [hidden] {
+	display: none !important;
+}
+
+.licenser-migration-intro {
+	margin: 0 0 24px;
+	color: var(--lic-text-secondary);
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.licenser-import-sections {
+	display: grid;
+	gap: 24px;
+}
+
+.licenser-import-sections h3 {
+	margin: 0 0 14px;
+	font-size: 14px;
+	color: var(--lic-text);
+}
+
+.licenser-import-sections .licenser-field,
+.licenser-import-sections .licenser-card {
+	margin-bottom: 0;
+}
+
+.licenser-import-sample-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 16px;
+	padding: 18px;
+	background: var(--lic-surface-subtle);
+	border: 1px solid var(--lic-border);
+	border-radius: var(--lic-radius-sm);
+}
+
+.licenser-import-sample-bar p {
+	margin: 5px 0 0;
+	color: var(--lic-text-secondary);
+}
+
+.licenser-import-actions {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.licenser-import-footer-note {
+	margin-right: auto;
+	color: var(--lic-text-secondary);
+	font-size: 13px;
+}
+
+.licenser-migration .licenser-file-input {
+	width: 100%;
+	padding: 24px;
+	box-sizing: border-box;
+	border: 1px dashed var(--lic-border-strong);
+	border-radius: var(--lic-radius-sm);
+	background: var(--lic-surface-subtle);
+	color: var(--lic-text);
+}
+
+.licenser-migration .licenser-file-input::file-selector-button {
+	margin-right: 14px;
+	padding: 8px 14px;
+	border: 1px solid var(--lic-border-strong);
+	border-radius: 7px;
+	background: var(--lic-surface);
+	color: var(--lic-text);
+	font-family: var(--lic-font);
+	cursor: pointer;
+}
+
+.licenser-migration .licenser-field .licenser-import-editor {
+	min-height: 200px;
+	font-family: var(--lic-mono);
+	font-size: 12px;
+	line-height: 1.7;
+	white-space: pre;
+	overflow: auto;
+}
+
+.licenser-import-validation {
+	margin: 0;
+	padding: 12px 16px;
+	border-radius: var(--lic-radius-sm);
+	background: #fff1f0;
+	color: #a32020;
+	border: 1px solid #f5c8c4;
+}
+
+.licenser-import-table-scroll {
+	overflow: auto;
+	max-height: 520px;
+}
+
+.licenser-import-mapping .licenser-mini-table {
+	min-width: 630px;
+}
+
+.licenser-import-mapping .licenser-mini-table td.licenser-field {
+	display: table-cell;
+	width: 36%;
+	min-width: 180px;
+}
+
+.licenser-import-mapping .licenser-mini-table th:first-child {
+	width: 29%;
+}
+
+.licenser-import-sample-value {
+	max-width: 320px;
+	font-family: var(--lic-mono);
+	font-size: 12px;
+	overflow-wrap: anywhere;
+	white-space: pre-wrap;
+}
+
+.licenser-migration .licenser-card__header > a {
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.licenser-migration .licenser-form-grid .licenser-card {
+	margin-bottom: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.licenser-migration .licenser-form-grid .licenser-card .licenser-card__body {
+	flex: 1 1 auto;
+}
+
+.licenser-import-results {
+	scroll-margin-top: 60px;
+}
+
+.licenser-import-results .licenser-form-grid {
+	align-items: start;
+}
+
+.licenser-import-results .licenser-card {
+	min-width: 0;
+}
+
+.licenser-import-results .licenser-mini-table tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+.licenser-import-summary {
+	padding: 20px 24px;
+	margin: 24px 0;
+	border: 1px solid var(--lic-border);
+	border-radius: var(--lic-radius-lg);
+	background: var(--lic-surface);
+	box-shadow: var(--lic-shadow-xs);
+}
+
+.licenser-import-counts {
+	display: flex;
+	gap: 22px;
+	flex-wrap: wrap;
+	margin-top: 14px;
+	color: var(--lic-text-secondary);
+}
+
+.licenser-import-counts b {
+	color: var(--lic-text);
+	font-variant-numeric: tabular-nums;
+}
+
+.licenser-import-identifier,
+.licenser-import-row-summary {
+	display: block;
+	overflow-wrap: anywhere;
+}
+
+.licenser-import-row-summary {
+	margin: 5px 0;
+	color: var(--lic-text-secondary);
+}
+
+.licenser-import-results details summary {
+	color: var(--lic-accent);
+	cursor: pointer;
+}
+
+.licenser-import-results pre {
+	max-width: 420px;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	font-size: 12px;
+}
+
+.licenser-migration-prompt {
+	padding: 24px;
+	margin: 0;
+	max-height: 480px;
+	overflow: auto;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	font-family: var(--lic-mono);
+	font-size: 12px;
+	line-height: 1.8;
+	color: #dbeafe;
+}
+
+.licenser-import-samples-heading {
+	margin: 28px 0 16px;
+	font-size: 17px;
+}
+
+@media (max-width: 782px) {
+	.licenser-migration .licenser-card__footer {
+		align-items: flex-start;
+	}
+
+	.licenser-import-footer-note {
+		width: 100%;
+	}
+
+	.licenser-migration .licenser-code-chrome {
+		flex-wrap: wrap;
+	}
+}

@@ -37,6 +37,7 @@ class Api {
 			'products' => 'Products',
 			'licenses' => 'Licenses',
 			'settings' => 'Settings',
+			'import'   => 'Import',
 			'public'   => 'Public_Apis',
 		];
 

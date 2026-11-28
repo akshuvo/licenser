@@ -62,6 +62,12 @@ $licenser_add_url    = admin_url( 'admin.php?page=licenser-' . $licenser_product
 				</div>
 			</div>
 			<div class="licenser-topbar__actions">
+				<?php if ( current_user_can( (string) apply_filters( 'licenser_admin_capability', 'manage_options', 'migration' ) ) ) : ?>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=licenser-migration&entity=products' ) ); ?>" class="licenser-btn licenser-btn--secondary">
+						<span class="dashicons dashicons-upload" aria-hidden="true"></span>
+						<?php esc_html_e( 'Import CSV', 'licenser' ); ?>
+					</a>
+				<?php endif; ?>
 				<a href="<?php echo esc_url( $licenser_add_url ); ?>" class="licenser-btn licenser-btn--primary">
 					<span class="dashicons dashicons-plus-alt2"></span>
 					<?php

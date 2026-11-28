@@ -1,0 +1,6 @@
+product_slug,label,package_id,update_period,domain_limit
+northstar-blocks,Single Site Annual,northstar-single-annual,365,1
+northstar-blocks,Agency Annual,northstar-agency-annual,365,25
+northstar-blocks,Lifetime,northstar-lifetime,lifetime,unlimited
+harbor-studio,Single Site Annual,harbor-single-annual,365,1
+harbor-studio,Lifetime,harbor-lifetime,0,0
